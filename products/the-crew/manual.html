@@ -1,0 +1,714 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Crew manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Manual for The Crew">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/the-crew/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="The Crew manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Manual for The Crew">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/the-crew/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/the-crew_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; The Crew</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#the-crew">THE CREW</a><ul>
+<li><a href="#eleven-session-specialists-under-one-warden-equal-lot-recovery-you-choose-how-many-run">Eleven session specialists under one warden. Equal-lot recovery. You choose how many run.</a></li>
+<li><a href="#1-what-this-is">1. What This Is</a></li>
+<li><a href="#2-how-it-works-plain-language">2. How It Works (Plain Language)</a></li>
+<li><a href="#3-quick-start">3. Quick Start</a><ul>
+<li><a href="#the-presets">The presets</a></li>
+</ul>
+</li>
+<li><a href="#4-where-the-risk-really-lives">4. Where the Risk Really Lives</a><ul>
+<li><a href="#45c-three-live-feeds-one-tier-change-2026-09-06">4.5c Three live feeds, one tier change (2026-09-06)</a></li>
+</ul>
+</li>
+<li><a href="#5-performance-and-account-sizing-the-important-section">5. Performance and Account Sizing — the important section</a></li>
+<li><a href="#5b-risk-tier-how-the-ea-turns-section-5-into-a-lot-size">5b. Risk Tier — how the EA turns section 5 into a lot size</a></li>
+<li><a href="#6-testing-a-small-account-on-a-large-demo-inpvirtualbalance">6. Testing a Small Account on a Large Demo — InpVirtualBalance</a></li>
+<li><a href="#7-settings-reference">7. Settings Reference</a><ul>
+<li><a href="#settings-we-deliberately-do-not-offer-as-risk-controls">Settings we deliberately do NOT offer as risk controls</a></li>
+</ul>
+</li>
+<li><a href="#8-the-arbiter-and-what-it-does-not-do">8. The Arbiter — and what it does not do</a></li>
+<li><a href="#9-what-to-expect-day-to-day">9. What to Expect Day to Day</a></li>
+<li><a href="#10-troubleshooting">10. Troubleshooting</a></li>
+<li><a href="#11-risk-disclosure">11. Risk Disclosure</a></li>
+<li><a href="#is-it-waiting-or-is-it-broken-the-regime-monitor">Is it waiting, or is it broken? — the regime monitor</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="the-crew">THE CREW</h1>
+<p><em>Version 2.84 · XAUUSD · MetaTrader 5</em></p>
+<h3 id="eleven-session-specialists-under-one-warden-equal-lot-recovery-you-choose-how-many-run"><em>Eleven session specialists under one warden. Equal-lot recovery. You choose how many run.</em></h3>
+<p><strong>Symbol:</strong> XAUUSD (Gold) — any broker spelling (<code>XAUUSD</code>, <code>XAUUSD+</code>, <code>XAUUSD-ECN</code>, <code>GOLD.pro</code>)
+<strong>Timeframe:</strong> any — the EA runs its own internal clock · <strong>Platform:</strong> MetaTrader 5 · <strong>Account type:</strong> hedging</p>
+<p>This manual is written for someone who has never run an expert advisor before. If you only read
+one chapter, read chapter 4.</p>
+<hr />
+<h2 id="1-what-this-is">1. What This Is</h2>
+<p>THE CREW runs <strong>eleven independent session-timed sub-strategies</strong> on one gold chart. Each wakes in
+its own hour window, opens a single position, and — if price moves against it — adds <strong>equal-sized</strong>
+layers at a fixed dollar spacing, closing the whole group when price returns to a shared average
+target.</p>
+<p><strong>The number of sub-strategies you enable IS the risk dial.</strong> That is unusual and it is the point:
+you are not tuning an abstract percentage, you are choosing which specialists trade. Some of them
+are structurally shallow and rarely build a deep recovery; others carry most of the account risk on
+their own. Section 5 gives you what is currently measured about the difference.</p>
+<blockquote>
+<p><strong>Read this first.</strong> This is a grid. It <strong>holds positions through adverse moves by design</strong> —
+that is how it earns. You will see floating (unrealised) losses on open trades while a group
+recovers. Sections 4 and 10 are mandatory reading.</p>
+</blockquote>
+<p>These are backtest figures throughout this manual, not results from live trading. Results differ
+by broker — the measured reason is in section 4.5. Past performance is not indicative of future
+results. Only trade with money you can afford to lose.</p>
+<hr />
+<h2 id="2-how-it-works-plain-language">2. How It Works (Plain Language)</h2>
+<p><strong>Eleven specialists, different hours.</strong> Each sub-strategy trades one narrow window of the day and
+one direction. Some buy the London pre-open, one sells the morning session, one works the small
+hours. They spread the work across the day instead of betting on a single idea.</p>
+<p><strong>Each one recovers rather than stops out.</strong> When a position goes against it, the sub-strategy does
+not panic-close and does not double down. It adds <strong>another position of the same size</strong> a measured
+distance away, which pulls the group's average price toward the market. The whole group closes
+together once price reaches that shared average target.</p>
+<p><strong>Adding layers is the engine, not the emergency.</strong> This matters and it is counter-intuitive: a
+depth cap was tested and made things <strong>worse</strong> — the group could no longer pull its average toward
+price, so it sat open far longer and the floating loss grew <em>larger</em>, not smaller. Depth caps are
+therefore not offered as a risk control on the shipped build, because measured, they are not one.</p>
+<p><strong>A shared arbiter stops the specialists from crowding.</strong> Three of the eleven trade the same hour in
+the same direction. When they compete for the same moment, a fixed priority decides which one takes
+it. This makes the EA behave consistently; see section 8 for what it does and does not buy you.</p>
+<p><strong>Flat lots inside a group. Always.</strong> Every layer of a group is the same size as the layer that
+opened it. No martingale, no doubling, no escalation while a recovery is running — risk inside a
+group grows in a straight line. <em>Between</em> groups the size follows the account, so the strategy grows
+with the balance (section 5b).</p>
+<p><strong>A hard account breaker.</strong> If floating drawdown reaches your configured percentage of the equity
+peak, the EA flattens everything and stands down until the next day. An optional confirmation delay
+(<code>InpBreakerConfirmSec</code>, default: fire on the first tick) lets you require the breach to persist
+before it acts.</p>
+<p><strong>Never refuses a small account.</strong> If the balance cannot carry the chosen roster at the chosen risk
+tier, the shipped build narrows the roster to what the account can carry rather than refusing to
+trade or silently trading a different configuration than requested.</p>
+<hr />
+<h2 id="3-quick-start">3. Quick Start</h2>
+<ol>
+<li>Attach to a <strong>gold</strong> chart (any timeframe) on a <strong>hedging</strong> account.</li>
+<li>Load a preset from <code>presets/</code> — <strong><code>THE_CREW_BAL6_CONSERVATIVE</code></strong> reproduces the shipped
+   defaults and is the recommended starting point.</li>
+<li>Pick your <strong>Roster</strong> (section 5) — this is the main risk decision.</li>
+<li>Pick your <strong>Risk tier</strong> (section 5b). <code>Conservative</code> is the shipped default and budgets 10% of
+   the balance for floating drawdown; <code>Balanced</code> budgets 15% and grows the lot faster as the
+   account grows — read section 4.5c before choosing it.</li>
+<li>Check the startup line the EA prints in the journal. If your server clock is not GMT+2/+3,
+   set <code>InpBrokerHourShift</code> — it is the one setting that silently removes the edge if it is wrong
+   (section 7.2), and it must be right before you fund anything.</li>
+</ol>
+<p>That is the whole setup. Everything else is already the validated configuration.</p>
+<h3 id="the-presets">The presets</h3>
+<table>
+<thead>
+<tr>
+<th>Preset</th>
+<th>Roster</th>
+<th>Risk tier</th>
+<th>For</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>THE_CREW_CORE4</code></td>
+<td>Core 4</td>
+<td>Conservative</td>
+<td>starter / smallest accounts</td>
+</tr>
+<tr>
+<td><code>THE_CREW_BAL6</code></td>
+<td>Balanced 6</td>
+<td>Balanced (15%)</td>
+<td>the pre-2.78 default; on one of three live feeds (Pepperstone EU) its February 2025 basket reached the 30% flatten - see section 5c</td>
+</tr>
+<tr>
+<td><strong><code>THE_CREW_BAL6_CONSERVATIVE</code></strong> ⭐</td>
+<td>Balanced 6</td>
+<td>Conservative (10%)</td>
+<td><strong>the shipped default</strong>: no flatten on any of three live feeds tested (section 5c)</td>
+</tr>
+<tr>
+<td><code>THE_CREW_BAL8</code></td>
+<td>Balanced 8</td>
+<td>Balanced</td>
+<td>Balanced 6 + the two gated specialists — read the caution in section 5 first</td>
+</tr>
+<tr>
+<td><code>THE_CREW_WIDE8</code></td>
+<td>Wide 8</td>
+<td>Balanced</td>
+<td>aggressive</td>
+</tr>
+<tr>
+<td><code>THE_CREW_FULL9</code></td>
+<td>Full 9</td>
+<td>Balanced</td>
+<td>maximum exposure</td>
+</tr>
+<tr>
+<td><code>THE_CREW_BAL6_HIGH</code></td>
+<td>Balanced 6</td>
+<td>High (20%)</td>
+<td>faster growth, more floating drawdown</td>
+</tr>
+<tr>
+<td><code>THE_CREW_BAL6_EXTREME</code></td>
+<td>Balanced 6</td>
+<td><strong>Extreme (30%)</strong></td>
+<td>⚠ blow-up possible — experienced users only</td>
+</tr>
+<tr>
+<td><code>THE_CREW_BAL6_FIXED001</code></td>
+<td>Balanced 6</td>
+<td>Fixed 0.01 lot</td>
+<td>no compounding; the flat-lot reference configuration</td>
+</tr>
+<tr>
+<td><code>THE_CREW_BAL6_OANDA</code></td>
+<td>Balanced 6</td>
+<td>Conservative</td>
+<td>selects the <strong>OANDA</strong> broker profile (its measured float table and +1h clock)</td>
+</tr>
+</tbody>
+</table>
+<p>Every preset is emitted <strong>complete</strong> — all twelve inputs, explicitly — by
+the build tooling from the <code>.mq5</code> defaults. A hand-edited or partial <code>.set</code> silently
+inherits whatever the build happens to default to, which is how you end up trading a configuration
+nobody validated. Do not edit them by hand.</p>
+<hr />
+<h2 id="4-where-the-risk-really-lives">4. Where the Risk Really Lives</h2>
+<p><strong>1. It holds floating drawdown on purpose.</strong> While a group recovers you will see red on open
+trades. That is the mechanism working. If you cannot leave that alone, this is not the right
+strategy for you.</p>
+<p><strong>2. There is no stop loss.</strong> The only brake is the account-level breaker, and when it fires it
+<em>realises</em> the loss it was holding. It is a last resort, not a routine safety net.</p>
+<p><strong>3. Your account balance decides how the floating loss feels.</strong> The same trades produce a very
+different experience at different balances, because a fixed dollar amount of floating loss is a
+smaller share of a larger account. Section 5b hands the arithmetic to the EA, which is what makes
+the position size grow with the account.</p>
+<h3 id="45c-three-live-feeds-one-tier-change-2026-09-06">4.5c Three live feeds, one tier change (2026-09-06)</h3>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, 100% history quality, the same binary, the same
+dates (2025-01-02 to 2026-06-30):</p>
+<table>
+<thead>
+<tr>
+<th>Tier</th>
+<th>Fusion Markets</th>
+<th>Vantage Markets</th>
+<th>Pepperstone EU</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Conservative (shipped default)</td>
+<td>PF 4.27, equity DD 6.7%</td>
+<td>PF 4.95, 5.7%</td>
+<td>PF 4.19, <strong>15.0%</strong>, no flatten</td>
+</tr>
+<tr>
+<td>Balanced (pre-2.78 default)</td>
+<td>PF 4.45, 10.3%</td>
+<td>PF 4.90, 9.1%</td>
+<td>PF 2.23, <strong>31.9%</strong> - hard flatten fired once (2025-02-27, seven positions in one tick)</td>
+</tr>
+<tr>
+<td>Fixed 0.01 lot</td>
+<td>PF 4.02, 1.3%</td>
+<td>PF 4.78, 1.0%</td>
+<td>PF 3.70, 3.3%</td>
+</tr>
+</tbody>
+</table>
+<p>Every tier was positive on every feed with 100% positive months, except the Balanced tier's one
+flatten on Pepperstone. The same February 2025 basket floated roughly twice as deep on that feed as
+on Fusion from the identical start date: your broker's tick path decides the depth, not the code.
+The breaker did its job (the account survived a deep dip and finished positive), but a default tier
+that can reach its own hard flatten on one live feed is not a default. Balanced remains selectable.</p>
+<p><strong>A higher risk tier scales the floating drawdown by roughly the same factor as the profit.</strong></p>
+<p><strong>4. Tested in a gold bull market.</strong> The validation windows referenced in this manual (2022 through
+2026) ran gold from roughly 1,800 to 4,000. <strong>There is no bear-market evidence for this strategy.</strong>
+A sustained downtrend is the scenario a no-stop grid is least equipped for, and it has not been
+measured.</p>
+<p><strong>5. Your broker changes the answer.</strong> On identical code the worst floating exposure at a fixed
+0.01 lot varies by broker feed — backtest, MetaTrader 5 Strategy Tester, real ticks, measured across
+several broker tick archives, 2022-2026: roughly <strong>140</strong> units of account currency per 0.01 lot on
+the more forgiving feed measured, and roughly <strong>342</strong> on the least forgiving, because spread decides
+which entries fire at all. <strong>Validate on the broker you will actually trade</strong>, not on a convenience
+feed. The table below turns that cross-feed worst case into a share of balance, at a flat 0.01 lot
+(before the Risk tier auto-sizing in section 5b changes the lot):</p>
+<table>
+<thead>
+<tr>
+<th>Balance</th>
+<th>share of account at the cross-feed worst case (342 per 0.01 lot)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>5,000</td>
+<td>about 7%</td>
+</tr>
+<tr>
+<td>2,000</td>
+<td>about 17%</td>
+</tr>
+<tr>
+<td>1,000</td>
+<td>about 34%</td>
+</tr>
+</tbody>
+</table>
+<p>This is safety information, not a performance figure: it is simple division of the measured
+worst-case floating exposure by a hypothetical balance, at the smallest lot the EA can trade. Your
+own Risk tier and broker profile change the actual number — the EA prints its own measured figure
+for your broker and roster in the journal (<code>InpRiskReport</code>, on by default) before you rely on this
+table.</p>
+<p><strong>6. News shocks are the human's job.</strong> No statistical model pre-empts a CPI or geopolitical spike.
+Consider flattening manually before scheduled high-impact events if you are running a wide roster.</p>
+<hr />
+<h2 id="5-performance-and-account-sizing-the-important-section">5. Performance and Account Sizing — the important section</h2>
+<blockquote>
+<p><strong>Honesty note.</strong> The figures below are backtest results, MetaTrader 5 Strategy Tester, real
+ticks, 100% history quality, XAUUSD, 2025-07-01 to 2026-09-07, 10,000 starting balance, compiled
+defaults (Roster: Balanced 6, Risk tier: Conservative — the shipped default), measured on build
+2.83. The shipped 2.84 build was verified behaviour-identical to 2.83 by a trade-for-trade parity
+test on the same feed and window (identical deal count, profit matched to the cent). <strong>Past
+performance does not guarantee future results.</strong> There is no live track record.</p>
+</blockquote>
+<table>
+<thead>
+<tr>
+<th>Feed</th>
+<th style="text-align: right;">Net</th>
+<th style="text-align: right;">% of deposit</th>
+<th style="text-align: right;">Profit factor</th>
+<th style="text-align: right;">Trades</th>
+<th style="text-align: right;">Equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pepperstone</td>
+<td style="text-align: right;">+7,569.28</td>
+<td style="text-align: right;">+75.7%</td>
+<td style="text-align: right;">4.42</td>
+<td style="text-align: right;">627</td>
+<td style="text-align: right;">6.5%</td>
+</tr>
+<tr>
+<td>BlackBull</td>
+<td style="text-align: right;">+8,083.94</td>
+<td style="text-align: right;">+80.8%</td>
+<td style="text-align: right;">4.12</td>
+<td style="text-align: right;">627</td>
+<td style="text-align: right;">6.17%</td>
+</tr>
+<tr>
+<td>Fusion</td>
+<td style="text-align: right;">+7,965.23</td>
+<td style="text-align: right;">+79.7%</td>
+<td style="text-align: right;">4.87</td>
+<td style="text-align: right;">617</td>
+<td style="text-align: right;">6.11%</td>
+</tr>
+<tr>
+<td>Vantage</td>
+<td style="text-align: right;">+8,011.91</td>
+<td style="text-align: right;">+80.1%</td>
+<td style="text-align: right;">4.43</td>
+<td style="text-align: right;">631</td>
+<td style="text-align: right;">6.13%</td>
+</tr>
+<tr>
+<td>OANDA (demo, spread-survival check only)</td>
+<td style="text-align: right;">+1,827.46</td>
+<td style="text-align: right;">+18.3%</td>
+<td style="text-align: right;">4.31</td>
+<td style="text-align: right;">581</td>
+<td style="text-align: right;">2.01%</td>
+</tr>
+</tbody>
+</table>
+<p>The same configuration takes near-identical trades on every broker and earns different money on
+each: <strong>results differ by broker</strong>, and OANDA is shown only as a spread-survival check, not as a
+broker recommendation or a headline.</p>
+<p><strong>Widening the roster (Core 4 → Balanced 6 → Wide 8 → Full 9 → Balanced 8) is expected to raise
+both the return and the floating drawdown together, roughly in proportion.</strong> The exact per-roster
+dollar figures for this binary version are being re-measured; rather than quote the pre-2.63 table
+(which does not describe the current risk gates and is withdrawn as a current claim), this manual
+directs you to the number that is always current: the EA's own end-of-run risk report and its
+start-of-run journal line, which print the <em>measured</em> worst floating drawdown for your broker,
+roster and risk tier every time you run it. Read that line before choosing a roster wider than
+Balanced 6, and before funding an account.</p>
+<p><strong>Balanced 8 needs an extra caution.</strong> Its measured floating drawdown depends on a self-calibrating
+risk gate that has a warm-up period (section 7.2): a fresh account starts closer to the gate's
+ungated behaviour than a long backtest shows. Until the shipped binary's Balanced 8 figure is
+re-measured under warm-start, size it as though its floating drawdown were at least as large as
+Full 9's.</p>
+<hr />
+<h2 id="5b-risk-tier-how-the-ea-turns-section-5-into-a-lot-size">5b. Risk Tier — how the EA turns section 5 into a lot size</h2>
+<p>You do not have to size the lot by hand, and you should not be stuck at 0.01 forever while the
+account grows. That is what the <strong>Risk tier</strong> does.</p>
+<p><strong>Why this works, exactly.</strong> This engine is <em>linear in volume</em>: flat lots inside a group, no stop
+loss, no escalation during a recovery. Trade for trade, doubling the lot doubles the profit <strong>and
+doubles the floating drawdown</strong>. Nothing else changes — not the entries, not the spacing, not the
+depth. So a risk setting can be stated as one honest number: <strong>the share of your balance you are
+willing to see floating.</strong> The EA divides that budget by the roster's own measured floating
+drawdown at 0.01 lots and sizes accordingly:</p>
+<pre><code>lot = 0.01 x (balance x budget% / 100) / (worst floating drawdown at 0.01 lots, measured
+      for your broker profile and roster, printed in the journal)
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Risk tier</th>
+<th>Float budget</th>
+<th>Character</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Fixed lot</strong></td>
+<td>—</td>
+<td>no growth at all; uses <code>InpFixedLot</code></td>
+</tr>
+<tr>
+<td><strong>Conservative</strong> ⭐</td>
+<td>10%</td>
+<td><strong>the shipped default</strong>: slowest growth, calmest ride</td>
+</tr>
+<tr>
+<td><strong>Balanced</strong></td>
+<td>15%</td>
+<td>reached a hard flatten once on one live feed (section 4.5c)</td>
+</tr>
+<tr>
+<td><strong>High</strong></td>
+<td>20%</td>
+<td>faster growth, more floating drawdown</td>
+</tr>
+<tr>
+<td><strong>Extreme</strong></td>
+<td>30%</td>
+<td>⚠ <strong>account blow-up is possible.</strong> Risk capital only</td>
+</tr>
+<tr>
+<td><strong>Custom</strong></td>
+<td>your own</td>
+<td>set <code>InpFloatBudgetPct</code></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Three things to know before you rely on it.</strong></p>
+<ol>
+<li><strong>The lot is locked when a group opens.</strong> Every layer of that group uses the size the first
+   position used, even if the balance moves while the recovery runs. It has to be — equal-lot
+   averaging is what pulls the group's average price toward the market, and that is the only way a
+   group closes. Only <em>new</em> groups pick up the new size.</li>
+<li><strong>The divisor is measured on the broker profile you select, not automatically on yours.</strong>
+   Section 4.5 is not a footnote: worst floating exposure varies meaningfully across feeds.
+   <code>InpBrokerProfile</code> picks which measured table the EA divides by — Vantage (the default) or OANDA
+   (which carries a +1h clock). Backtest your own broker before you trust either one.</li>
+<li><strong>A Custom roster has no measured number</strong>, so the EA assumes the widest roster it knows and
+   sizes small. It says so in the journal.</li>
+</ol>
+<p>If the account is too small to reach the requested budget, the shipped build <strong>narrows the roster</strong>
+to what the balance can carry rather than under-sizing silently or refusing to trade — read the
+journal line it prints when this happens.</p>
+<p><strong>Margin, not floating drawdown, can be the binding constraint on a low-leverage account.</strong> A
+free-margin guard fixed at <strong>20%</strong> blocks <strong>new groups</strong> when free margin runs low. It never blocks
+a <em>layer</em> — blocking layers is a depth cap, and section 2 explains why those make things worse. The
+guard is not a setting: it is baked in, because the value it should take is not a preference.</p>
+<hr />
+<h2 id="6-testing-a-small-account-on-a-large-demo-inpvirtualbalance">6. Testing a Small Account on a Large Demo — <code>InpVirtualBalance</code></h2>
+<blockquote>
+<p><strong>Not on the shipped facade.</strong> The product build exposes twelve inputs and <code>InpVirtualBalance</code> is
+not one of them; it is fixed at <code>0</code> (off). The mechanism is still in the source and appears when
+the file is compiled with <code>RESEARCH_BUILD</code> defined. On the shipped binary, fund the demo at the
+balance you actually intend to trade — that is the only configuration the facade can express, and
+it measures the same thing more honestly. This section documents the mechanism for anyone
+building from source.</p>
+</blockquote>
+<p>Brokers rarely let you fund a demo with exactly your intended balance, and a large demo will happily
+size positions a small account could never carry. <code>InpVirtualBalance</code> rebases the whole risk
+arithmetic onto a fictional balance:</p>
+<pre><code>virtual_balance = InpVirtualBalance + (real_balance - real_balance_at_start)
+virtual_equity  = InpVirtualBalance + (real_equity  - real_equity_at_start)
+</code></pre>
+<ul>
+<li><strong>Position sizing</strong> uses the virtual balance, so the demo trades the lots your intended account
+  would actually trade. (Under <strong>Fixed lot</strong> the size is your fixed lot either way.)</li>
+<li>The account breaker (<code>InpMaxAccountDDPct</code>) and the equity-peak tracking measure against the
+  <strong>virtual</strong> account.</li>
+<li>The end-of-run journal line reports worst floating drawdown in money <strong>and</strong> as a percentage of
+  the virtual balance.</li>
+<li><code>0</code> disables it entirely.</li>
+</ul>
+<p><strong>Use it like this:</strong> fund the demo with whatever the broker gives you, set <code>InpVirtualBalance</code> to
+your intended balance, and sizing, the breaker and the risk report all behave as though the account
+were that size. The journal will print a line similar in shape to:</p>
+<pre><code>THE CREW v2.84 | XAUUSD | roster=Balanced 6 (6 specialists) | breaker=30.0% | spread&lt;=1.00
+THE CREW SIZING: budget 10.0% of &lt;virtual balance&gt; against a measured &lt;X&gt; float per 0.01 lot
+        -&gt; &lt;lot&gt; lots. Lots follow the balance.
+THE CREW: VIRTUAL BALANCE &lt;virtual balance&gt; (real equity &lt;real equity&gt;) - sizing, the breaker and
+        the risk report all measure against the virtual account.
+THE CREW RISK: worst floating drawdown &lt;-X&gt; = &lt;Y&gt;% of the VIRTUAL balance &lt;virtual balance&gt;
+</code></pre>
+<p><code>&lt;X&gt;</code> is the figure measured for your own broker profile and roster — read it from your own journal
+rather than assume a number from this manual, since it is exactly the quantity under re-measurement
+(section 5). That is the only honest way to see how the strategy would feel on the account you
+intend to trade.</p>
+<hr />
+<h2 id="7-settings-reference">7. Settings Reference</h2>
+<p><strong>The shipped build has twelve inputs.</strong> Everything else — the strategy toggles, the gate
+constants, the ladder geometry, the calendar filters, the arbiter and the research switches — is
+fixed at the value it was validated on. That is deliberate: the parts interlock, and moving one
+without the others produces a machine that was never tested. A knob you cannot evaluate is a way to
+lose money, not a feature.</p>
+<p><em>(The full surface still exists in the same source file. Uncomment <code>#define RESEARCH_BUILD</code> near
+the top of the <code>.mq5</code> and recompile and every fixed value becomes an input again — one source of
+truth, so a research finding and a shipped build can never disagree about what the engine does.
+Research <code>.set</code> files are not loadable by the shipped binary, and vice versa.)</em></p>
+<p><strong>1. The council — how many specialists trade</strong></p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>InpRoster</code></td>
+<td><code>Balanced 6</code></td>
+<td><strong>The risk dial.</strong> Core 4 · <strong>Balanced 6</strong> · Wide 8 · Full 9 · Custom · Balanced 8. Section 5 has what is currently measured. Balanced 8 is contested — read the caution there before choosing it</td>
+</tr>
+</tbody>
+</table>
+<p>The eleven, and what each one is: <em>Nadia</em> (long, 22:00), <em>Amara</em> (long, 03:00), <em>Nerissa</em> (long,
+22:00), <em>Evelyn</em> (long, 19:00), <em>Selene</em> (short, 00:00), <em>Thea</em> (short, 23:00), <em>Imogen</em> (long,
+08:00-10:00), <em>Clara</em> (long, 06:00-11:00), <em>Juno</em> (long, 10:00-13:00), <em>Nova</em> (long, 22:00),
+<em>Cassandra</em> (short, 08:00-09:00). <strong>Selene</strong> and <strong>Thea</strong> appear in no shipped roster and carry no
+measured numbers under the current gates. Individual on/off switches exist only in the research
+build; the shipped facade selects a roster, not a specialist.</p>
+<p><strong>2. Your broker — set this once, it matters</strong></p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>InpBrokerHourShift</code></td>
+<td><code>0</code></td>
+<td><strong>The one setting you must get right.</strong> Every specialist wakes on a <em>server-time</em> hour validated on a GMT+2/+3 server. Set it to (validated server hour minus your server hour); a broker running 2 hours behind needs <code>+2</code></td>
+</tr>
+<tr>
+<td><code>InpBrokerProfile</code></td>
+<td><code>Vantage / VT family</code></td>
+<td>Which <strong>measured</strong> float table and clock offset the lot sizing divides by. Vantage (the validated clock) · OANDA GOLD.pro (+1h) · Custom. <strong>The wrong profile sizes every lot off the wrong measurement</strong></td>
+</tr>
+</tbody>
+</table>
+<p>A wrong clock does not degrade the edge visibly — it removes it silently, because the specialists
+are calibrated to market <em>moments</em> and an hour mask only names a moment if the clock agrees. The
+response is a cliff, not a slope, and there is no safe direction to err in. Check the startup line
+the EA prints in the journal before you fund anything.</p>
+<p><strong>3. Risk — how much of the account is committed</strong> (section 5b)</p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>InpRiskTier</code></td>
+<td><strong><code>Conservative</code></strong></td>
+<td>Fixed lot · <strong>Conservative 10%</strong> · Balanced 15% · High 20% · Extreme 30% · Custom. The lot follows the balance</td>
+</tr>
+<tr>
+<td><code>InpFixedLot</code></td>
+<td><code>0.01</code></td>
+<td>The lot when <code>InpRiskTier = Fixed lot</code></td>
+</tr>
+<tr>
+<td><code>InpFloatBudgetPct</code></td>
+<td><code>15.0</code></td>
+<td>Your own budget when <code>InpRiskTier = Custom</code></td>
+</tr>
+<tr>
+<td><code>InpMaxLot</code></td>
+<td><code>0</code></td>
+<td>Hard lot cap. <code>0</code> = broker maximum</td>
+</tr>
+<tr>
+<td><code>InpSizePolicy</code></td>
+<td><code>Automatic</code></td>
+<td>Automatic adapts the validated configuration to the account and narrows the roster if the balance cannot carry it; Exact uses your own numbers and lets the broker decline what it cannot carry rather than second-guessing you</td>
+</tr>
+</tbody>
+</table>
+<p><strong>4. Protection</strong></p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>InpMaxAccountDDPct</code></td>
+<td><code>30.0</code></td>
+<td>% below the equity peak -&gt; flatten everything, resume next day. The main brake there is</td>
+</tr>
+<tr>
+<td><code>InpBreakerConfirmSec</code></td>
+<td><code>0</code></td>
+<td>Seconds a breach must persist before the breaker fires. <code>0</code> = act on the first tick that crosses the line</td>
+</tr>
+<tr>
+<td><code>InpMaxSpreadUsd</code></td>
+<td><code>1.00</code></td>
+<td>Skip entries above this spread, <strong>in quote currency</strong> (1.00 = $1 of gold price), not points. <strong>Do not lower it</strong> — a tighter value silently starves the EA on wide-spread brokers</td>
+</tr>
+<tr>
+<td><code>InpRiskReport</code></td>
+<td><code>true</code></td>
+<td>Print the worst-floating-drawdown line at the end of the run</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Fixed, and not offered as settings:</strong> the free-margin guard (20%, blocks new groups only),
+the per-direction book exposure cap, the per-specialist entries-per-day limit, the Friday-night
+cutoff, the scoped arbiter, the one-minute evaluation clock, the entry filter, and every ladder
+constant (spacing, target, maximum depth) — each specialist keeps its own. None of these is a
+preference; each is a measurement.</p>
+<h3 id="settings-we-deliberately-do-not-offer-as-risk-controls">Settings we deliberately do NOT offer as risk controls</h3>
+<p>Both were tested and both <strong>increase</strong> risk, and neither is reachable in the shipped build:</p>
+<ul>
+<li><strong>Depth cap.</strong> Capping the deepest specialist's layers moved its worst floating drawdown
+  substantially deeper and stretched one group's hold time from hours to weeks. Adding layers is
+  what lets a group close.</li>
+<li><strong>Floating-loss stop.</strong> Closing a group once it is underwater by a fixed amount converts
+  recoverable groups into realised losses. Measured on one specialist, a position that would have
+  finished ahead finished behind instead.</li>
+</ul>
+<p>The one place the EA <em>will</em> refuse to act is the free-margin guard, fixed at 20% — and it refuses
+to open a <strong>new group</strong>, never to add a layer to an existing one, precisely because of the first
+bullet. A third rejected control is <strong>ATR-denominated spacing</strong>: widening the ladder in a volatile
+regime starves the grid of the layers it needs to pull its average toward price, and measured it
+cost a large share of net while making results <em>more</em> variable across regimes, not less. For a
+recovery grid, high volatility calls for more layers, not wider ones.</p>
+<hr />
+<h2 id="8-the-arbiter-and-what-it-does-not-do">8. The Arbiter — and what it does <em>not</em> do</h2>
+<p>Three specialists trade the same hour in the same direction. The arbiter is fixed at <strong>Scoped</strong>:
+only the highest-priority one takes a contested moment, scoped so that specialists which never
+share an hour never interfere. It is not a setting in the shipped build.</p>
+<p><strong>It is a consistency feature, not a safety feature.</strong> Measured across every arbiter setting, the
+worst equity drawdown was <strong>the same</strong> — because the deepest drawdown belongs to a specialist the
+arbiter never suppresses. It costs a small share of net. It ships on because it makes behaviour
+predictable, <strong>not</strong> because it reduces risk. If you want less risk, use a narrower roster or a
+lower risk tier.</p>
+<hr />
+<h2 id="9-what-to-expect-day-to-day">9. What to Expect Day to Day</h2>
+<ul>
+<li>Most groups close quickly, typically within minutes to a few hours.</li>
+<li>Most groups never add a single layer.</li>
+<li>A small share of groups go several layers deep. Those are the ones that matter for sizing.</li>
+<li>Deep groups usually resolve within a few hours; occasionally one runs for days.</li>
+<li>Long flat stretches are normal — most sub-strategies trade only in their own hour window.</li>
+</ul>
+<hr />
+<h2 id="10-troubleshooting">10. Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Likely cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No trades at all</td>
+<td>Wrong symbol, market closed, or <code>InpBrokerHourShift</code> far off</td>
+<td>Confirm the chart symbol is gold; check the journal's startup line for the specialist hours it computed</td>
+</tr>
+<tr>
+<td>Fewer trades than expected</td>
+<td>Correct — most specialists trade only in a narrow window each day</td>
+<td>Compare against the presets table (section 3); this is normal</td>
+</tr>
+<tr>
+<td>Lot size stuck at the broker minimum</td>
+<td>Balance too small for the chosen roster/tier</td>
+<td>Read the journal's sizing line; either fund more, narrow the roster, or accept the broker minimum</td>
+</tr>
+<tr>
+<td>Everything closed unexpectedly</td>
+<td>The account breaker fired</td>
+<td>Check the journal for the <code>InpMaxAccountDDPct</code> message; this is by design, not a bug</td>
+</tr>
+<tr>
+<td>Roster looks narrower than requested</td>
+<td><code>InpSizePolicy = Automatic</code> downgraded it because the balance could not carry the request</td>
+<td>Fund more, or switch to <code>Exact</code> and accept the broker's own margin decisions</td>
+</tr>
+<tr>
+<td>Different results than this manual</td>
+<td>Different broker feed, different window, or a different build</td>
+<td>Results differ by broker (section 4.5); confirm the version banner in the journal matches this manual's header</td>
+</tr>
+</tbody>
+</table>
+<hr />
+<h2 id="11-risk-disclosure">11. Risk Disclosure</h2>
+<p>Trading leveraged instruments carries substantial risk of loss. THE CREW is a <strong>grid strategy
+without a stop loss</strong>: it holds losing positions through adverse moves and recovers them by adding
+equal-sized layers. This exposes the account to open-ended floating loss during a sustained adverse
+trend.</p>
+<p>All performance figures in this manual are <strong>backtest results on historical data</strong>, produced in the
+MetaTrader 5 Strategy Tester on real-tick history over a period in which gold trended strongly
+upward. They are not results from live trading and not a prediction. No bear-market evidence exists
+for this strategy. Broker conditions materially change the outcome. Never trade money you cannot
+afford to lose, and never run a grid on an account you cannot leave alone through a recovery.</p>
+<h2 id="is-it-waiting-or-is-it-broken-the-regime-monitor">Is it waiting, or is it broken? — the regime monitor</h2>
+<p>This product earns in a particular market state and goes quiet outside it. That is disclosed above,
+but a disclosure without a number is not usable: meeting a flat stretch, you cannot tell whether the
+machine is waiting for its conditions or whether its edge has changed. This section gives you the
+one measurement that separates those, taken from this product's own record.</p>
+<p><strong>The state to watch</strong> is the daily Average True Range of the traded instrument, expressed as a
+percentile of its own trailing 250 days — not a fixed number of dollars or pips, which goes stale as
+the instrument reprices. Most charting packages will plot ATR; the percentile is simply where today's
+ATR sits within the last year of its own values.</p>
+<p><strong>Not yet measured on this product.</strong> The tripwire requires a real-tick record of at least 36 months
+so the good-state sample can bound anything; the validation runs behind this manual are shorter than
+that. Rather than print a number from a sample too thin to support it, this section states the method
+and leaves the threshold open.</p>
+<p><strong>What to do in the meantime.</strong> Track the daily ATR percentile as described above alongside your
+monthly result. A flat stretch while the percentile is low is the behaviour this manual already
+describes. A flat stretch while the percentile is <em>high</em> is the case worth reporting, because that is
+the combination that would indicate a change rather than a wait.</p>
+<p><strong>What this cannot tell you.</strong> While the market is <em>outside</em> the good state, a temporary quiet
+period and a permanent change in behaviour look identical. The tripwire is the earliest point at
+which they separate, not an early warning. Nothing here is a guarantee; it is the historical extreme
+of a backtested record, and being beyond it is evidence rather than proof.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>The Crew research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Research for The Crew">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/the-crew/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="The Crew research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Research for The Crew">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/the-crew/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/the-crew_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; The Crew</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#the-crew-research-note">THE CREW - Research Note</a><ul>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
+<li><a href="#2-the-base-mechanism-eleven-specialists-one-warden">2. The base mechanism: eleven specialists, one warden</a></li>
+<li><a href="#3-building-the-risk-architecture">3. Building the risk architecture</a></li>
+<li><a href="#4-what-was-tested-and-rejected">4. What was tested and rejected</a></li>
+<li><a href="#5-compliance-and-hygiene-passes">5. Compliance and hygiene passes</a></li>
+<li><a href="#6-sizing-turning-a-risk-share-into-a-lot-size">6. Sizing: turning a risk share into a lot size</a></li>
+<li><a href="#7-why-results-differ-by-broker">7. Why results differ by broker</a></li>
+<li><a href="#8-limits">8. Limits</a></li>
+<li><a href="#appendix-build-order">Appendix - build order</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="the-crew-research-note">THE CREW - Research Note</h1>
+<p><em>What the machine does, what was changed on the way to the shipped version, and what each change
+did - with the tests that decided it.</em></p>
+<p>Version 2.84.</p>
+<p>All figures in this note are Strategy Tester runs on real broker ticks at 100 percent history
+quality. They are backtests, not results from live trading. Every number names the build, the
+broker feed and the window it came from; a number that cannot be traced that way does not appear
+here. Ideas that were tried and set aside are described in words, without numbers, because the
+number that mattered was a historical build's, not this one's.</p>
+<hr />
+<h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p>The shipped build runs on its default configuration - Balanced 6 (six of the eleven specialists),
+Conservative risk tier (a 10 percent floating-exposure budget). Backtest,
+MetaTrader 5 Strategy Tester, real ticks, 100 percent history quality, XAUUSD, 2025-07-01 to
+2026-09-07, 10,000 starting balance, measured on build 2.83 (the shipped 2.84 build was verified
+behaviour-identical to 2.83 by a trade-for-trade parity test on the same feed and window - identical
+deal count, profit matched to the cent):</p>
+<table>
+<thead>
+<tr>
+<th>feed</th>
+<th style="text-align: right;">net</th>
+<th style="text-align: right;">% of deposit</th>
+<th style="text-align: right;">profit factor</th>
+<th style="text-align: right;">equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pepperstone</td>
+<td style="text-align: right;">+7,569.28</td>
+<td style="text-align: right;">+75.7%</td>
+<td style="text-align: right;">4.42</td>
+<td style="text-align: right;">6.5%</td>
+</tr>
+<tr>
+<td>BlackBull</td>
+<td style="text-align: right;">+8,083.94</td>
+<td style="text-align: right;">+80.8%</td>
+<td style="text-align: right;">4.12</td>
+<td style="text-align: right;">6.17%</td>
+</tr>
+<tr>
+<td>Fusion</td>
+<td style="text-align: right;">+7,965.23</td>
+<td style="text-align: right;">+79.7%</td>
+<td style="text-align: right;">4.87</td>
+<td style="text-align: right;">6.11%</td>
+</tr>
+<tr>
+<td>Vantage</td>
+<td style="text-align: right;">+8,011.91</td>
+<td style="text-align: right;">+80.1%</td>
+<td style="text-align: right;">4.43</td>
+<td style="text-align: right;">6.13%</td>
+</tr>
+<tr>
+<td>OANDA (demo, spread-survival check only)</td>
+<td style="text-align: right;">+1,827.46</td>
+<td style="text-align: right;">+18.3%</td>
+<td style="text-align: right;">4.31</td>
+<td style="text-align: right;">2.01%</td>
+</tr>
+</tbody>
+</table>
+<p>Same configuration, four different live cost structures, four different amounts of money. That gap
+is the subject of section 7. How the machine got from a raw idea to this table is the rest of this
+note.</p>
+<hr />
+<h2 id="1-how-it-was-tested">1. How it was tested</h2>
+<p>Before the mechanism, the rules the testing followed - because the numbers are only worth what the
+method is worth.</p>
+<ul>
+<li><strong>Real ticks only.</strong> Every figure in this note comes from a Strategy Tester run on a broker's own
+  tick archive at 100 percent history quality.</li>
+<li><strong>One binary, byte for byte.</strong> The build is compiled once and the identical bytes are copied to
+  every terminal used for testing; a guard refuses to run a leg whose on-disk binary does not match
+  the recorded build, so a stale binary can never be mistaken for a change that did something.</li>
+<li><strong>Behaviour-neutral changes are proved, not asserted.</strong> Whenever the compiled surface changed
+  without an intended change to trading logic, a trade-for-trade parity check confirmed the deal
+  count and the money matched the previous build to the cent, on the same feed and window, before
+  the change shipped.</li>
+<li><strong>Four brokers are one market, read through four cost structures.</strong> Pepperstone, Vantage, Fusion
+  and BlackBull see the same gold market. Agreement across them shows a mechanism survives the
+  broker; it does not multiply the evidence by four, and disagreement across them is itself a
+  finding (section 7).</li>
+<li><strong>A demo feed is a spread-survival check, not a result to lead with.</strong> OANDA appears throughout
+  this note and the manual for that reason only.</li>
+</ul>
+<hr />
+<h2 id="2-the-base-mechanism-eleven-specialists-one-warden">2. The base mechanism: eleven specialists, one warden</h2>
+<p>The machine does not send one method into every hour of the trading day. It runs eleven, each built
+for one hour window and one direction, and puts one warden above all of them who is not herself a
+trader.</p>
+<p>Each specialist waits for its own hour and takes at most one position a day. When a position moves
+against it, the specialist adds another position of the same size - never larger - a measured
+distance further out, which pulls the group's average entry price toward the market. The whole
+group closes together once price reaches that shared average target. There is no per-trade stop
+loss; the only brake is the warden, who can flatten the entire book if the account's floating loss
+passes a configured share of its peak.</p>
+<p>Three of the eleven specialists can want the same hour and the same direction. A fixed priority
+order, not a race, decides which one is allowed to act when that happens - a consistency device, not
+a risk control (its effect on the worst measured drawdown was found to be negligible; a narrower
+roster or a lower risk tier is what actually reduces risk).</p>
+<p><strong>The number of specialists enabled is the primary risk control</strong>, and the risk tier - the share of
+the account budgeted for floating exposure - is the second. Both are exposed as inputs; nothing
+about a specialist's own hour, gate or ladder geometry is, because those interlock and a partial
+edit produces a configuration nobody tested.</p>
+<hr />
+<h2 id="3-building-the-risk-architecture">3. Building the risk architecture</h2>
+<p>The ladder mechanism alone is not the whole story of what ships. Three further layers were added on
+top of it, in this order, each one tested before it shipped.</p>
+<p><strong>A per-specialist pre-seed check.</strong> Before a specialist opens a new group, a feature drawn from
+that specialist's own recent trading history is read, and the group is refused - or sized down - if
+the reading sits in the dangerous tail of that specialist's own distribution. This shipped switched
+off at first, which was later found to be a mistake: two of the eleven specialists carry almost all
+of the book's worst-case floating loss between them, and with the check off, both of those
+specialists ran fully unguarded in every roster that included them. Turning the check on by default
+cut both of their worst cases sharply, without touching any other specialist's behaviour.</p>
+<p><strong>An absolute threshold, not a relative one.</strong> The check was first built to rank today's reading
+against that specialist's own recent history; it was rebuilt to compare against a fixed distance in
+market terms instead, and then widened slightly once testing located a plateau in front of a cliff -
+the gate now sits inside that plateau rather than at its edge, and a per-direction cap across the
+whole book was added alongside it as a second, independent brake.</p>
+<p><strong>The warm-up problem.</strong> A check that calibrates against its own history does not work on day one of
+a fresh account, because the history it needs has not been recorded yet. The same configuration, run
+from two different start dates on the same feed, produced very different measured floating losses
+for exactly this reason - the shorter history understated how deep the book could go, because its own
+safety check had not yet learned where the tail was. The fix pre-loads each specialist's check from
+measured reference values at start-up, so a fresh account is calibrated from its first decision
+rather than starting blind. <strong>This is the harmful direction to get wrong</strong>: a backtest run over many
+years accumulates history as it goes and looks safer than a fresh deployment actually is, not the
+other way round. Anyone re-measuring this engine's numbers on a short window should treat the result
+as the more honest one for a new account, not the long backtest.</p>
+<p>A further correction followed from the same change: once the pre-seed check began refusing some
+entries, the reference figures the position-sizing arithmetic divided by were measured again,
+because the old reference values were stale by a wide margin - sizing had been equalising against a
+number that no longer described the specialist it was attached to.</p>
+<hr />
+<h2 id="4-what-was-tested-and-rejected">4. What was tested and rejected</h2>
+<p>So that the reader knows what is not in the box, and why - described in words, because the specific
+numbers belong to superseded builds and do not describe the shipped one.</p>
+<ul>
+<li><strong>A hard cap on how many layers a specialist's ladder may add.</strong> This was tested as an obvious
+  risk control and made things worse, not better: capped at a shallower depth, a group could no
+  longer pull its average price toward the market, so it stayed open far longer and its floating
+  loss grew larger, not smaller. Adding layers is what lets a group close; capping them is what
+  strands it open.</li>
+<li><strong>Closing a group once its floating loss passes a fixed amount.</strong> This converts a position that
+  was on track to recover into a realised loss. Measured on one specialist, a group that would have
+  finished ahead finished behind instead. No input for this exists in the shipped build.</li>
+<li><strong>Scaling the ladder's spacing with a volatility measure.</strong> The idea was that a wider spacing in a
+  volatile period should behave more consistently across regimes. Measured, it did the opposite: it
+  cost a large share of the net result and made the outcome more variable across regimes, not less,
+  because widening the spacing in a volatile period starves the ladder of the layers it needs
+  exactly when it needs them most. The lesson kept from this experiment: for a recovery grid, high
+  volatility calls for more layers, not wider ones.</li>
+</ul>
+<hr />
+<h2 id="5-compliance-and-hygiene-passes">5. Compliance and hygiene passes</h2>
+<p>Two further passes shipped without touching any trading decision, confirmed by the same
+trade-for-trade parity method described in section 1.</p>
+<p><strong>The adjustable surface was collapsed.</strong> What had been dozens of independently adjustable levers -
+gate constants, ladder geometry, calendar filters, research toggles - was reduced to the twelve
+inputs a user sees today. Everything else is compiled as a fixed constant at the value it was
+validated on. The full adjustable surface still exists in one source file and can be rebuilt for
+research use, but the shipped product and any research finding describe the same
+engine, because they come from the same file.</p>
+<p><strong>An affordability check on every order, not only the first of a group.</strong> A market-readiness
+validator surfaced two mechanical edge cases: on a very small account, later layers of a recovery
+were being sent without checking whether the account could actually afford them, and the engine's
+own one-minute clock was occasionally trying to send or close an order while the symbol's market was
+shut. Both are now checked before every order the engine sends: available margin and the broker's
+own per-symbol volume limit for the first, the symbol's own trading session for the second. An order
+the broker would decline is simply not sent, rather than sent and refused.</p>
+<hr />
+<h2 id="6-sizing-turning-a-risk-share-into-a-lot-size">6. Sizing: turning a risk share into a lot size</h2>
+<p>The engine is linear in traded volume: flat lot sizes inside a group, no per-trade stop loss, no
+escalation while a recovery is running. That means doubling the lot doubles both the profit and the
+floating exposure, and nothing else about the trade set changes. A risk setting can therefore be
+stated as one honest number - the share of the balance a user is willing to see floating - and the
+lot is derived by dividing that budget by the specialist roster's own measured worst-case floating
+exposure at the smallest tradable lot. The full mechanism, including what happens on an account too
+small to reach the requested budget, is in the manual, section 5b.</p>
+<hr />
+<h2 id="7-why-results-differ-by-broker">7. Why results differ by broker</h2>
+<p>The section 0 table runs the same configuration on four live cost structures and gets four
+different amounts of money for it, because a fixed-distance ladder rests its orders at prices that a
+wider or narrower spread reaches, or does not reach, at slightly different moments. Backtest,
+MetaTrader 5 Strategy Tester, real ticks, measured across several broker tick archives spanning
+2022 to 2026: the worst-case floating exposure at a fixed 0.01 lot ranges roughly from the low
+hundreds to the mid-300s of account currency per 0.01 lot depending on the feed. The shipped sizing
+model uses the less forgiving end of that range rather than the friendlier one, because a user
+cannot know in advance which kind of feed their own broker will turn out to be, and planning against
+the friendlier number would be planning to be lucky.</p>
+<hr />
+<h2 id="8-limits">8. Limits</h2>
+<ul>
+<li>The evidence behind this note runs through a period in which gold rose substantially. A sustained
+  decline is the condition this design has the least evidence about, because a no-stop recovery grid
+  has not faced a full one in the tested history.</li>
+<li>There is no per-trade stop loss anywhere in the engine. The account-level breaker is the only
+  brake, and it acts by realising the loss it was holding, not by preventing one.</li>
+<li>One specialist - the one working the hours just before the Western session opens - accounts for a
+  large share of both the trade count and the net result. When the broker clock setting is wrong,
+  that same specialist is also the one most affected. This is a property of the design, independent
+  of broker or feed.</li>
+<li>Internally, this build's trade set is close to, but not byte-identical with, an earlier reference
+  version of the same engine: one specialist is not fully isolated from the others by a rule that has
+  been named precisely. The measured effect is small, and it is disclosed rather than rounded away.</li>
+<li>These are backtest figures on historical data. There is no live or forward track record yet.</li>
+</ul>
+<hr />
+<h2 id="appendix-build-order">Appendix - build order</h2>
+<table>
+<thead>
+<tr>
+<th>stage</th>
+<th>change</th>
+<th>how it was confirmed</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>base engine</td>
+<td>eleven session specialists, shared warden, equal-lot ladder, scoped priority arbiter</td>
+<td>the mechanism this note describes throughout</td>
+</tr>
+<tr>
+<td>risk lever, on by default</td>
+<td>per-specialist pre-seed check against that specialist's own dangerous tail</td>
+<td>two specialists' worst-case floating loss cut sharply; every other specialist unaffected</td>
+</tr>
+<tr>
+<td>absolute gate + book cap</td>
+<td>fixed-distance threshold, widened into a measured plateau; per-direction exposure cap added</td>
+<td>cliff located and avoided by testing across the threshold's own range</td>
+</tr>
+<tr>
+<td>warm-start</td>
+<td>pre-load each specialist's check from measured reference values at start-up</td>
+<td>fresh-account and long-backtest measurements converge instead of diverging</td>
+</tr>
+<tr>
+<td>reference re-measurement</td>
+<td>position-sizing divisor recalculated after the gate changed which groups seed at all</td>
+<td>stale divisor identified and corrected</td>
+</tr>
+<tr>
+<td>facade collapse</td>
+<td>dozens of research levers reduced to twelve shipped inputs; the rest fixed as compiled constants</td>
+<td>trade-for-trade parity to the prior build, same feed and window</td>
+</tr>
+<tr>
+<td>affordability and session checks</td>
+<td>every order checked against margin, volume limit and the symbol's own trading session before it is sent</td>
+<td>validator edge cases closed; canonical result unchanged to the cent</td>
+</tr>
+<tr>
+<td>behaviour-neutral rename and geometry declaration</td>
+<td>product renamed; per-specialist ladder geometry exposed through the same compiled-constant mechanism as everything else</td>
+<td>trade-for-trade parity to the prior build, same feed and window</td>
+</tr>
+</tbody>
+</table>
+<p>Every table in this note names its feed and window; the compiled binary that produced each row is
+recorded by its hash in the product manifest.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

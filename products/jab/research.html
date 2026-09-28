@@ -1,0 +1,173 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jab research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Research for Jab">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/jab/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Jab research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Research for Jab">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/jab/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/jab_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Jab</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#jab-research-note">Jab — Research Note</a><ul>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
+<li><a href="#2-the-base-mechanism-a-stop-order-at-the-freshest-unbroken-pivot">2. The base mechanism: a stop order at the freshest unbroken pivot</a></li>
+<li><a href="#3-choosing-the-level-eight-definitions-were-screened-one-survived">3. Choosing the level: eight definitions were screened, one survived</a></li>
+<li><a href="#4-timing-the-fill-waiting-for-confirmation-gives-the-edge-back">4. Timing the fill: waiting for confirmation gives the edge back</a></li>
+<li><a href="#5-shaping-the-exit-the-two-stage-trail-versus-faster-alternatives">5. Shaping the exit: the two-stage trail versus faster alternatives</a></li>
+<li><a href="#6-an-optional-faster-cadence-shipped-off-by-default">6. An optional faster cadence, shipped off by default</a></li>
+<li><a href="#7-what-was-tested-and-not-built-in">7. What was tested and not built in</a></li>
+<li><a href="#8-the-jab-family-what-is-and-is-not-shared">8. The Jab family: what is, and is not, shared</a></li>
+<li><a href="#9-lineage">9. Lineage</a></li>
+<li><a href="#limits">Limits</a></li>
+<li><a href="#appendix-build-history">Appendix — build history</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="jab-research-note">Jab — Research Note</h1>
+<p><em>What the machine does, what was changed on the way to the shipped version, and what each change did — with the tests that decided it.</em></p>
+<p>Version 1.48 · XAUUSD, M15</p>
+<p>All figures in this note are Strategy Tester runs on real broker ticks at 100% history quality. They are backtest figures, not a record of live trading. Every number names the broker feed and the window it came from. Where a design decision is described without a number, it is because the underlying test produced a small or negative reading that this note does not repeat — the decision it led to is stated instead, in words.</p>
+<hr />
+<h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p>Jab runs out of the box on its compiled defaults — no set file needed. Strategy Tester, real broker ticks, 100% history quality, a 10,000 starting balance, matched window 2025-07-01 to 2026-09-07, measured on build 1.42; every default through the current 1.48 build reproduces the same trades:</p>
+<table>
+<thead>
+<tr>
+<th>feed</th>
+<th style="text-align: right;">net</th>
+<th style="text-align: right;">profit factor</th>
+<th style="text-align: right;">trades</th>
+<th style="text-align: right;">equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fusion Markets — the published claim</td>
+<td style="text-align: right;">+348 (+3.5%)</td>
+<td style="text-align: right;">1.82</td>
+<td style="text-align: right;">262</td>
+<td style="text-align: right;">0.32%</td>
+</tr>
+<tr>
+<td>BlackBull Markets</td>
+<td style="text-align: right;">+536 (+5.4%)</td>
+<td style="text-align: right;">2.59</td>
+<td style="text-align: right;">264</td>
+<td style="text-align: right;">0.27%</td>
+</tr>
+<tr>
+<td>Pepperstone EU</td>
+<td style="text-align: right;">+676 (+6.8%)</td>
+<td style="text-align: right;">2.86</td>
+<td style="text-align: right;">269</td>
+<td style="text-align: right;">0.28%</td>
+</tr>
+<tr>
+<td>Vantage Markets</td>
+<td style="text-align: right;">+451 (+4.5%)</td>
+<td style="text-align: right;">2.24</td>
+<td style="text-align: right;">259</td>
+<td style="text-align: right;">0.29%</td>
+</tr>
+<tr>
+<td>OANDA (demo, spread-survival check only)</td>
+<td style="text-align: right;">+262 (+2.6%)</td>
+<td style="text-align: right;">1.56</td>
+<td style="text-align: right;">274</td>
+<td style="text-align: right;">0.34%</td>
+</tr>
+</tbody>
+</table>
+<p>The published claim is always the worst-performing qualifying live feed. Where the same configuration takes near-identical trades on every broker and earns different money on each, the surviving edge is smaller than the gap between brokers — the rest of this note is the record of what was tested to find a configuration that survives that gap at all.</p>
+<hr />
+<h2 id="1-how-it-was-tested">1. How it was tested</h2>
+<ul>
+<li><strong>Real ticks decide; a demo feed provides era context only.</strong> Every claim in section 0 is a Strategy Tester run on a broker's own tick archive. A longer-history demo feed (OANDA, back to 2018) was kept only for two purposes: reading how the mechanism behaves in years no live archive covers, and as a spread-survival check — proof the strategy still works on a broker whose costs are unfavourable. Live feeds decide every design question; the demo feed never overrules one.</li>
+<li><strong>Two controls, on every level tested.</strong> A random resting order at the same cadence (does a level matter at all, versus any order placed the same way at a random moment) and a level-less breakout (does the level add anything a plain breakout of the same size would not). A candidate level definition had to beat both controls, on more than one broker's tick archive, to be treated as a real reading rather than a coincidence of one dataset.</li>
+<li><strong>Predict, then run.</strong> Each design question was written down — the expected result and what would count as a contradiction — before the test that answered it. Where the prediction failed, the note below says so rather than being silently revised.</li>
+<li><strong>Several brokers are one market, not four data points.</strong> Pepperstone, Vantage, Fusion and BlackBull all show the same underlying gold market through four different cost paths. Agreement across them shows a mechanism survives the broker; it does not multiply the evidence by four, and a result that only appears on one feed is treated as that feed's property, not the market's.</li>
+<li><strong>Look at it.</strong> No design decision in this note was taken from a single summary statistic. Every candidate was read at three zooms — the whole balance curve, a few weeks of bars with the resting orders drawn, and single fills at one-minute resolution — before it was adopted or dropped.</li>
+</ul>
+<hr />
+<h2 id="2-the-base-mechanism-a-stop-order-at-the-freshest-unbroken-pivot">2. The base mechanism: a stop order at the freshest unbroken pivot</h2>
+<p>Gold builds recent swing highs and lows that price has not yet traded back through. Jab watches the M15 chart for the freshest such pivot far enough from the current price, and rests a stop order just beyond it, in the direction of the last closed candle. If price reaches the pivot the order fills; if it does not fill within its patience window, it is cancelled. A pivot that has already been tested more than once is skipped rather than traded again.</p>
+<p>Every position carries a hard stop loss from the moment it opens, is managed by a short two-stage trailing stop, and Jab holds at most one position per side. It does not average down, does not grid, and does not use martingale sizing.</p>
+<p><strong>What the level is worth.</strong> Measured against a resting order placed at a random moment with the same offsets and the same exit, the pivot-anchored order was the stronger, or tied-strongest, entry on every measure taken, on both live and demo tick archives — the level adds a real, repeatable displacement in the trade's favour in the minutes after the fill, over and above what a same-sized breakout with no level under it would give on its own.</p>
+<hr />
+<h2 id="3-choosing-the-level-eight-definitions-were-screened-one-survived">3. Choosing the level: eight definitions were screened, one survived</h2>
+<p>The natural question for any level-to-level system is which price counts as "the level." Before the shipped rule was fixed, eight different definitions were measured against the two controls above, across several years of tick data on more than one broker:</p>
+<ul>
+<li>the candle <strong>wick</strong> extreme (the shipped rule) versus its <strong>body</strong> close;</li>
+<li>a <strong>cluster</strong> of nearby pivots instead of a single one;</li>
+<li>the <strong>prior trading session's</strong> high or low, tried both as a measured comparison and as a live rule inside the EA;</li>
+<li>a <strong>statistical band</strong> drawn from the mean and spread of the pivot candle itself, at a range of widths, both trend-aligned and not;</li>
+<li>the <strong>nearest qualifying pivot in price</strong>, rather than the freshest one in time;</li>
+<li>the candle's own <strong>inner body</strong> as the order price, with the wick kept only as the stop.</li>
+</ul>
+<p>Across every one of these, the freshest untested wick extreme was the level with the largest and most repeatable displacement in the trade's favour after the fill. Levels chosen for being nearby in price, or for having survived several tests already, carried measurably less of that displacement, and in the case of the nearest-in-price rule, none beyond what a level-less breakout already gets. The prior-session extreme was also built into the EA as a selectable option: inside Jab's own order flow it turned out to already be, almost always, the same pivot the shipped rule would have picked, so the two rules produce nearly the same trades and the shipped rule stayed the default. This is why the level ships as one definition rather than several: the alternatives were not close substitutes, they were measurably worse or, in the closest case, redundant with what was already there.</p>
+<h2 id="4-timing-the-fill-waiting-for-confirmation-gives-the-edge-back">4. Timing the fill: waiting for confirmation gives the edge back</h2>
+<p>A second, separate question is when to take the trade once a qualifying level exists: at first touch (a stop order), on a confirming candle close beyond the level, or after a retest of the level from the far side. All three were measured on the same set of levels. Filling at first touch carried essentially all of the measured edge; waiting for a confirming close, or for a retest, gave almost all of it back — on the retest rule, what remained was no better than chance. The market does not distinguish, in the first minutes after a level breaks, between a genuine continuation and a stop-run that reverses; by the time a confirmation would have formed, that distinction has already been priced. Jab is built to be filled at the touch for this reason, and this is also why the request for a filter that only takes the "real" breaks and skips the sweeps could not be met by changing entry timing — the two are, at this resolution, the same population of fills.</p>
+<h2 id="5-shaping-the-exit-the-two-stage-trail-versus-faster-alternatives">5. Shaping the exit: the two-stage trail versus faster alternatives</h2>
+<p>The shipped exit moves the stop once a trade is a set distance ahead, then switches to a tighter trail once it is further ahead again, and gives back as little of the move as possible from there. Two faster, tighter exits were measured against it on the same entries, across live feeds: one a scratch-style exit that locks in a small win almost immediately, the other a genetic-search pick optimised on a different chart timeframe from the one the product trades.</p>
+<p>On every live broker feed tested, the shipped exit was the strongest, or tied-strongest, arm on the measure that matters most for an account that compounds — the number of days between one equity high and the next, and the depth of the worst rolling three-month stretch. The faster exits produced a higher win rate on paper, because they cap the size of a winning trade well below the size of the stop; that trade-off looked better on a demo feed than it did once real broker spread was applied to the same trades, and on two of the three live feeds tested it also gave up money outright. Scaling the stop and target to the day's own volatility was tested the same way, as a separate lever, and was dropped for the same reason: it cost money and made the worst stretches less predictable on every live feed it was tried on, confirming an earlier reading from the machine this engine descends from.</p>
+<h2 id="6-an-optional-faster-cadence-shipped-off-by-default">6. An optional faster cadence, shipped off by default</h2>
+<p>Loosening three of the entry gates — the minimum distance to a level, how far back a pivot is searched for, and how many prior tests of a level are still acceptable — roughly doubles the number of trades. Across four live feeds this traded configuration earned more in total, at a lower profit factor, than the shipped defaults; it is a cadence choice rather than a stronger trade, each individual fill earning less, and the extra fills are the ones most exposed to a wide spread. It ships as a named optional preset for a trader on a tight-spread broker who wants more frequent, smaller trades, and the defaults remain the tested configuration Jab ships on. In the most recent three-month window measured, the defaults held their edge and the faster preset did not add anything to it — read as a reminder that a cadence choice is not free to change back and forth, not as a permanent verdict on either setting.</p>
+<h2 id="7-what-was-tested-and-not-built-in">7. What was tested and not built in</h2>
+<p>So the reader knows what this product does not do, and why:</p>
+<ul>
+<li><strong>A gap-fill breakout entry</strong>, tried as a separate trigger on both M15 and M5: it produced no edge over a matched random control on either timeframe. Not adopted.</li>
+<li><strong>A wide resting-order "liquidity pool" filter</strong>, which predicted that a stop placed near a dense cluster of other price wicks would be more likely to be run to its stop than to its target: the predicted pattern did not appear on either live feed tested; the stop-out rate was flat across every measured version of the filter. Not adopted.</li>
+<li><strong>A machine-learning ranking of the moments after a fill</strong>, built over several dozen features of the price path: it ranked outcomes no better than the position's own running profit already does, which the shipped exit already uses for free. Not built in.</li>
+<li><strong>Market-state gating</strong> (volatility percentile, trend efficiency, channel width, time of day) measured against realised drawdown episodes on the long demo record: no single state ordered the outcome consistently enough across separate slices of the data to justify a gate. Reported as a finding, not built in as a filter.</li>
+</ul>
+<h2 id="8-the-jab-family-what-is-and-is-not-shared">8. The Jab family: what is, and is not, shared</h2>
+<p>Jab, Heavy Jab and Jab Savant share one engine lineage but are three separate builds, each validated on its own market:</p>
+<ul>
+<li><strong>Heavy Jab</strong> runs the same level-to-level mechanism on bitcoin, with its own stop and target distances measured from scratch for that market. An earlier attempt to simply rescale Jab's gold distances onto bitcoin was tested directly and traded far fewer times, at a loss — bitcoin's noise sits inside gold-sized exits, so Heavy Jab's geometry is a separate, independently measured build, not a resized copy.</li>
+<li><strong>Jab Savant</strong> adds a trained model in front of the same gold engine that screens each qualifying level and sits out the ones its scoring expects to fail. Jab, this build, has no learned filter: it takes every level that passes its (non-learned) gates.</li>
+</ul>
+<h2 id="9-lineage">9. Lineage</h2>
+<p>Jab's engine descends from an earlier gold decode programme (an earlier gold research programme), which is where the level rule, the trailing-stop shape and the volatility-scaling question were first measured. This programme re-ran and, in most cases, reconfirmed those findings on Jab's own build and on a wider set of live broker feeds — the ATR-scaling result above is one example of a finding that repeated on real ticks after first appearing on the ancestor engine.</p>
+<hr />
+<h2 id="limits">Limits</h2>
+<ul>
+<li>Jab earns its result from a level breaking and being filled at the moment it does; between qualifying levels, and outside the market conditions that produce them, it is quiet rather than active. A quiet stretch is the designed behaviour, not a fault, and is not distinguishable in real time from an early sign of a changed edge — that limit is inherent to any level-based system and is not solved by anything in this note.</li>
+<li>The same configuration produces different money on different brokers even though the trades themselves are nearly identical, because the per-trade edge is small relative to typical broker cost differences. A raw-spread or ECN account is a measured requirement, not a preference.</li>
+<li>The figures in section 0 are backtests on tick archives. Live spreads, slippage and a broker's own fill behaviour differ from the archive's. Past performance does not indicate future results. Test on a demo account with your broker before trading real funds.</li>
+</ul>
+<hr />
+<h2 id="appendix-build-history">Appendix — build history</h2>
+<table>
+<thead>
+<tr>
+<th>version</th>
+<th>change</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.44</td>
+<td>trailing-stop distance widened; the earlier tighter trail sat inside the spread of most live feeds and gave back the edge</td>
+</tr>
+<tr>
+<td>1.45</td>
+<td>added a selectable prior-day-first level mode; default unchanged, and inside the EA's own order flow this mode reproduces the shipped default almost exactly</td>
+</tr>
+<tr>
+<td>1.47</td>
+<td>trade-management calls skipped while the trading session is closed, removing spurious counter activity outside trading hours; trading itself unchanged, proved deal for deal against the prior version</td>
+</tr>
+<tr>
+<td>1.48</td>
+<td>added an optional prop-firm rules group (daily loss limit, maximum loss limit, profit target, best-day cap, Friday close), every rule off by default; with every rule off, Jab places the same deals as the version before it, proved deal for deal</td>
+</tr>
+</tbody>
+</table>
+<p>Every figure in section 0 names its feed and window; the compiled binary that produced it is recorded by its hash in the product manifest.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

@@ -1,0 +1,283 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leapfrog research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Research for Leapfrog">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/leapfrog/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Leapfrog research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Research for Leapfrog">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/leapfrog/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/leapfrog_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Leapfrog</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#leapfrog-research-note">Leapfrog - Research Note</a><ul>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
+<li><a href="#2-the-base-mechanism-five-rolling-ranges-not-one">2. The base mechanism: five rolling ranges, not one</a></li>
+<li><a href="#3-preventing-losses-reading-golds-own-recent-volatility">3. Preventing losses: reading gold's own recent volatility</a></li>
+<li><a href="#4-finding-and-fixing-a-filter-that-looked-right-and-read-wrong">4. Finding, and fixing, a filter that looked right and read wrong</a></li>
+<li><a href="#5-the-exit-partial-profit-taking-and-a-trail-in-r-multiples">5. The exit: partial profit-taking and a trail, in R multiples</a></li>
+<li><a href="#6-what-was-tested-and-rejected">6. What was tested and rejected</a></li>
+<li><a href="#7-the-honest-limit-this-is-a-regime-dependent-system">7. The honest limit: this is a regime-dependent system</a></li>
+<li><a href="#8-limits">8. Limits</a></li>
+<li><a href="#appendix-traceability">Appendix - traceability</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="leapfrog-research-note">Leapfrog - Research Note</h1>
+<p><em>What the machine does, what was changed on the way to the shipped version, and what each change did - with the
+tests that decided it.</em></p>
+<p>Version 1.28 - September 2026</p>
+<p>All figures in this note are Strategy Tester runs on real broker ticks at 100 percent history quality. They are
+backtest figures, not results from live trading. Every number names the build, the broker feed and the window it came from; a number
+that cannot be traced that way does not appear here. Profit factors below 1.5 and single results below break-even
+are not quoted here even where they were measured; the underlying finding is still described in words.</p>
+<hr />
+<h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p>Leapfrog runs out of the box on its compiled defaults - no .set file is needed. One binary, four live broker
+feeds, 10,000 starting balance, the same fourteen-month window (1 July 2025 to 7 September 2026):</p>
+<table>
+<thead>
+<tr>
+<th>feed</th>
+<th>net</th>
+<th>profit factor</th>
+<th>equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vantage Markets</td>
+<td>+9,749 (+97%)</td>
+<td>1.74</td>
+<td>5.9%</td>
+</tr>
+<tr>
+<td>Pepperstone EU</td>
+<td>+9,241 (+92%)</td>
+<td>1.65</td>
+<td>7.9%</td>
+</tr>
+<tr>
+<td>BlackBull Markets</td>
+<td>+8,449 (+84%)</td>
+<td>1.67</td>
+<td>5.1%</td>
+</tr>
+<tr>
+<td>Fusion Markets</td>
+<td>+8,260 (+83%)</td>
+<td>1.58</td>
+<td>6.7%</td>
+</tr>
+</tbody>
+</table>
+<p>These four rows were measured on version 1.20 of the engine. Every version since is proved to place the same
+deals as the version before it under the shipped defaults, an unbroken chain to the current 1.28. A Strategy
+Tester check run directly on the 1.28 binary agrees: BlackBull, 1 April 2025 to 19 September 2026, 2,388 trades,
+net +12,261.24, profit factor 1.77, equity drawdown 5.29%.</p>
+<p>On OANDA GOLD.pro - a demo account, and the one feed whose tick archive reaches back to 2018, used here only
+to test survival through a full market cycle rather than as a headline - a Strategy Tester run of the same
+defaults stayed net positive across the 2018-2026 window at an equity drawdown under 10%. That full-cycle view
+is also where the honest limit of this system shows up, and section 7 states it plainly.</p>
+<p>How the machine got from a raw multi-window range idea to that table is the rest of this note. Each section
+names a mechanism, shows the figure that decided it, and states what it did to losses and to profit. The exact
+geometry (distances, windows, thresholds) is deliberately not written out here; it is in the product's inputs.</p>
+<hr />
+<h2 id="1-how-it-was-tested">1. How it was tested</h2>
+<p>Before the mechanisms, the rules the testing followed - because the numbers are only worth what the method is
+worth.</p>
+<ul>
+<li><strong>Real ticks only.</strong> Every claim comes from a tester run on a broker's own tick archive at 100% history
+  quality. The engine's ladders trade off intraday highs and lows, which is exactly the kind of level a
+  one-minute-OHLC search misreads.</li>
+<li><strong>One compiled binary, several feeds.</strong> Pepperstone, Vantage, Fusion, BlackBull and a demo feed see the same
+  gold market through different cost paths. Agreement across the live ones shows a mechanism survives the
+  broker; the demo feed is used only for reach - it is the one archive that covers the full 2018-2026 cycle.</li>
+<li><strong>Parity before a claim.</strong> Each version change was proved to place the same deals as the version before it,
+  deal for deal, on a real-tick window, before any figure from the new version was published. The chain from
+  1.20 to the current 1.28 is unbroken.</li>
+<li><strong>Predict, then run.</strong> Each mechanism change stated its expected effect before the run. Where the effect did
+  not appear, the change was dropped or rebuilt rather than tuned until it looked better (section 6).</li>
+<li><strong>Look at it.</strong> No verdict was passed on a statistic alone; every candidate mechanism was also read on the
+  equity curve and on the chart with the ladders' own resting orders drawn.</li>
+</ul>
+<hr />
+<h2 id="2-the-base-mechanism-five-rolling-ranges-not-one">2. The base mechanism: five rolling ranges, not one</h2>
+<p>Gold's daily and multi-day ranges are not fixed; they expand and contract with the market's own state. Leapfrog
+does not pick one "the" range. It runs five ladders side by side, each one watching the highest high and lowest
+low of its own rolling window - windows from about one day up to about four trading weeks - and rests a stop
+order a small percentage of price beyond that window's current edge. A genuine break of the range fills the
+order in the direction of the move; the order is re-aimed as the range itself moves, and placed only at fixed
+clock slots rather than on every tick, so the machine is not fighting its own orders tick by tick.</p>
+<p>Because the five windows resolve on different clocks, the ladders behave like a small portfolio rather than one
+system: in most months some are active while others wait for their own range to set up. Each ladder holds at
+most one position per side, there is no averaging down, no grid and no martingale, and a losing position is
+closed at its stop.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, OANDA GOLD.pro, 2018 to 2026 (full-cycle, position level).</em></p>
+<p><strong>The win rate is a geometry, not a skill.</strong> An early read of this record quoted a 51% win rate; that count
+included partial closes as separate trades. Read at the position level - one open-to-close position is one
+result - the true hit rate is about 23%, with an average winner near $23.89 against an average loser near
+$6.65 (fixed-lot terms). A breakout system with a stop close to the range edge and a target several multiples
+of that stop wins a minority of the time by design; the 23% is the shape of the payoff, not a flaw in the entry.</p>
+<hr />
+<h2 id="3-preventing-losses-reading-golds-own-recent-volatility">3. Preventing losses: reading gold's own recent volatility</h2>
+<p>A range-breakout system has two natural failure modes, at opposite ends of the same axis. When volatility
+explodes, an order fills into a move that runs straight past its stop before the position can be managed. When
+volatility collapses, the range edges sit inside the noise and a "break" is just the noise crossing a line that
+was never a real level.</p>
+<p>Two controls address this, and both compare gold to its own recent history rather than to a fixed number, so
+neither needs retuning as gold's price level changes:</p>
+<p><strong>Daily stand-down.</strong> New orders are not armed when the previous day's average true range sits at either
+extreme of its own trailing 250-day distribution - the very top or the very bottom. Measured across the full
+tick record, daily profit and loss by that percentile is a U-shape, not a slope: the middle of the distribution
+is where the range-breakout mechanism earns, and the top percentile - the small slice of days where volatility
+is already exploding - is the one slice that loses money on average. Standing down on that slice, and on the
+quietest slice where a "break" is mostly noise, removes a loss concentrated in a small number of days without
+giving up the ordinary middle of the distribution.</p>
+<p><strong>Hourly channel-width sizing.</strong> The width of the hourly rolling channel, again read as a percentile of its own
+recent history, scales position size on a curve rather than a switch: narrow-channel conditions are traded
+smaller, not skipped. Across four ladders measured independently, this axis ranked among the strongest of over
+two hundred candidate indicators tested for the same purpose, and it was sign-stable across every non-overlapping
+slice of the record - the reason it is a continuum rather than a binary skip is that even the narrowest-channel
+trades keep earning in a trending market, just less; a hard skip would have discarded some of that.</p>
+<hr />
+<h2 id="4-finding-and-fixing-a-filter-that-looked-right-and-read-wrong">4. Finding, and fixing, a filter that looked right and read wrong</h2>
+<p>An earlier version shipped an input read as "only arm when the day is expanding" - a sensible-sounding rule.
+Reading the code against the tester journal showed it did something different: it let the order <strong>fill first</strong>,
+then closed the position immediately if the day turned out not to be expanding after all. Every rejection this
+way still paid the full cost of a fill and a close. It fired on a sizable share of all fills and it cut into the
+winners specifically - the position-level win rate with it running was well under the win rate without it.</p>
+<p>Turning it off, and later rebuilding it correctly on the arming side rather than the fill side, was tested both
+ways. The correctly-built arming-side version recovers the wasted cost of the old behaviour but still gives up
+the drawdown reduction that comes from having no such filter at all - the underlying measure (how much of a day
+has elapsed against how much range has appeared so far) looks quiet early on a day that later turns out to be
+exactly the kind of day the ladders exist to catch. Both forms are kept as documented, off-by-default options;
+neither is the shipped configuration.</p>
+<hr />
+<h2 id="5-the-exit-partial-profit-taking-and-a-trail-in-r-multiples">5. The exit: partial profit-taking and a trail, in R multiples</h2>
+<p>Once a ladder's position is ahead, the exit engine closes part of it in three stages and trails the stop behind
+the best price reached, all measured in multiples of the position's own initial stop distance (R) rather than a
+fixed dollar amount - so the same exit logic scales sensibly whether a ladder's stop is a fraction of a percent
+of price or closer to one percent. This keeps a share of every winning move while giving the position room to
+extend past the first profit mark rather than capping it there.</p>
+<hr />
+<h2 id="6-what-was-tested-and-rejected">6. What was tested and rejected</h2>
+<p>So that the reader knows what is not in the box, and why - described here without the specific figures, which
+belong to the internal research record rather than the public one:</p>
+<ul>
+<li><strong>Sizing by the last completed break's outcome.</strong> An earlier form of the engine showed its profits arriving in
+  runs, which suggested sizing up after a win and down after a loss. On the current engine, with the volatility
+  controls of section 3 already in place, that clustering is gone: a corrected statistical test found no
+  dependence between consecutive outcomes, and turning the sizing rule on cost money on every live feed it was
+  tried on. It ships off.</li>
+<li>
+<p><strong>Dropping the two ladders with the largest full-cycle drawdown contribution.</strong> Recommended more than once
+  from the long record, this was tested directly and reversed: nearly all of each ladder's full-cycle loss traced
+  to a small cluster of extreme-volatility trades that the section 3 controls now stand down on. With those
+  controls active, both ladders are net positive across every slice of the record tested, and removing them
+  gives up a large share of total profit for a small reduction in the worst weeks.</p>
+</li>
+<li>
+<p><strong>A second-attempt entry after a failed break reverses back through the level.</strong> Tested as a research option;
+  it is not part of the shipped configuration. It is kept in a research-only build for further work rather than
+  discarded outright.</p>
+</li>
+<li><strong>A staged genetic search over entry parameters, validated forward.</strong> The search converged on shorter-window
+  variants of the ladders that looked better in-sample; on an untouched forward window they traded far more
+  often at a lower quality of fit to the underlying signal. The shipped ladder windows were kept. A parallel
+  search over the exit parameters showed the same pattern - better in-sample, worse on the forward window by
+  every measure except raw net - and the shipped exit was kept as well.</li>
+</ul>
+<hr />
+<h2 id="7-the-honest-limit-this-is-a-regime-dependent-system">7. The honest limit: this is a regime-dependent system</h2>
+<p>The mechanism in section 2 needs a range to break. Measured across the full 2018-2026 tick history on the one
+feed that reaches back that far, the years of small, quiet daily ranges produced little for this system to catch,
+and the two volatility controls in section 3 were built specifically to take the cost of trading through those
+years from a loss down to close to flat, rather than to make the engine indifferent to the regime. They narrow
+the regime-dependence; they do not remove it.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Vantage / Pepperstone / BlackBull / Fusion, 2025-07-01 to 2026-09-07 (section 0's table).</em></p>
+<p>The return in the table in section 0 is concentrated in the more recent stretch of the record, where gold's
+daily ranges have been larger and more frequent. That is not a coincidence: it is the mechanism in section 2
+working in the conditions it needs. A buyer should expect the same pattern going forward - flatter stretches in
+a genuinely quiet gold market, and the system doing its work when gold's ranges expand - rather than a constant
+rate of growth in every kind of market.</p>
+<hr />
+<h2 id="8-limits">8. Limits</h2>
+<ul>
+<li>Leapfrog earned its result in a market of expanding daily and multi-day gold ranges and goes quiet, not
+  negative, when that condition is absent for an extended period (section 7).</li>
+<li>The figures are backtests on tick archives. Live spreads, slippage and a broker's own fills differ from the
+  archive's; use a raw-spread or ECN account, and reproduce a short recent window on your own broker before
+  trading it (product manual, "Reproduce the tests yourself").</li>
+<li>Growth figures at the shipped lot-per-equity setting (backtest, Strategy Tester, real ticks, Vantage /
+  Pepperstone / BlackBull / Fusion, 2025-07-01 to 2026-09-07) include the compounding of one fourteen-month window from a 10,000
+  start; a different start date inside the same window moves the growth number more than it moves the drawdown
+  number, which is why drawdown is reported alongside every growth figure in this note.</li>
+<li>Past performance does not indicate future results. Test on a demo account with your broker before trading real
+  funds.</li>
+</ul>
+<hr />
+<h2 id="appendix-traceability">Appendix - traceability</h2>
+<table>
+<thead>
+<tr>
+<th>version</th>
+<th>change</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.10 line</td>
+<td>daily volatility stand-down and hourly channel-width sizing added</td>
+<td>improved the result on every live feed tested against the ungated binary, four feeds</td>
+</tr>
+<tr>
+<td>1.20</td>
+<td>a mis-built "day expanding" filter (fill-then-close) found and disabled</td>
+<td>full-cycle position-level hit rate measurably higher with it off; the full-cycle result improved on every measure</td>
+</tr>
+<tr>
+<td>1.21</td>
+<td>internal reliability fixes (a trade call moved out of a transaction handler; a magic-number filter widened)</td>
+<td>proved neutral: same deals as before the fix, deal for deal</td>
+</tr>
+<tr>
+<td>1.22</td>
+<td>streak-based sizing added as an off-by-default option</td>
+<td>measured null on the shipped configuration; independence confirmed by a corrected statistical test; ships off</td>
+</tr>
+<tr>
+<td>1.24</td>
+<td>trade requests no longer sent while the market session is closed</td>
+<td>proved neutral: same deals, deal for deal</td>
+</tr>
+<tr>
+<td>1.25</td>
+<td>Account type input added (Personal / Prop firm 2-step / Prop firm 1-step)</td>
+<td>Personal default proved neutral against 1.24; prop modes proved to match the equivalent manual lot setting, deal for deal</td>
+</tr>
+<tr>
+<td>1.26</td>
+<td>prop-firm rule engine added (daily loss, maximum loss, target, best-day cap, Friday close)</td>
+<td>with every rule off, proved neutral, deal for deal; each rule proved to trigger correctly at its threshold</td>
+</tr>
+<tr>
+<td>1.27</td>
+<td>research-only switch for a post-loss re-entry idea (section 6)</td>
+<td>shipped behaviour unchanged; research build only</td>
+</tr>
+<tr>
+<td>1.28</td>
+<td>Inputs tab reorganised behind Settings: Recommended / Custom; unused inputs removed from the visible tab</td>
+<td>proved neutral against 1.26, deal for deal, on an independent real-tick window</td>
+</tr>
+</tbody>
+</table>
+<p>Every table in this note names its feed and window; the compiled binary that produced each row is recorded by
+its hash in the product manifest.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

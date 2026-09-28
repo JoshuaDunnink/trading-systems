@@ -1,0 +1,337 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Captain Karat-Smash research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Research for Captain Karat-Smash">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/captain-karat-smash/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Captain Karat-Smash research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Research for Captain Karat-Smash">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/captain-karat-smash/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/captain-karat-smash_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Captain Karat-Smash</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#captain-karat-smash-research-note">Captain Karat-Smash — Research Note</a><ul>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
+<li><a href="#2-the-base-mechanism-one-object-seven-strategies">2. The base mechanism: one object, seven strategies</a></li>
+<li><a href="#3-building-the-exit-bracket-then-lock-then-trail">3. Building the exit: bracket, then lock, then trail</a><ul>
+<li><a href="#31-version-107-109-widening-and-conditioning-the-trail">3.1 Version 1.07-1.09: widening and conditioning the trail</a></li>
+</ul>
+</li>
+<li><a href="#4-sizing-the-risk-facade">4. Sizing: the risk facade</a></li>
+<li><a href="#5-prop-firm-accounts">5. Prop-firm accounts</a></li>
+<li><a href="#6-out-of-sample-the-eight-year-test">6. Out-of-sample: the eight-year test</a></li>
+<li><a href="#7-what-was-tested-and-rejected">7. What was tested and rejected</a></li>
+<li><a href="#8-why-results-differ-by-broker">8. Why results differ by broker</a></li>
+<li><a href="#9-limits">9. Limits</a></li>
+<li><a href="#appendix-version-history-and-how-each-change-was-proved">Appendix — version history and how each change was proved</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="captain-karat-smash-research-note">Captain Karat-Smash — Research Note</h1>
+<p><em>What the machine does, what was changed on the way to the shipped version, and what each change did — with the tests that decided it.</em></p>
+<p>Version 1.09 · September 2026</p>
+<p>All figures in this note are Strategy Tester runs on real broker ticks at 100 % History Quality, compiled
+defaults, 10,000 starting deposit unless stated otherwise. They are backtests and do not represent trading on a
+live account. Every number
+names the build, the broker feed and the window it came from; a number that cannot be traced that way does not
+appear here.</p>
+<hr />
+<h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p>Captain Karat-Smash runs out of the box on its <strong>Medium</strong> risk level. One 14-month window run identically on
+four live broker feeds, compiled defaults, 10,000 starting deposit (backtest, MetaTrader 5 Strategy Tester,
+real ticks, 2025-07-01 to 2026-09-07):</p>
+<table>
+<thead>
+<tr>
+<th>feed</th>
+<th style="text-align: right;">net</th>
+<th style="text-align: right;">% of deposit</th>
+<th style="text-align: right;">profit factor</th>
+<th style="text-align: right;">trades</th>
+<th style="text-align: right;">equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fusion (worst qualifying live feed)</td>
+<td style="text-align: right;">4,935.14</td>
+<td style="text-align: right;">+49.4 %</td>
+<td style="text-align: right;">1.73</td>
+<td style="text-align: right;">896</td>
+<td style="text-align: right;">7.88 %</td>
+</tr>
+<tr>
+<td>Vantage</td>
+<td style="text-align: right;">5,184.50</td>
+<td style="text-align: right;">+51.8 %</td>
+<td style="text-align: right;">2.14</td>
+<td style="text-align: right;">705</td>
+<td style="text-align: right;">5.65 %</td>
+</tr>
+<tr>
+<td>BlackBull</td>
+<td style="text-align: right;">5,234.33</td>
+<td style="text-align: right;">+52.3 %</td>
+<td style="text-align: right;">1.99</td>
+<td style="text-align: right;">786</td>
+<td style="text-align: right;">5.99 %</td>
+</tr>
+<tr>
+<td>Pepperstone</td>
+<td style="text-align: right;">6,907.96</td>
+<td style="text-align: right;">+69.1 %</td>
+<td style="text-align: right;">2.11</td>
+<td style="text-align: right;">924</td>
+<td style="text-align: right;">6.56 %</td>
+</tr>
+<tr>
+<td>OANDA (demo, spread-survival check only)</td>
+<td style="text-align: right;">7,618.23</td>
+<td style="text-align: right;">+76.2 %</td>
+<td style="text-align: right;">1.76</td>
+<td style="text-align: right;">902</td>
+<td style="text-align: right;">9.71 %</td>
+</tr>
+</tbody>
+</table>
+<p>The published claim is the worst of the four live feeds, Fusion. Read as: the same seven-strategy machine
+takes closely related trades on every broker and still earns different money on each one, which is the honest
+range rather than a defect. How the machine got from a raw idea to that table is the rest of this note.</p>
+<hr />
+<h2 id="1-how-it-was-tested">1. How it was tested</h2>
+<p>Before the mechanisms, the rules the research followed, because the numbers are only worth what the method is
+worth.</p>
+<ul>
+<li><strong>Real ticks decide; one-minute bars only search.</strong> A calendar-shift control on one-minute bars first
+  confirmed the pattern was tied to the price bars rather than to dates, which made the bars a valid search
+  instrument; every figure that is claimed anywhere in the product line came from a real-tick run.</li>
+<li><strong>Feed-matched, cross-checked.</strong> The level object, the stop and target percentages and the exit machine were
+  each measured independently on BlackBull's multi-year archive and cross-checked against Fusion, Pepperstone
+  and Vantage before being written down as a constant. A constant that only held on one feed was not shipped.</li>
+<li><strong>Controls, not assertions.</strong> A random level at the same distance and cadence as the real one, a bracket-only
+  exit with the stop-lock removed, and a stop-lock with the trail removed were each run as separate arms so the
+  contribution of each part of the machine could be isolated rather than assumed.</li>
+<li><strong>Parity before shipping.</strong> The product build was gated on reproducing the research engine's own trades
+  exactly, not on "looks similar": in a Strategy Tester backtest at a fixed 0.01 lot the product reproduces
+  the research build's seven-strategy leg fill for fill (1,293 fills, entry match 1.0000, net matched to the
+  cent, Pepperstone 2025-01-02 to 2026-09-05). Every later version change was proved the same way before
+  release — deal for deal against the version before it, on a real-tick window, before the change shipped.</li>
+<li><strong>An untouched out-of-sample era.</strong> The strategy constants were measured on 2022-2026 data from three
+  brokers. A fourth broker's eight-year archive, which reaches back to 2018, was set aside as a genuine
+  out-of-sample test rather than used to fit anything (section 6).</li>
+</ul>
+<hr />
+<h2 id="2-the-base-mechanism-one-object-seven-strategies">2. The base mechanism: one object, seven strategies</h2>
+<p>Captain Karat-Smash is a level-break system. Before a burst, gold sits under a recent high or above a recent
+low it has not managed to close through — an unbroken swing. Seven strategies run side by side on one chart,
+each watching that same kind of object on its own timeframe (two on daily bars, five on four-hour bars), each
+with its own entry offset inside the level and its own bracket:</p>
+<ol>
+<li><strong>Level.</strong> A swing is a bar whose high or low is more extreme than the bars on both sides of it, and which
+   no closed bar has since traded through.</li>
+<li><strong>Entry.</strong> A stop order rests a small, strategy-specific percentage of price inside the level, so price has
+   to carry <em>through</em> the level to trigger the order — a break, not a touch.</li>
+<li><strong>Bracket.</strong> Every fill receives a stop loss and a take profit set as a percentage of the entry price. Because
+   the geometry is proportional to price rather than a fixed dollar distance, it reads the same whether gold
+   trades near 1,800 or near 4,300 — confirmed by measuring the same percentages holding constant, to two
+   decimal places, across sixteen calendar quarters and four different price eras.</li>
+<li><strong>Exit.</strong> Once a trade is far enough ahead its stop locks, then trails behind each closed one-minute bar and
+   is never loosened. Two of the seven strategies also pull their target closer when a trade goes far enough
+   against them, so they can leave on a bounce instead of riding to the full stop.</li>
+</ol>
+<p><strong>What the level is worth.</strong> A control that replaces the real level with a random price at the same
+distance and the same placement cadence keeps only a minority of the net that the real level earns, on two
+independent random seeds. The level is the source of the edge; the bracket geometry alone is not enough.</p>
+<p><strong>Nine variants, seven shipped.</strong> The underlying research identified nine timeframe-and-strictness variants of
+this one object. Two were set aside on causal, not curve-fit, grounds: one earned a few cents on average across
+nearly two thousand trades — practically inside the noise of trading costs — and lost money in the quiet and
+middling-volatility thirds of the sample; the other traded only a handful of times a year and lost money in two
+of the three volatility thirds. The seven that shipped were each profitable in at least two of the three
+volatility thirds, several in every one.</p>
+<hr />
+<h2 id="3-building-the-exit-bracket-then-lock-then-trail">3. Building the exit: bracket, then lock, then trail</h2>
+<p>The bracket alone is not the finished machine. Three exit arms were compared on identical entries:</p>
+<ul>
+<li><strong>Bracket only</strong> (stop and target, nothing else) earns a little more in isolation, but at several times the
+  drawdown of the machines below — the raw stop and target are not enough on their own.</li>
+<li><strong>Stop-lock plus trail</strong> — once a trade is far enough ahead the stop moves to a small locked profit, then
+  trails behind each closed one-minute bar and never loosens — cuts that drawdown far more than it costs the
+  net. This is the shipped exit for five of the seven strategies.</li>
+<li><strong>Trail without the lock stage</strong> (Strategy Tester backtest, BlackBull and Pepperstone real ticks, 2025-2026)
+  looked like a candidate improvement in isolation (more net at a similar or lower drawdown on some feeds),
+  but the gain lived almost entirely in the two strategies that were excluded from the roster in section 2.
+  On the shipped seven strategies, the worst-feed ratio of net to drawdown was lower without the lock than
+  with it, so the lock stays — decided on the worst feed, not the most favourable one.</li>
+</ul>
+<p>A separate control removed the trail entirely and let every position ride to its bracket stop or target: this
+also raised net but at a large multiple of the drawdown, which is why the close-anchored trail is the shipped
+risk control rather than an option.</p>
+<p><strong>Per-tick versus per-bar trailing.</strong> A per-tick version of the same trail moved most exits earlier by roughly
+two minutes on average, but the net effect across the trade population was negligible. The one-minute-close
+trail is what ships — cheaper to compute and no worse for it.</p>
+<h3 id="31-version-107-109-widening-and-conditioning-the-trail">3.1 Version 1.07-1.09: widening and conditioning the trail</h3>
+<p>Three further changes were made to the trail after the roster and lock-then-trail exit were fixed, each proved
+deal-for-deal against the version before it on a real-tick window before release:</p>
+<ul>
+<li><strong>1.07 — a wider trail on four of the seven strategies.</strong> (Strategy Tester backtest, BlackBull, OANDA,
+  Fusion and IC Markets real ticks, 2023 to 2026.) The original trail was found to close winners too early
+  in quiet stretches; doubling its distance on strategies 3, 4, 6 and 7 earned more net on every one of the
+  four broker feeds tested, and on the longest-history feed its worst drawdown episode also recovered faster.
+  A trail wider still earned a little more again but took several times longer to recover from its worst
+  episode, so it was not chosen.</li>
+<li><strong>1.08 — the trail follows the daily trend.</strong> The wider 1.07 trail helps trades that move with the daily
+  trend and costs a little on trades against it, because a counter-trend break tends to snap back. From 1.08,
+  a position opened against the prior day's trend keeps the tighter, pre-1.07 trail; a position with the trend
+  uses the wider one. Measured on four broker feeds, this raised net on every one and shrank the worst
+  five-day stretch at equal profit on every one.</li>
+<li><strong>1.09 — a profit lock for London-session breaks, and a wider with-trend trail.</strong> The London session's first
+  push is often the day's false move: it runs, then fades once New York opens. From 1.09, a position opened in
+  that window is protected by a profit-lock exit once it is meaningfully ahead; positions opened at other times
+  keep the trail, now a further quarter wider when they run with the daily trend. Measured in a Strategy Tester
+  backtest on the same four broker feeds, 2023 to 2026, against the 1.08 machine at a fixed 0.01 lot, this
+  raised net on every one and reduced the average dip below the running equity peak on every one, with the
+  trade-off that the deepest single drawdown episode, while shallower, arrived and cleared faster than
+  before. The full per-broker table is in the manual, chapter 3d.</li>
+</ul>
+<hr />
+<h2 id="4-sizing-the-risk-facade">4. Sizing: the risk facade</h2>
+<p>Position size is set by one input, the balance behind each 0.01 lot; the account scales the same shape of
+exposure up or down with that single number. The calibration was measured, not assumed: the boundary between
+risk levels was set from the drawdown actually produced on the feed with the longest history and the only full
+flat year in the record, then re-measured on the same feed at the shipped default to confirm the prediction
+held before it was used. The exact figures for each level, and what each one has produced historically, are in
+the manual (chapter 3) rather than repeated here, because they are safety information for choosing a setting,
+not a growth claim.</p>
+<hr />
+<h2 id="5-prop-firm-accounts">5. Prop-firm accounts</h2>
+<p>An account-type switch sets the position size and turns off two of the seven strategies for prop-firm modes.
+Those two strategies were identified, by measuring the worst single day across the record, as the pair that
+puts the most loss into the worst days; removing them for prop accounts was decided on that measurement, not
+by searching for the combination that produced the most favourable backtest. A day-replay simulation that reapplies a
+firm's daily-loss and maximum-loss rules to the record's own trading days was used to check the prop sizing
+against real limits before it shipped; the pass-rate table and the rule-guard mechanics are in the manual,
+chapters 3a and 5a.</p>
+<hr />
+<h2 id="6-out-of-sample-the-eight-year-test">6. Out-of-sample: the eight-year test</h2>
+<p>The seven strategies' constants were measured on 2022-2026 data from three brokers. A fourth broker's archive
+reaches back to 2018 and was deliberately not used while the constants were being fixed, so it functions as a
+genuine out-of-sample test rather than more fitting data (backtest, MetaTrader 5 Strategy Tester, real ticks,
+OANDA GOLD.pro, 2018-06-13 to 2026-09-05, Medium risk level):</p>
+<ul>
+<li>The design held up across the whole eight years, including the quiet gold years it was never tuned on.</li>
+<li>The record is uneven: a small part of the total return was earned from 2018 through the end of 2024, and
+  most of it arrived from 2025 onward, a period in which gold moved from about 2,658 to about 4,430.</li>
+<li>Both the long side and the short side of the machine were profitable over the full eight years on this feed.
+  A longs-only variant looked better on every risk measure in the pre-2025 sub-period, but was rejected as a
+  default because it fits that sub-period specifically — the short side is net positive over the complete
+  record, and disabling it permanently would bake a single macro view into the product. It ships as a visible
+  switch instead of a default.</li>
+<li>The record includes long stretches — up to about two years — without a new equity high. This is stated here
+  because it is what a headline return compresses away: the mechanism worked in every era tested, but it is a trend-harvesting
+  machine, not a smooth one.</li>
+</ul>
+<hr />
+<h2 id="7-what-was-tested-and-rejected">7. What was tested and rejected</h2>
+<p>So the reader knows what is not in the box, and why:</p>
+<ul>
+<li><strong>A volatility-regime gate.</strong> A self-calibrating filter based on where the daily trading range sits relative
+  to its own recent history looked strong when every era was pooled together, but the same range bucket
+  flipped from good to bad to very good across three different multi-year eras, and the one bucket that stayed
+  consistently unhelpful had no identifiable market mechanism behind it. A pattern that only holds when the
+  eras are pooled and disagrees with itself era by era is a statistical artefact, not a causal filter, and it
+  is not in the product.</li>
+<li><strong>Longs-only.</strong> Covered in section 6 — better in one sub-period, but it bakes a permanent market view into an
+  otherwise direction-agnostic machine, so it ships as a switch rather than a default.</li>
+<li><strong>Removing the stop-lock for the full nine-strategy machine.</strong> Covered in section 3 — a clear win for the two
+  excluded strategies, a net loss for the worst broker feed on the shipped seven.</li>
+<li><strong>Per-position profit ratchets and basket-level profit capture.</strong> A range of retrace thresholds, floors and
+  basket take-profit or basket-trailing rules were tested against the plain trail. Every setting tried lost
+  money compared with letting the trail run, on both the rebuild and the reference machine it was measured
+  against. The conclusion drawn: the open-profit spikes that retreat before a position closes are the price of
+  the tail that eventually pays, not money left on the table.</li>
+<li><strong>Per-tick trailing.</strong> Covered in section 3 — moves exits earlier by a couple of minutes on average and
+  changes almost nothing in aggregate; the cheaper one-minute-close trail ships instead.</li>
+</ul>
+<hr />
+<h2 id="8-why-results-differ-by-broker">8. Why results differ by broker</h2>
+<p>The same machine, run in the same Strategy Tester backtest on the same window (2025-07-01 to 2026-09-07) on
+four different live brokers (Fusion, Vantage, BlackBull, Pepperstone; section 0), produces different net and
+different drawdown. The entries are closely related across feeds; what differs is the cost of getting filled
+and stopped — spread and execution. A percentage-of-price bracket does not remove that difference, it only
+keeps it proportional to the price level rather than letting it drift as gold's price changes over the years.
+This is why every figure in this note and in the listing names its broker and its window, and why the
+published claim is always the worst of the qualifying live feeds rather than the most favourable one.</p>
+<hr />
+<h2 id="9-limits">9. Limits</h2>
+<ul>
+<li>The machine earns its return in trending gold and stands aside, relatively speaking, in flat multi-year
+  stretches — the eight-year test (section 6) shows both kinds of period without excluding either.</li>
+<li>A hedging account is required. On a netting account the strategies' independent positions cannot be tracked
+  reliably, and the EA prints a notice rather than guessing.</li>
+<li>Results differ materially between brokers (section 8); the published figures always state which broker and
+  which window they come from.</li>
+<li>The figures throughout this note are Strategy Tester results on real tick archives. They do not represent
+  trading on a live account and do not predict future performance.</li>
+</ul>
+<hr />
+<h2 id="appendix-version-history-and-how-each-change-was-proved">Appendix — version history and how each change was proved</h2>
+<p>Every change below was proved deal for deal in a Strategy Tester backtest, real ticks (Pepperstone and the
+other feeds named in the sections above), 2025 to 2026, before it shipped.</p>
+<table>
+<thead>
+<tr>
+<th>version</th>
+<th>change</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.00</td>
+<td>product build from the seven-strategy research engine</td>
+<td>fixed-lot parity: 1,293 fills, entry match 1.0000, net matched to the cent</td>
+</tr>
+<tr>
+<td>1.01-1.03</td>
+<td>internal constant and research-only controls exposed as switchable knobs, all off by default</td>
+<td>defaults reproduce the prior version deal for deal on a real-tick window before each release</td>
+</tr>
+<tr>
+<td>1.04</td>
+<td>a scheduling fix so expired orders are not repeatedly evaluated while the market is closed</td>
+<td>reproduces the version before it deal for deal on a real-tick window</td>
+</tr>
+<tr>
+<td>1.05</td>
+<td>prop-firm rule group added (daily loss, maximum loss, profit target, Friday close), all off unless a number is entered</td>
+<td>defaults reproduce the version before it deal for deal; each rule fires at its intended trigger in a functional test</td>
+</tr>
+<tr>
+<td>1.06</td>
+<td>account-type switch for prop-firm sizing and the two-strategy exclusion (section 5)</td>
+<td>personal mode reproduces the version before it deal for deal; each prop mode reproduces the strategy-off configuration it is built from, to the cent</td>
+</tr>
+<tr>
+<td>1.07</td>
+<td>wider trail on four strategies (section 3.1)</td>
+<td>shipped defaults reproduce the tested wide-trail configuration deal for deal on an independent real-tick window</td>
+</tr>
+<tr>
+<td>1.08</td>
+<td>trend-conditioned trail width (section 3.1)</td>
+<td>shipped defaults reproduce the tested trend-conditioned configuration deal for deal on the same independent window</td>
+</tr>
+<tr>
+<td>1.09</td>
+<td>London-session profit lock and wider with-trend trail (section 3.1)</td>
+<td>shipped defaults reproduce the tested configuration deal for deal on the same independent window</td>
+</tr>
+</tbody>
+</table>
+<p>Every figure in this note names its feed and window; the compiled binary that produced each row is recorded by
+its hash in the product manifest.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

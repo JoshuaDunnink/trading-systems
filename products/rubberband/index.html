@@ -1,0 +1,132 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rubberband - AUDCAD mean-reversion grid Expert Advisor for MT5 (AUDCAD M15) | Joshua Dunnink</title><meta name="description" content="Rubberband is a MetaTrader 5 (MT5) Expert Advisor that trades AUDCAD (forex) on the M15 chart with a regime-aware mean-reversion grid. It reads how far price...">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Rubberband", "applicationCategory": "FinanceApplication", "operatingSystem": "MetaTrader 5 (Windows)", "description": "Rubberband is a MetaTrader 5 (MT5) Expert Advisor that trades AUDCAD (forex) on the M15 chart with a regime-aware mean-reversion grid. It reads how far price...", "url": "https://joshuadunnink.github.io/trading-systems/products/rubberband/", "author": {"@type": "Person", "name": "Joshua Dunnink", "url": "https://www.mql5.com/en/users/joshuadunnink"}, "image": "https://joshuadunnink.github.io/trading-systems/img/rubberband_hero.jpg"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://joshuadunnink.github.io/trading-systems/"}, {"@type": "ListItem", "position": 2, "name": "Products", "item": "https://joshuadunnink.github.io/trading-systems/products.html"}, {"@type": "ListItem", "position": 3, "name": "Rubberband", "item": "https://joshuadunnink.github.io/trading-systems/products/rubberband/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which broker and account type does Rubberband need?", "acceptedAnswer": {"@type": "Answer", "text": "A hedging account with a low AUDCAD spread. No DLLs or external calls are used."}}, {"@type": "Question", "name": "What is the minimum deposit?", "acceptedAnswer": {"@type": "Answer", "text": "300 in account currency at any profile; 500 is recommended at the default LOW risk tier."}}, {"@type": "Question", "name": "Which chart and timeframe do I attach it to?", "acceptedAnswer": {"@type": "Answer", "text": "One AUDCAD chart on the M15 timeframe."}}, {"@type": "Question", "name": "Which is the one risk setting, and where should I start?", "acceptedAnswer": {"@type": "Answer", "text": "InpRiskProfile - LOW is the compiled default and needs no .set file; MEDIUM, HIGH and HOT sit in the same dropdown for a larger account and a larger floating drawdown."}}, {"@type": "Question", "name": "Does Rubberband use a grid or martingale?", "acceptedAnswer": {"@type": "Answer", "text": "It is an averaging grid without martingale: if price keeps moving against the first leg, the EA adds an equal-lot leg every fixed multiple of ATR, up to 15 legs, and closes the whole basket once price comes back. No leg is doubled or scaled up."}}, {"@type": "Question", "name": "Why does it sometimes not open a new basket, especially on a Friday?", "acceptedAnswer": {"@type": "Answer", "text": "A basket seeds only when the regime detector's z-score is strongly extended and RSI(14) confirms the same extreme; a trending market skips the seed. By default the EA also stops opening a new basket from Friday noon server time, so it does not carry a fresh floating position into the weekend gap - a basket already open keeps managing itself as normal."}}, {"@type": "Question", "name": "Do I need a VPS, and what happens after a restart?", "acceptedAnswer": {"@type": "Answer", "text": "Continuous operation is recommended (a VPS or an always-on PC). On a terminal restart with a basket still open, the grid rebuilds its own add-spacing from the account's live positions rather than from any saved state."}}, {"@type": "Question", "name": "Can I backtest Rubberband myself?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The LOW tier runs on its compiled defaults with no .set file, so it can be tested in the MetaTrader 5 Strategy Tester on real ticks using the feed, window and starting balance stated in the Results section of this listing."}}]}</script>
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/rubberband/"><meta property="og:type" content="website">
+<meta property="og:title" content="Rubberband - AUDCAD mean-reversion grid Expert Advisor for MT5 (AUDCAD M15) | Joshua Dunnink"><meta property="og:description" content="Rubberband is a MetaTrader 5 (MT5) Expert Advisor that trades AUDCAD (forex) on the M15 chart with a regime-aware mean-reversion grid. It reads how far price...">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/rubberband/"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/rubberband_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<a href="../../img/rubberband_hero.jpg"><img class="hero" src="../../img/rubberband_hero.jpg" width="800" height="800" alt="Rubberband artwork"></a><h1>Rubberband</h1><p class="lead">AUDCAD · M15 · MetaTrader 5 Expert Advisor</p><p class="note"><strong>Coming soon.</strong> This Expert Advisor is in final testing and is not for sale yet. Its description, manual and research are published so you can follow it before release.</p><p><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 2.95 · worst equity drawdown 2.37% · 103 trades · return +3.8% on 10,000</p><p class="stamp">Backtest, real ticks, Fusion Markets, 2026-03-01 to 2026-09-01, version 1.40. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/rubberband_headline.png" alt="Rubberband balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>Rubberband is a MetaTrader 5 (MT5) Expert Advisor that trades AUDCAD (forex) on the M15 chart with a regime-aware mean-reversion grid. It reads how far price has
+stretched from its own recent average and fades the stretch with a small averaging basket, then closes the whole
+basket once price comes back.</p>
+<p>How a trade is made:</p>
+<p>Stretch. A linear regression channel is fit over the last 20 M15 bars. The distance from price to the channel, in
+standard deviations (the regression z-score), measures how far price has pulled away from its own trend line.</p>
+<p>Entry. A basket seeds only when the z-score is strongly extended and RSI(14) confirms the same extreme (oversold
+for a buy, overbought for a sell); a Kaufman efficiency-ratio filter skips the seed when the market is trending
+too cleanly for a fade to make sense.</p>
+<p>Regime. A live four-state detector (range, high volatility, trend, quiet) reads the daily trend efficiency and
+the daily ATR percentile and re-tunes the entry threshold, the grid spacing and the basket profit target to the
+state it finds - wider spacing and a stronger extension are demanded in a trending or high-volatility market,
+tighter and more frequent entries in a range.</p>
+<p>Basket. If price keeps moving against the first leg, the EA adds an equal-lot leg every fixed multiple of ATR, up
+to 15 legs. The basket closes as soon as its floating profit reaches the regime's target; an optional per-position
+time or ATR stop can close a single leg on its own, independent of the basket.</p>
+<p>Safety. A tier-scaled account guard flattens an open basket only if its floating loss reaches a level set well
+above the normal float for that risk tier. On a terminal restart with a basket still open, the grid rebuilds its
+own add-spacing from the account's live positions rather than from any saved state, and a basket's exit is not
+marked complete until every one of its legs is confirmed closed by the broker.</p>
+<p>Friday and weekend control. <code>InpFriNoNewHour</code> (server hour, 0-23) stops the EA from seeding a NEW basket from
+that hour on a Friday; a basket that is already open keeps adding and exiting exactly as before - only the seed
+is gated. The default is 12 (noon, server time): from Friday noon the EA opens no new basket, so it does not
+carry a fresh floating position into the weekend gap. It is independent of the existing <code>InpPropFridayCloseHour</code>
+(default 0 = off), which would flatten every open basket at a chosen Friday hour and block new trading until
+Monday - left off by default, because forcing a still-open basket shut removes the chance it had to close on its
+own target. Set <code>InpFriNoNewHour</code> to 0 to let the EA trade every Friday hour as earlier versions did.</p>
+<p>What the EA does not do: no martingale doubling, no news-calendar reading, no files, no DLLs, no external
+resources, no trading on any symbol other than the one you attach it to.</p>
+<h2 id="risk-profile">Risk profile</h2>
+<p>One input, <code>InpRiskProfile</code>, picks the position-sizing tier. <code>RP_LOW</code> is the compiled default since version 1.39
+and needs no <code>.set</code> file; <code>InpSizePolicy</code> (default Automatic) decides whether the EA scales the tier to your
+balance or trades the exact lot you set yourself.</p>
+<p>Backtest, MetaTrader 5 Strategy Tester, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06 (about 4.5 years, measured
+before the Friday weekend cutoff described above existed - every basket in this run could still seed on a Friday
+evening):</p>
+<ul>
+<li>LOW (about 1.5% balance risk, 500 recommended account): net +41%, profit factor 2.4, floating drawdown about
+  10%.</li>
+<li>MEDIUM (about 3% balance risk, 1,000 recommended account): net +71%, profit factor 2.34, floating drawdown
+  about 18%.</li>
+</ul>
+<p>HIGH and HOT tiers are available in the same dropdown for a larger account and a larger floating drawdown than
+shown here; a CUSTOM tier lets you set your own fixed lot or your own balance-risk percentage.</p>
+<h2 id="results">Results</h2>
+<p>Both runs below are on version 1.42's compiled configuration, Friday weekend cutoff included (<code>InpFriNoNewHour</code>
+at its default of 12):</p>
+<ul>
+<li>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone AUDCAD, 2025.01.02 to 2026.09.01 (about 20
+  months), 10,000 starting balance, compiled RP_LOW defaults: net 569.69 (+5.7%), profit factor 1.64, 400 trades,
+  equity drawdown 3.88%. One basket was still open across a weekend close in this run.</li>
+<li>Backtest, MetaTrader 5 Strategy Tester, real ticks, OANDA AUDCAD (demo account, shown only as the
+  spread-survival check), 2024.09.01 to 2026.09.01 (about 2 years), 10,000 starting balance, compiled RP_LOW
+  defaults: net 960.35 (+9.6%), profit factor 2.46, 433 trades, equity drawdown 3.68%. No basket was left open
+  across a weekend in this run.</li>
+</ul>
+<p>Pepperstone is the headline: it is the live-account feed, on the two-year cutoff configuration.</p>
+<p>Two more feeds, from the build immediately before the Friday weekend cutoff existed (build 1.40), on a shorter,
+earlier window:</p>
+<ul>
+<li>Backtest, real ticks, Fusion AUDCAD, build 1.40 (before the Friday weekend cutoff), 2026.03.01 to 2026.09.01,
+  10,000 starting balance: net 382.75 (+3.8%), profit factor 2.95, 103 trades, equity drawdown 2.37%.</li>
+<li>Backtest, real ticks, Vantage AUDCAD, build 1.40 (before the Friday weekend cutoff), 2026.03.01 to 2026.09.01,
+  10,000 starting balance: net 414.08 (+4.1%), profit factor 1.69, 119 trades, equity drawdown 8.76%.</li>
+</ul>
+<p>The same rules take near-identical trades on every broker; where the money differs, the smaller and the
+longer-window result are the ones to plan with.</p>
+<h2 id="how-rubberband-differs-from-boomerang">How Rubberband differs from Boomerang</h2>
+<p>Rubberband and Boomerang are both AUDCAD reversion systems. They are separate builds, and the mechanism differs in
+four places:</p>
+<ul>
+<li>Entry: Rubberband fades a linear regression channel z-score confirmed by RSI(14). Boomerang instead requires
+  five simultaneous conditions - position in the rolling eight-hour range, a Bollinger z-score, the sign of the
+  previous bar, a four-bar move threshold and RSI(3).</li>
+<li>Adaptation: Rubberband runs a live four-state regime detector (range, high volatility, trend, quiet) that
+  re-tunes its entry threshold, its grid spacing and its profit target. Boomerang has no regime detector and uses
+  fixed thresholds.</li>
+<li>Exit: Rubberband closes the basket at a regime-set profit target and can cap how long a single position is
+  held. Boomerang's target decays with both basket depth and basket age, and it separately retires its best
+  winner against its worst loser.</li>
+<li>Depth and data: Rubberband holds up to 15 legs and reads five timeframes (M1, M5, M15, H1, D1). Boomerang caps
+  at 5 legs and reads only its M5 chart.</li>
+</ul>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<p><strong>Q: Which broker and account type does Rubberband need?</strong>
+A: A hedging account with a low AUDCAD spread. No DLLs or external calls are used.</p>
+<p><strong>Q: What is the minimum deposit?</strong>
+A: 300 in account currency at any profile; 500 is recommended at the default LOW risk tier.</p>
+<p><strong>Q: Which chart and timeframe do I attach it to?</strong>
+A: One AUDCAD chart on the M15 timeframe.</p>
+<p><strong>Q: Which is the one risk setting, and where should I start?</strong>
+A: InpRiskProfile - LOW is the compiled default and needs no .set file; MEDIUM, HIGH and HOT sit in the same dropdown for a larger account and a larger floating drawdown.</p>
+<p><strong>Q: Does Rubberband use a grid or martingale?</strong>
+A: It is an averaging grid without martingale: if price keeps moving against the first leg, the EA adds an equal-lot leg every fixed multiple of ATR, up to 15 legs, and closes the whole basket once price comes back. No leg is doubled or scaled up.</p>
+<p><strong>Q: Why does it sometimes not open a new basket, especially on a Friday?</strong>
+A: A basket seeds only when the regime detector's z-score is strongly extended and RSI(14) confirms the same extreme; a trending market skips the seed. By default the EA also stops opening a new basket from Friday noon server time, so it does not carry a fresh floating position into the weekend gap - a basket already open keeps managing itself as normal.</p>
+<p><strong>Q: Do I need a VPS, and what happens after a restart?</strong>
+A: Continuous operation is recommended (a VPS or an always-on PC). On a terminal restart with a basket still open, the grid rebuilds its own add-spacing from the account's live positions rather than from any saved state.</p>
+<p><strong>Q: Can I backtest Rubberband myself?</strong>
+A: Yes. The LOW tier runs on its compiled defaults with no .set file, so it can be tested in the MetaTrader 5 Strategy Tester on real ticks using the feed, window and starting balance stated in the Results section of this listing.</p>
+<h2 id="requirements">Requirements</h2>
+<ul>
+<li>Symbol AUDCAD, timeframe M15, one chart.</li>
+<li>Hedging account, minimum 300 in account currency, low AUDCAD spread.</li>
+<li>No DLLs, no external or web calls.</li>
+<li>Continuous operation recommended (a VPS or an always-on PC); the EA manages open baskets across sessions and
+  across a restart.</li>
+</ul>
+<h2 id="risk-disclosure">Risk disclosure</h2>
+<p>This is an averaging grid: it holds a small basket of same-direction positions open until price reverts, and an
+open basket can go significantly underwater before it does. An extreme, non-reverting move can produce a large
+loss. By default the EA opens no new basket in the last hours of the Friday session, so a new position is less
+likely to be carried into the weekend gap; a basket that is already open still manages itself exactly as on any
+other day. Trade only risk capital, respect the minimum account, and keep margin headroom for the floating
+drawdown of the tier you choose. Backtest results do not guarantee future performance. Past results do not
+predict future results.</p><h2>Evidence</h2><figure><img src="img/01_equity_FUSION.png" alt="equity FUSION (backtest chart)" loading="lazy"><figcaption>equity FUSION - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_PEPPERSTONE.png" alt="equity PEPPERSTONE (backtest chart)" loading="lazy"><figcaption>equity PEPPERSTONE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_VANTAGE.png" alt="equity VANTAGE (backtest chart)" loading="lazy"><figcaption>equity VANTAGE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_OANDA.png" alt="equity OANDA (backtest chart)" loading="lazy"><figcaption>equity OANDA - Strategy Tester, real ticks, backtest</figcaption></figure>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

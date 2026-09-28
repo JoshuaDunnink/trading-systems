@@ -1,0 +1,285 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Rubberband research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Research for Rubberband">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/rubberband/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Rubberband research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Research for Rubberband">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/rubberband/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/rubberband_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Rubberband</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#rubberband-research-note">Rubberband — Research Note</a><ul>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
+<li><a href="#2-the-market-mechanism-fading-an-audcad-stretch">2. The market mechanism: fading an AUDCAD stretch</a></li>
+<li><a href="#3-design-decisions-in-build-order">3. Design decisions, in build order</a></li>
+<li><a href="#4-what-was-tested-and-rejected">4. What was tested and rejected</a></li>
+<li><a href="#5-validation">5. Validation</a></li>
+<li><a href="#limits">Limits</a></li>
+<li><a href="#appendix-traceability">Appendix — traceability</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="rubberband-research-note">Rubberband — Research Note</h1>
+<p><em>What the machine does, why AUDCAD, what was changed on the way to the shipped version, and what each change
+did — with the tests that decided it.</em></p>
+<p>Version 1.42 · September 2026</p>
+<p>All figures in this note are Strategy Tester runs on real broker ticks. They are backtests, not a live-account
+record. Every number names the build, the broker feed and the window it came from; a number that cannot be
+traced that way does not appear here.</p>
+<hr />
+<h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p>Rubberband runs out of the box on its <strong>LOW</strong> risk tier (about 1.5% of balance per basket) and, since version
+1.42, does not open a new basket in the last hours of the Friday session. Two live-broker feeds, compiled
+defaults, 10,000 starting balance:</p>
+<table>
+<thead>
+<tr>
+<th>feed · window</th>
+<th>net</th>
+<th>profit factor</th>
+<th>equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pepperstone · 2025-01 to 2026-09 (about 20 months)</td>
+<td>+5.7%</td>
+<td>1.64</td>
+<td>3.88%</td>
+</tr>
+<tr>
+<td>OANDA (demo, spread-survival check) · 2024-09 to 2026-09 (about 2 years)</td>
+<td>+9.6%</td>
+<td>2.46</td>
+<td>3.68%</td>
+</tr>
+</tbody>
+</table>
+<p>Pepperstone is the live-account feed and the smaller of the two; it is the number to plan with. Two further feeds
+(Fusion, Vantage) are measured on the build immediately before this weekend policy existed (1.40, a shorter
+2026-03 to 2026-09 window) and have not yet been re-run on the 1.42 configuration — see the version history for
+those figures.</p>
+<p>How the machine got from a raw idea to that table is the rest of this note. Each section names a mechanism,
+shows the figure that decided it, and states what it changed. The exact geometry (thresholds, ATR multiples,
+spacing) is deliberately not written out here; it is in the product's inputs.</p>
+<hr />
+<h2 id="1-how-it-was-tested">1. How it was tested</h2>
+<ul>
+<li><strong>Real ticks only.</strong> Every claim in this note comes from a Strategy Tester run on a broker's own tick archive,
+  a complete <code>.set</code> per arm (every enum written as its integer, never as text), and a fixed 10,000 starting
+  balance unless stated otherwise.</li>
+<li><strong>A control before a change.</strong> Every version bump is checked against the previous version deal-for-deal on an
+  identical window before its own new behaviour is measured — a new input left at its old default must reproduce
+  the prior build exactly, or the change is not accepted.</li>
+<li><strong>Two feeds, not one.</strong> OANDA and Pepperstone see the same AUDCAD market through two different cost paths.
+  Agreement between them shows a mechanism survives the broker; a result that only appears on one feed is
+  reported as such, not generalised.</li>
+<li><strong>Predict, then run.</strong> The Friday weekend policy (section 3, "the weekend and Friday-afternoon cutoff") was
+  pre-registered with a stated prediction and a falsifier before either feed was read.</li>
+<li><strong>A loss limit.</strong> No realised loss on a single basket may exceed 20% of the balance immediately before it
+  in any arm quoted in this note; the rule is checked as a matter of course.</li>
+</ul>
+<hr />
+<h2 id="2-the-market-mechanism-fading-an-audcad-stretch">2. The market mechanism: fading an AUDCAD stretch</h2>
+<p>AUDCAD pairs two commodity-linked currencies — the Australian dollar against iron ore and other exports, the
+Canadian dollar against oil — whose macro drivers often move in the same direction against the rest of the
+market and partly cancel each other out in the cross itself. That is the reason the product looks for reversion
+rather than continuation on this pair: without one dominant currency doing the driving, a stretch away from the
+recent average is, more often than not, a stretch that comes back rather than the start of a new trend.</p>
+<p>Rubberband measures the stretch with a linear regression channel fit over the last 20 M15 bars: the distance from
+price to that channel, in standard deviations, is the regression z-score. A basket seeds only when the z-score is
+strongly extended and RSI(14) confirms the same extreme. A Kaufman efficiency-ratio filter is the machine's own
+acknowledgement that the mechanism is conditional, not universal — it skips the seed when the market is trending
+too cleanly for a fade to make sense, because a stretch that keeps stretching is exactly the case the mechanism
+does not want to be in.</p>
+<p>A live four-state regime detector (range, high volatility, trend, quiet) reads the daily trend efficiency and the
+daily ATR percentile and re-tunes the entry threshold, the grid spacing and the basket's profit target to the
+state it finds. The basket itself is the second half of the mechanism: if price keeps moving against the first
+leg, the EA adds an equal-lot leg every fixed multiple of ATR, up to 15 legs, and closes the whole basket once its
+floating profit reaches the regime's target — averaging into the stretch rather than exiting at the first sign it
+was wrong, on the premise that the stretch itself is the signal, not a one-shot prediction of the next few bars.</p>
+<hr />
+<h2 id="3-design-decisions-in-build-order">3. Design decisions, in build order</h2>
+<p><strong>v1.0 — the base engine.</strong> Regime-adaptive mean-reversion grid (range / high-volatility / trend / quiet states)
+plus a risk-profile facade and a tier-scaled account tail-guard. This is the mechanism described in section 2;
+everything after this version adjusts it or adds an optional switch around it.</p>
+<p><strong>v1.10 — confidence lot-size boosting (opt-in).</strong> A single switch enlarges the lot only on the
+highest-confidence entries (calm-market extreme reversions). Real-tick backtest, OANDA AUDCAD, 2022-26, LOW tier:
+off +78% at 11.4% drawdown, on +92% at 13.2% drawdown — more return for a small amount of extra drawdown, still
+comfortably inside the drawdown-acceptance rule. Ships off by default.</p>
+<p><strong>v1.20 — a self-adaptive quiet-volatility regime (opt-in).</strong> A GA-derived detector for the low-volatility state
+AUDCAD entered from 2024. This is a selectivity mode: it raises the profit factor and the share of consistent
+months without raising net or lowering the balance-series drawdown. Ships off; the default golden is unchanged.</p>
+<p><strong>v1.30 — "ride the trend" (opt-in exit).</strong> When a trade is aligned with the multi-day trend rather than against
+it, the EA holds and trails the exit instead of booking the small fixed profit, and freezes new adds while
+riding. Backtest, real ticks, OANDA AUDCAD, 2022-26: profit factor rose from 1.50 to 1.70, balance drawdown fell
+from 7.6% to 6.6%, and the share of profitable months rose from 67% to 74%, for a modest reduction in net.
+Counter-trend trades —
+most of the book — still book fast at the regime's fixed target; only the trend-aligned minority changes
+behaviour. Ships off by default.</p>
+<p><strong>2026-07 — exit geometry study (research, not shipped as-is).</strong> A study of price immediately after a basket
+closes found it continues in the same direction by a median of about 1.98 ATR — the basket is exiting into room,
+not into exhaustion. Two configurations tested whether that room could be harvested: a wider-target
+configuration with a 10-leg depth cap, and the same wide targets with no depth cap at all. Backtest, real
+ticks, OANDA AUDCAD, 2021: the depth-capped configuration returned net +$2,879 at a profit factor of 2.28 and
+a realised drawdown of 7.3%. The uncapped configuration carried a rare, much deeper tail event and was judged portfolio-use
+only, at reduced weight, rather than a standalone default. Neither configuration replaced the shipped basket
+target; the finding that a depth cap is what turns a wide-target tail risk into a bounded one carried forward as
+understanding, not as a specific shipped parameter.</p>
+<p><strong>v1.33 — a spread-relative add/seed guard (opt-in).</strong> The seed basket's median winner is about two pips. A
+spread census on live broker archives found raw-ECN feeds running 0.4-0.8 pips through the session (28-39% of
+that target) and standard-spread feeds running 1.5-2 pips (75-100% of it) — an absolute points cap cannot tell
+those two situations apart, so the guard is expressed as a fraction of the basket's own target instead, which
+self-calibrates with volatility without needing a broker-specific number. Ships off pending a broker-by-broker
+read.</p>
+<p><strong>v1.34 — alternate seed families (research, not shipped as default).</strong> Two alternate entry conditions —
+percentile rank of the recent close, and a Bollinger-band close-outside rule — were tested through the product's
+own exit machine, holding every other rule fixed, so the comparison was between entry families and nothing else.
+See section 4 for what came of it.</p>
+<p><strong>v1.39 — LOW becomes the default risk tier.</strong> Detailed in the manual (section 2b): the LOW tier's tighter
+account-breaker budget keeps a basket floating rather than letting it realise at the wider budget the previous
+default used. This is a sizing-and-safety decision, not a change to the entry or exit mechanism.</p>
+<p><strong>v1.40 — restart and failed-close safety.</strong> The basket-close routine now confirms every leg is actually gone
+before it clears the basket's state, and on a terminal restart the grid's add-spacing anchor is rebuilt from the
+account's own open positions rather than from any saved value. A deal-for-deal A/B against the prior build on
+OANDA, 2024-09 to 2026-09, matched on 529 of 532 trades; the three that differed were a single basket caught in a
+genuine market-closed retry sequence, where the new logic keeps the basket's regime-locked profit target intact
+through the failed retries instead of losing it. This is a robustness fix, not a change to when or how the
+machine trades.</p>
+<p><strong>2026-09-28 — the deep-basket study.</strong> A backtest read of every basket in a two-year OANDA record
+(2024-09 to 2026-09, real ticks) found that baskets
+held open across a weekend, and baskets seeded in the 14:00-18:00 server window on the first Friday of a month
+(when the US and Canadian jobs reports land together), were both over-represented among the deepest equity dips
+— three of the twelve deepest baskets were weekend-held against about 0.3 expected by chance, and two were
+first-Friday-jobs seeds against the same 0.3 expected. Both kinds of basket recovered on net over the record:
+weekend-held baskets averaged +22.3 each, and first-Friday-jobs baskets averaged +12.5 each — they cost equity
+dips along the way, not money at the end. That distinction is what shaped the response in v1.41/1.42: rather than
+force those baskets shut (which would convert a recovering float into a realised loss — the same mechanism the
+2026-07 exit study and the section-4 rejected flatten-all both point to), the fix is to stop a new one from
+starting.</p>
+<p><strong>v1.41/1.42 — the Friday weekend cutoff.</strong> <code>InpFriNoNewHour</code> (server hour, default now 12) stops the EA from
+seeding a <strong>new</strong> basket from that hour on a Friday; a basket that is already open keeps adding to itself and
+exiting exactly as on any other day — only the seed is gated. It shipped in 1.41 behind an off-by-default switch
+while its effect was measured on two feeds, and the owner reviewed the full measurement before turning it on by
+default in 1.42. Backtest, real ticks: baskets left open across a weekend fell from 7 to 0 on OANDA (2024-09 to
+2026-09) and from 5 to 1 on Pepperstone (2025-01 to 2026-09), and equity drawdown fell from 6.08% to 3.68%
+(OANDA) and from 5.43% to 3.88% (Pepperstone) over those same windows. This is a deliberate, owner-set safety choice: the machine is a
+little more selective about opening a fresh basket in the closing hours of the week, in exchange for not holding
+a brand-new position open across the weekend gap.</p>
+<hr />
+<h2 id="4-what-was-tested-and-rejected">4. What was tested and rejected</h2>
+<p>So that the reader knows what is not in the product, and why:</p>
+<ul>
+<li><strong>Alternate seed conditions</strong> (a percentile-rank-of-close entry, and a Bollinger close-outside entry) were
+  compared against the product's own regression-z-and-RSI seed through the same exit machine. They ranked well
+  on other instruments in the same screen, but on AUDCAD specifically, run through this product's own basket and
+  exit logic, they did not separate cleanly from a random threshold. They remain in the product as off-by-default
+  research inputs rather than replacing the shipped seed.</li>
+<li><strong>A forced Friday flatten-all</strong>, closing every open basket at a fixed hour regardless of its own progress, was
+  measured directly against the seed-only cutoff described above. Forcing a basket shut converts a float that
+  would often have recovered into a realised loss — the same failure mode the averaging mechanism exists to
+  avoid — and it added no further weekend protection once the seed-only cutoff was already in place. It ships
+  off by default; the seed-only cutoff is the one that shipped on.</li>
+<li><strong>A depth cap tighter than the shipped one</strong>, tested in the 2026-07 exit-geometry study, controlled the tail
+  risk of a much wider take-profit target than the product uses today. It was not carried into the product as a
+  specific parameter — the shipped basket instead uses a narrower, regime-set profit target that does not need
+  as deep a cap to stay inside the drawdown-acceptance rule.</li>
+</ul>
+<hr />
+<h2 id="5-validation">5. Validation</h2>
+<ul>
+<li>Every version bump was checked deal-for-deal against the previous build on an identical window before its own
+  new behaviour was measured (v1.40's 529-of-532 match against v1.39-era logic; v1.41's control leg matching
+  v1.40 exactly; v1.42's compiled defaults reproducing the v1.41 cutoff-on arm exactly).</li>
+<li>The weekend-cutoff prediction was pre-registered — expected weekend-held baskets, expected drawdown range —
+  before either feed was read, and the measured result on both feeds met or exceeded every part of that
+  prediction.</li>
+<li>Two independent live-broker feeds (Pepperstone, OANDA) agree in direction on every metric measured for the
+  cutoff: fewer weekend-held baskets, lower equity drawdown, on both.</li>
+<li>No realised basket loss on any arm in this note exceeds 20% of the balance immediately before it.</li>
+</ul>
+<h2 id="limits">Limits</h2>
+<ul>
+<li>The figures here are Strategy Tester backtests on tick archives, not a record of live trading. Live spreads,
+  slippage and a broker's own fills differ from the archive's.</li>
+<li>Fusion and Vantage have not yet been re-measured on the 1.42 configuration; their most recent figures are from
+  build 1.40, before the weekend cutoff existed, on a shorter window (see the version history).</li>
+<li>This is a mean-reversion grid on one pair and one timeframe: a market regime the four-state detector has not
+  seen before is, by definition, not in this record. The regime detector and the efficiency-ratio gate exist to
+  step the machine aside when the pair is trending rather than reverting, not to predict when that will happen.</li>
+<li>Past performance does not indicate future results. Test on a demo account with your own broker before trading
+  real funds.</li>
+</ul>
+<hr />
+<h2 id="appendix-traceability">Appendix — traceability</h2>
+<p>All entries below are Strategy Tester backtests, real ticks.</p>
+<table>
+<thead>
+<tr>
+<th>version</th>
+<th>change</th>
+<th>proof</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.0</td>
+<td>base regime-adaptive mean-reversion grid + risk facade + tail-guard</td>
+<td>—</td>
+</tr>
+<tr>
+<td>1.10</td>
+<td>confidence lot-size boosting (opt-in)</td>
+<td>OANDA AUDCAD 2022-26: off +78%/11.4% DD, on +92%/13.2% DD</td>
+</tr>
+<tr>
+<td>1.20</td>
+<td>self-adaptive quiet-volatility regime (opt-in)</td>
+<td>selectivity mode; default golden unchanged</td>
+</tr>
+<tr>
+<td>1.30</td>
+<td>ride-the-trend trailing exit (opt-in)</td>
+<td>OANDA AUDCAD 2022-26: PF 1.50 to 1.70, balance DD 7.6% to 6.6%</td>
+</tr>
+<tr>
+<td>1.33</td>
+<td>spread-relative add/seed guard (opt-in)</td>
+<td>live-feed spread census; ships off pending a broker-by-broker read</td>
+</tr>
+<tr>
+<td>1.34</td>
+<td>alternate seed families (research inputs)</td>
+<td>screened against the shipped seed through the product's own exit machine; not adopted on AUDCAD</td>
+</tr>
+<tr>
+<td>1.39</td>
+<td>LOW becomes the default risk tier</td>
+<td>manual section 2b</td>
+</tr>
+<tr>
+<td>1.40</td>
+<td>restart / failed-close safety</td>
+<td>OANDA AUDCAD 2024-09 to 2026-09: 529/532 deals identical, 3 explained by a market-closed retry</td>
+</tr>
+<tr>
+<td>1.41</td>
+<td>Friday weekend cutoff (<code>InpFriNoNewHour</code>), shipped off</td>
+<td>pre-registered A/B, OANDA + Pepperstone AUDCAD</td>
+</tr>
+<tr>
+<td>1.42</td>
+<td>Friday weekend cutoff turned on by default</td>
+<td>compiled defaults reproduce the 1.41 cutoff-on arm exactly</td>
+</tr>
+</tbody>
+</table>
+<p>Every table in this note names its feed and window; the compiled binary that produced each row is recorded by
+its hash in the product manifest.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

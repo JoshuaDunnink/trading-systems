@@ -1,9 +1,9 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Kingfisher manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="User manual for Kingfisher">
+<title>Kingfisher manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Manual for Kingfisher">
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html"><meta property="og:type" content="website">
-<meta property="og:title" content="Kingfisher manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="User manual for Kingfisher">
-<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html">
+<meta property="og:title" content="Kingfisher manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Manual for Kingfisher">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/kingfisher_hero.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
 <body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
@@ -44,7 +44,7 @@
 </ul>
 </div>
 </nav><h1 id="kingfisher-user-manual">KINGFISHER — user manual</h1>
-<p><em>Version 1.11 · XAUUSD · MetaTrader 5 · THE AEGIS ARCADE</em></p>
+<p><em>Version 1.11 · XAUUSD · MetaTrader 5</em></p>
 <p>KINGFISHER sits still above the water and dives once, when the fish breaks the surface. On a gold chart it waits at the nearest price level that has not been broken yet, rests a small order just inside it, and is filled at the moment the level gives way. Every trade has a fixed stop loss and take profit from the second it opens. When the market is too quiet for that stop loss to make sense, KINGFISHER does not trade at all.</p>
 <p>This manual is written for someone who has never run an expert advisor before. If you only read one chapter, read chapter 3.</p>
 <hr />
@@ -105,7 +105,7 @@
 <li>Make sure the <strong>Algo Trading</strong> button in the toolbar is green. A smiling face in the chart's top-right corner means the EA is running.</li>
 </ol>
 <p>The journal (<strong>Toolbox → Experts</strong>) shows one line on start, for example:</p>
-<pre><code>KINGFISHER v1.11 | account Personal | settings Recommended | XAUUSD | 5 of 5 hunters | risk Medium (1.00% per level) | exit Smart, Skim Grip | trade while stop &lt;= 0.20 x hourly ATR | max lot 5.00 | THE AEGIS ARCADE
+<pre><code>KINGFISHER v1.11 | account Personal | settings Recommended | XAUUSD | 5 of 5 hunters | risk Medium (1.00% per level) | exit Smart, Skim Grip | trade while stop &lt;= 0.20 x hourly ATR | max lot 5.00
 KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker minimum 0.01)
 </code></pre>
 <p>If your account is a <strong>netting</strong> account (one position per symbol) the EA prints a note; see chapter 6.</p>
@@ -336,7 +336,7 @@ challenge's rules applied tick-close by tick-close); a statement about the teste
 <li>trades often last <strong>seconds to minutes</strong>; firms that set a minimum trade duration are not suitable;</li>
 <li>one chart, one instance (a second chart needs its own magic number, chapter 12).</li>
 </ul>
-<p>Source of every figure: the project's research journal (entries J11, J19, J21, J29) and <code>scripts/_prop_sim.py</code>
+<p>Source of every figure: a day-block simulation replayed over the tested trade record (see the research note)
 (FTMO-class rules, day-block bootstrap), cross-checked against an independent prop-firm simulator within one
 percentage point.</p>
 <h2 id="3b-prop-firm-rules-your-firms-own-numbers-since-109">3b. Prop-firm rules: your firm's own numbers (since 1.09)</h2>
@@ -507,7 +507,7 @@ the middle of the day does not give it a fresh daily allowance.</p>
    - <strong>Fills per day.</strong> In an active market, 2–4. In a quiet week, zero is normal — that is the gate working, not a fault.
    - <strong>How far past the stop loss the losers closed.</strong> The stop is placed at 2.00; on the tested brokers the median loser closed at 2.06–2.30 and one in ten at 3.45–4.45. If your broker's median is past 2.60, your costs are materially worse than anything tested — stay on demo or change broker.</li>
 <li>When you go live, <strong>start at Low</strong> for the first eight trading weeks, or set Custom with <code>InpRiskPct = 0.25</code>.</li>
-<li>Move to Medium only after at least 60 closed trades with a profit factor above 1.5 and no single day worse than −3 % of balance.</li>
+<li>Move to Medium only after at least 60 closed trades with a profit factor above 1.5 and no single day losing more than 3 % of balance.</li>
 </ol>
 <h2 id="5-reading-the-chart-and-the-journal">5. Reading the chart and the journal</h2>
 <p>KINGFISHER draws nothing on the chart. You will see:</p>
@@ -748,12 +748,12 @@ closed by the Grip or by Smart gets no Rebound. Neither does a Dive: both were t
 </tr>
 <tr>
 <td>OANDA (wide spread)</td>
-<td>-5 %</td>
+<td>no benefit - leave it off on a wide-spread account</td>
 <td>-</td>
 </tr>
 <tr>
 <td>Dukascopy gold history 2013 - 2015, replayed at today's price</td>
-<td>flat (-0.1 %)</td>
+<td>flat</td>
 <td>about the same</td>
 </tr>
 </tbody>
@@ -928,15 +928,8 @@ and needs no .set file.</p>
 <p>On another broker the entries are the same but the numbers are not (chapter 8): expect the same order of magnitude,
 not the same cent. The Journal must say "real ticks" for the whole window — a tester that fills a gap with generated
 ticks produces a different, invalid result.</p>
-<p><strong>With one command</strong> (the project's own tester harness):</p>
-<pre><code>python scripts/reproduce.py --product KINGFISHER --list
-python scripts/reproduce.py --product KINGFISHER --manual BB_HOLDOUT
-python scripts/reproduce.py --product KINGFISHER --run --feed BLACKBULL
-</code></pre>
-<p><code>--run</code> starts a fresh pass (never a cached one) and prints PASS, FAIL or FEED CHANGED (the broker's tick history no
-longer covers the window). The rows live in <code>MANIFEST.json → reproduce</code>.</p>
 <h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</h2>
-<p>Generated from the compiled source (<code>scripts/_manual_from_inputs.py</code>); enum defaults are the source names — the Inputs tab shows their plain labels.</p>
+<p>Generated from the compiled source; enum defaults are the source names — the Inputs tab shows their plain labels.</p>
 <table>
 <thead>
 <tr>

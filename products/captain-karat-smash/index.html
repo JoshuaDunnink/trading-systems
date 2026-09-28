@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Captain Karat-Smash - Gold support/resistance breakout Expert Advisor for MT5 (XAUUSD H1) | Joshua Dunnink</title><meta name="description" content="Captain Karat-Smash is an MT5 Expert Advisor for gold (XAUUSD): a support and resistance breakout system that runs seven independent strategies on one H1...">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Captain Karat-Smash", "applicationCategory": "FinanceApplication", "operatingSystem": "MetaTrader 5 (Windows)", "description": "Captain Karat-Smash is an MT5 Expert Advisor for gold (XAUUSD): a support and resistance breakout system that runs seven independent strategies on one H1...", "url": "https://joshuadunnink.github.io/trading-systems/products/captain-karat-smash/", "author": {"@type": "Person", "name": "Joshua Dunnink", "url": "https://www.mql5.com/en/users/joshuadunnink"}, "image": "https://joshuadunnink.github.io/trading-systems/img/captain-karat-smash_hero.jpg"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://joshuadunnink.github.io/trading-systems/"}, {"@type": "ListItem", "position": 2, "name": "Products", "item": "https://joshuadunnink.github.io/trading-systems/products.html"}, {"@type": "ListItem", "position": 3, "name": "Captain Karat-Smash", "item": "https://joshuadunnink.github.io/trading-systems/products/captain-karat-smash/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Does it need a hedging account?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The seven strategies hold independent positions, so the account must be hedging, not netting."}}, {"@type": "Question", "name": "What is the minimum deposit?", "acceptedAnswer": {"@type": "Answer", "text": "The suggested minimum is 3,000 in account currency at the Medium risk level; below that a single lot is a large share of the account."}}, {"@type": "Question", "name": "What chart and timeframe do I attach it to?", "acceptedAnswer": {"@type": "Answer", "text": "One XAUUSD H1 chart. The chart is only a host - the seven strategies read the daily, four-hour, five-minute and one-minute data they need on their own."}}, {"@type": "Question", "name": "Which setting should I change first?", "acceptedAnswer": {"@type": "Answer", "text": "The Risk level input: Low, Medium, High or Hot (Medium by default). It sets the balance behind each 0.01 lot, and position size scales with it. Every other input can stay at its default."}}, {"@type": "Question", "name": "Does it use a grid, martingale or averaging down?", "acceptedAnswer": {"@type": "Answer", "text": "No. There is no grid, no martingale and no averaging down. Every position gets its own stop loss the moment it opens, and a losing trade is closed at that stop."}}, {"@type": "Question", "name": "Why does it go quiet for long stretches with no new equity high?", "acceptedAnswer": {"@type": "Answer", "text": "It is a trend harvester, not a steady income system. The strategies only act when a level breaks, so quiet or choppy gold means fewer trades and long stretches without a new equity high; it earns when gold makes a real move."}}, {"@type": "Question", "name": "Can I run it on a prop-firm challenge?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The Account type input has Prop firm 2-step and 1-step settings that size positions, switch off the two highest-loss-day strategies and turn on daily-loss and maximum-loss guards; a separate input group also accepts your own firm's numbers."}}, {"@type": "Question", "name": "Can I check the results myself?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. Every figure in this listing states its source - a Strategy Tester backtest, real broker ticks, the broker name and the date window - so you can reproduce the run in your own terminal."}}]}</script>
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/captain-karat-smash/"><meta property="og:type" content="website">
+<meta property="og:title" content="Captain Karat-Smash - Gold support/resistance breakout Expert Advisor for MT5 (XAUUSD H1) | Joshua Dunnink"><meta property="og:description" content="Captain Karat-Smash is an MT5 Expert Advisor for gold (XAUUSD): a support and resistance breakout system that runs seven independent strategies on one H1...">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/captain-karat-smash/"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/captain-karat-smash_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<a href="../../img/captain-karat-smash_hero.jpg"><img class="hero" src="../../img/captain-karat-smash_hero.jpg" width="800" height="800" alt="Captain Karat-Smash artwork"></a><h1>Captain Karat-Smash</h1><p class="lead">XAUUSD · H1 · MetaTrader 5 Expert Advisor</p><p class="note"><strong>Coming soon.</strong> This Expert Advisor is in final testing and is not for sale yet. Its description, manual and research are published so you can follow it before release.</p><p><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 1.73 · worst equity drawdown 7.88% · 896 trades · return +49.4% on 10,000</p><p class="stamp">Backtest, real ticks, Fusion Markets, 2025-07-01 to 2026-09-07, version 1.01. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/captain-karat-smash_headline.png" alt="Captain Karat-Smash balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>Captain Karat-Smash is an MT5 Expert Advisor for gold (XAUUSD): a support and resistance breakout system that
+runs seven independent strategies on one H1 chart. He waits for the walls of
+consolidation to close in, then punches through the level and takes what is on the other side. Seven independent
+strategies run side by side on a single H1 chart. They share one engine and differ in the timeframe they
+read, how strict their level definition is, and how their stop loss and take profit are proportioned.</p>
+<p>How a trade is made:</p>
+<p>Level. Each strategy tracks the most recent unbroken swing high above price and swing low below it. A swing
+is a bar whose high or low is more extreme than the bars on both sides of it and which no closed bar has
+traded through since. Strategies one and two read daily bars, the others read four-hour bars.</p>
+<p>Entry. A buy stop order rests just inside the swing high and a sell stop order just inside the swing low.
+Price has to carry through the level for the order to trigger, which distinguishes a break from a touch.
+Orders that are not triggered expire after a per-strategy timeout and are renewed only while their level is
+still current.</p>
+<p>Risk per trade. Every position receives a stop loss and a take profit when it opens. Both are set as a
+percentage of the entry price, so the geometry is unchanged whether gold trades near 1,800 or near 4,300.</p>
+<p>Exit. Once a position is far enough ahead, its stop loss is moved to a locked level. From there the stop
+trails behind each closed one-minute bar and is never loosened. Two strategies also move their take profit
+closer when a trade goes far enough against them, so that it can leave on a bounce instead of at the full
+stop loss.</p>
+<p>What the EA does not do: <strong>no grid, no martingale, no averaging down</strong>, no position without a stop loss, no
+recovery mode after a loss. A losing trade is closed at its stop. Every position carries a hard stop loss from
+the moment it opens.</p>
+<p>Settings. One input sets the risk level: Low, Medium, High or Hot, each defined as the account balance behind
+every 0.01 lot. Position size then scales with the balance. All other inputs are optional and the compiled
+defaults are the tested configuration, so the EA can be attached without a set file. Individual strategies can
+be switched off; they are independent and do not interact. The Inputs tab is ordered by how often you should touch
+it: 1 Start here (account type, risk level, a virtual balance to size a large account as if it held less, and the
+spread limit in US dollars, the same on every broker), 2 Strategies, 3 Prop-firm rules, 4 Trading, 5 Custom sizing.
+Version 1.07 trails the stop of four strategies twice as far behind price than before, and 1.08 keeps the tighter trail on trades that open against the daily trend; measured on four brokers' real
+tick histories it kept more of each winner on every one and recovered its deepest drawdown faster on the raw-spread feed.
+Version 1.09 protects breaks that open in the London session with a profit lock and gives with-trend trades a wider trail;
+on four brokers' real ticks at 0.01 lot it made 25 to 47 percent more and its average dip below the peak was a third to a
+half smaller.</p>
+<p>Prop-firm accounts. The first input is the Account type: Personal, Prop firm 2-step (5 percent daily / 10 percent
+maximum loss) or Prop firm 1-step (3 / 6 percent). A prop account type switches off the two strategies that put the
+most loss into the worst days, which halves the worst day, and sets the size itself; in a simulation that replays the
+backtest's own days neither prop type broke a daily-loss limit on the raw-spread feeds tested (2-step: 96 to 100
+percent of attempts passed). This describes tested history, not a prediction.</p>
+<p>Prop-firm rules. A second input group takes your firm's own numbers: daily loss limit (a share of the account size
+or of the day-start value, counted from balance, equity or the higher of the two), maximum loss limit (fixed or
+trailing), profit target, best-day cap and a Friday close hour. When a limit is about to be reached the EA closes its
+own trades, deletes its orders and pauses until the firm's next day (daily rules) or stops for good (maximum loss,
+target); the Journal names the rule and the equity. Every rule is off until you type a number; with every rule off the EA trades exactly as before. It is a rule guard, not a guarantee: a price gap can
+carry a loss past a limit, which is why the EA acts 0.5 percent early by default.</p>
+<p>Tested result. Strategy Tester backtest, real broker ticks, four live feeds, compiled default settings, 10,000
+deposit, 1 July 2025 to 7 September 2026: Fusion, the weakest of the five feeds tested (four live plus the OANDA
+demo check), returned 4,935 (49.4 percent of the deposit) at a profit factor of 1.73 over 896 trades with a 7.88
+percent equity drawdown. Pepperstone, the strongest, returned 6,908 at a profit factor of 2.11 over the same
+window. A separate, longer Strategy Tester backtest on OANDA real ticks reaching back to 2018 served as an
+out-of-sample check with the same compiled settings: the design held up through the quieter gold years, but most
+of its return arrived in 2025 and 2026 while gold trended strongly, and it went through long stretches without
+a new equity high before that. Expect the same: this is a trend harvester, not a steady income system. These are
+Strategy Tester backtest results on real broker ticks; they do not represent trading on a live account and do
+not predict future performance.</p>
+<p>Testing notes. The strategy constants were measured on real broker tick data from four brokers, and the EA was
+validated on each of them with the Strategy Tester at 100 percent history quality. Results differ between
+brokers; the published figures state which broker and which period they come from. Strategy Tester results are
+not live trading results and do not predict future performance. Plan for a future drawdown deeper than any in
+the test record.</p>
+<p>Family note. Two other products in this line also trade a break of a price level on gold. Captain Karat-Smash differs from them mechanically: its bracket sets both the stop loss and the take profit as a percentage of price on every one of its seven strategies, its levels are unbroken swing highs and lows on the daily and four-hour bars rather than a rolling range or a shared per-level position, and its exit is a single stop that locks once a trade is ahead and then trails behind each closed one-minute bar, with no partial closes and no per-fill profit-lock logic. Each strategy sizes and manages its own positions independently; strategies never share a bet the way some other level-break products in this line do.</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<p><strong>Q: Does it need a hedging account?</strong>
+A: Yes. The seven strategies hold independent positions, so the account must be hedging, not netting.</p>
+<p><strong>Q: What is the minimum deposit?</strong>
+A: The suggested minimum is 3,000 in account currency at the Medium risk level; below that a single lot is a large share of the account.</p>
+<p><strong>Q: What chart and timeframe do I attach it to?</strong>
+A: One XAUUSD H1 chart. The chart is only a host - the seven strategies read the daily, four-hour, five-minute and one-minute data they need on their own.</p>
+<p><strong>Q: Which setting should I change first?</strong>
+A: The Risk level input: Low, Medium, High or Hot (Medium by default). It sets the balance behind each 0.01 lot, and position size scales with it. Every other input can stay at its default.</p>
+<p><strong>Q: Does it use a grid, martingale or averaging down?</strong>
+A: No. There is no grid, no martingale and no averaging down. Every position gets its own stop loss the moment it opens, and a losing trade is closed at that stop.</p>
+<p><strong>Q: Why does it go quiet for long stretches with no new equity high?</strong>
+A: It is a trend harvester, not a steady income system. The strategies only act when a level breaks, so quiet or choppy gold means fewer trades and long stretches without a new equity high; it earns when gold makes a real move.</p>
+<p><strong>Q: Can I run it on a prop-firm challenge?</strong>
+A: Yes. The Account type input has Prop firm 2-step and 1-step settings that size positions, switch off the two highest-loss-day strategies and turn on daily-loss and maximum-loss guards; a separate input group also accepts your own firm's numbers.</p>
+<p><strong>Q: Can I check the results myself?</strong>
+A: Yes. Every figure in this listing states its source - a Strategy Tester backtest, real broker ticks, the broker name and the date window - so you can reproduce the run in your own terminal.</p>
+<h2 id="requirements">Requirements</h2>
+<p>Hedging account, XAUUSD with a standard contract size, one H1 chart, algorithmic trading
+enabled, and a stable connection or VPS.</p>
+<hr />
+<h2 id="pre-submission-checklist">Pre-submission checklist</h2>
+<ul>
+<li>[ ] <code>#property link</code> filled with the product URL once created</li>
+<li>[ ] Source compiles with no custom includes and no DLL imports</li>
+<li>[ ] Validator run on arbitrary symbols and timeframes with an "Errors only" journal that stays empty</li>
+<li>[ ] Three logo PNGs exported at 200x200, 140x140 and 60x60</li>
+<li>[ ] Screenshots 720px to 1920x1080, each under 2 MB, English, labelled backtest</li>
+<li>[ ] Description contains no emoji, no link, no superlative, no award reference, no profit promise</li>
+<li>[ ] Account type set to Hedging on the listing</li>
+</ul><h2>Evidence</h2><figure><img src="img/01_equity_BLACKBULL.png" alt="equity BLACKBULL (backtest chart)" loading="lazy"><figcaption>equity BLACKBULL - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_FUSION.png" alt="equity FUSION (backtest chart)" loading="lazy"><figcaption>equity FUSION - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_PEPPERSTONE.png" alt="equity PEPPERSTONE (backtest chart)" loading="lazy"><figcaption>equity PEPPERSTONE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_VANTAGE.png" alt="equity VANTAGE (backtest chart)" loading="lazy"><figcaption>equity VANTAGE - Strategy Tester, real ticks, backtest</figcaption></figure>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

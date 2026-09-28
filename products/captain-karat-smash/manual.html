@@ -1,0 +1,922 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Captain Karat-Smash manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Manual for Captain Karat-Smash">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/captain-karat-smash/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Captain Karat-Smash manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Manual for Captain Karat-Smash">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/captain-karat-smash/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/captain-karat-smash_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Captain Karat-Smash</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#captain-karat-smash-user-manual">Captain Karat-Smash — user manual</a><ul>
+<li><a href="#1-what-it-does">1. What it does</a></li>
+<li><a href="#2-installation">2. Installation</a></li>
+<li><a href="#3-the-only-setting-that-matters">3. The only setting that matters</a></li>
+<li><a href="#3d-what-changed-in-version-109">3d. What changed in version 1.09</a></li>
+<li><a href="#3c-what-changed-in-version-108">3c. What changed in version 1.08</a></li>
+<li><a href="#3b-what-changed-in-version-107">3b. What changed in version 1.07</a></li>
+<li><a href="#3a-prop-firm-accounts-one-choice-since-106">3a. Prop-firm accounts: one choice (since 1.06)</a></li>
+<li><a href="#4-all-inputs">4. All inputs</a></li>
+<li><a href="#5-what-to-expect">5. What to expect</a></li>
+<li><a href="#5a-prop-firm-rules-your-firms-own-numbers-since-105">5a. Prop-firm rules: your firm's own numbers (since 1.05)</a><ul>
+<li><a href="#the-inputs-group-3-prop-firm-rules-0-rule-off">The inputs (group "3. Prop-firm rules (0 = rule off)")</a></li>
+<li><a href="#examples-what-to-type">Examples - what to type</a></li>
+<li><a href="#what-these-rules-do-not-do">What these rules do not do</a></li>
+</ul>
+</li>
+<li><a href="#6-troubleshooting">6. Troubleshooting</a></li>
+<li><a href="#complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="captain-karat-smash-user-manual">Captain Karat-Smash — user manual</h1>
+<p><em>He waits patiently for the walls of consolidation to close in, and then BAM! Punches right through the
+resistance line to grab the gold. The rest of this manual explains exactly how he does it.</em></p>
+<p>Version 1.09 · XAUUSD · attach to one H1 chart · hedging account</p>
+<hr />
+<h2 id="1-what-it-does">1. What it does</h2>
+<p>Captain Karat-Smash trades breakouts of intraday support and resistance on gold. It is not one strategy but
+<strong>seven independent ones running side by side on a single chart</strong>. They share one engine and differ in which
+timeframe they read, how strict their level definition is, and how their stop and target are proportioned.</p>
+<p>Each strategy repeats the same cycle:</p>
+<ol>
+<li><strong>Find the level.</strong> It looks for the most recent <em>unbroken swing</em> high above price and swing low below it —
+   a bar whose high (or low) is more extreme than the bars on either side of it, and which no closed bar has
+   traded through since. Strategies 1 and 2 read daily bars; strategies 3 to 7 read four-hour bars.</li>
+<li><strong>Rest an order just inside it.</strong> A buy stop is placed slightly below the swing high, a sell stop slightly
+   above the swing low. Price must carry <em>through</em> the level to trigger the order, which is what separates a
+   break from a touch.</li>
+<li><strong>Bracket the fill.</strong> Every position gets a stop loss and a take profit the moment it opens, both set as a
+   percentage of the entry price, so the geometry is the same whether gold trades at 1,800 or 4,300.</li>
+<li><strong>Manage the exit.</strong> Once the trade is far enough ahead, the stop moves to a locked level; from then on it
+   trails behind each closed one-minute bar and never loosens. Two of the seven strategies also pull their
+   target closer if the trade goes far enough against them, to exit on a bounce rather than at the full stop.</li>
+<li><strong>Expire unfilled orders.</strong> Every resting order has a lifetime, from 20 hours to 20 days depending on the
+   strategy. When it expires it is re-placed at the same level if that level is still one of the two most
+   recent unbroken swings, and dropped otherwise.</li>
+</ol>
+<p>There is <strong>no grid, no martingale, no averaging down and no hedging of one position with another</strong>. Every
+position carries a hard stop loss from the moment it is opened. Losses are taken; they are not carried.</p>
+<h2 id="2-installation">2. Installation</h2>
+<ol>
+<li>Copy <code>CAPTAIN_KARAT-SMASH.ex5</code> into <code>MQL5\Experts</code> and restart the terminal. (An earlier build of this engine may still be present in some installs under a different file name; always install <code>CAPTAIN_KARAT-SMASH.ex5</code> and check the Journal shows version 1.09 on its version line.)</li>
+<li>Open <strong>one</strong> XAUUSD H1 chart and attach the EA. The chart timeframe is only a host — each strategy reads
+   the timeframes it needs on its own.</li>
+<li>Enable algorithmic trading.</li>
+<li>Leave every input at its default. The compiled defaults are the validated configuration; no preset file is
+   required. Set the <strong>Risk level</strong> and nothing else.</li>
+</ol>
+<p>Requirements: a <strong>hedging</strong> account (the seven strategies hold independent positions), XAUUSD available with a
+normal contract size, and a stable connection or VPS. The EA prints a note if it is started on a netting
+account.</p>
+<h2 id="3-the-only-setting-that-matters">3. The only setting that matters</h2>
+<p>The figures below come from a Strategy Tester backtest, real ticks, BlackBull XAUUSD, 2022 to 2026.</p>
+<table>
+<thead>
+<tr>
+<th>Risk level</th>
+<th style="text-align: right;">Balance behind each 0.01 lot</th>
+<th style="text-align: right;">Historical drawdown on the longest window tested</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td style="text-align: right;">8,000</td>
+<td style="text-align: right;">about 7%</td>
+</tr>
+<tr>
+<td><strong>Medium (default)</strong></td>
+<td style="text-align: right;"><strong>5,500</strong></td>
+<td style="text-align: right;"><strong>about 11%</strong></td>
+</tr>
+<tr>
+<td>High</td>
+<td style="text-align: right;">4,000</td>
+<td style="text-align: right;">about 15%</td>
+</tr>
+<tr>
+<td>Hot</td>
+<td style="text-align: right;">3,000</td>
+<td style="text-align: right;">about 20%</td>
+</tr>
+<tr>
+<td>Custom</td>
+<td style="text-align: right;">your own figure</td>
+<td style="text-align: right;">—</td>
+</tr>
+</tbody>
+</table>
+<p>The drawdown column is measured, not extrapolated, in a Strategy Tester backtest, BlackBull XAUUSD, 2022 to 2026:
+a balance of 4,000 behind each 0.01 lot produced a 14.8% peak-to-trough drawdown over 3.8 years of real ticks, the longest window tested and the only
+one containing a full flat year. Drawdown scales inversely with the balance figure, which is how the other
+levels are derived.</p>
+<p>Position size scales with account balance, so the drawdown percentage stays roughly constant as the account
+grows or shrinks. The percentages come from a backtest on real broker ticks; plan for the future being worse
+than the past. A widely used rule of thumb among system traders is to assume the worst historical drawdown can
+double, and to stop and review a system if drawdown in practice reaches one and a half times its historical maximum.</p>
+<p><strong>Suggested minimum balance:</strong> 3,000 at Medium. The EA never refuses to trade on a small balance — it
+falls back to the broker's minimum lot — but below that figure a single minimum lot is a large share of the
+account and the drawdown percentages above no longer apply.</p>
+<h2 id="3d-what-changed-in-version-109">3d. What changed in version 1.09</h2>
+<p><strong>London-session breaks are locked in; with-trend runners get more room.</strong> The London morning's first push is often the
+false move of the day: it runs, then fades once New York opens. From 1.09 a position opened in the London session (from
+3:00 to 8:00 New York time) is protected by the Grip once it is half a stop in profit, and closed if it gives back half of
+its best move. Positions opened in any other session keep the trail. At the same time the trail on trades that go with the
+daily trend is a quarter wider (strategies 3, 4, 6 and 7); trades against the trend keep the 1.08 width.</p>
+<p>Measured at 0.01 lot against 1.08 on four brokers' real ticks (January 2023 to September 2026):</p>
+<table>
+<thead>
+<tr>
+<th>broker</th>
+<th>net</th>
+<th>average dip below the peak</th>
+<th>deepest fall</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull</td>
+<td>+29 %</td>
+<td>47 % smaller</td>
+<td>488 vs 692</td>
+</tr>
+<tr>
+<td>OANDA</td>
+<td>+28 %</td>
+<td>36 % smaller</td>
+<td>522 vs 599</td>
+</tr>
+<tr>
+<td>Fusion</td>
+<td>+25 %</td>
+<td>35 % smaller</td>
+<td>515 vs 578</td>
+</tr>
+<tr>
+<td>IC Markets</td>
+<td>+47 %</td>
+<td>47 % smaller</td>
+<td>294 vs 372</td>
+</tr>
+</tbody>
+</table>
+<p>The trade-off: the dips are shallower and shorter, but the ones that happen come faster - the deepest fall took about four
+weeks instead of several months. Proved before release: the 1.09 defaults place exactly the same deals as the tested configuration (208 trades, +671.63 on IC Markets real ticks, 1 May - 5 September 2026, where 1.08 made +346.60), and the prop account types carry it.</p>
+<h2 id="3c-what-changed-in-version-108">3c. What changed in version 1.08</h2>
+<p><strong>The trail follows the daily trend.</strong> The wider 1.07 trail pays on trades that go WITH the daily trend and costs a little
+on trades AGAINST it: a counter-trend break tends to snap back, and the wider trail then gives back more. From 1.08 a
+position of strategies 3, 4, 6 or 7 that opens against the daily trend (the side of the previous day's close relative to
+its 20-day average) keeps the tighter pre-1.07 trail; with the trend it uses the 1.07 trail. Measured in a Strategy
+Tester backtest at 0.01 lot against 1.07 on four brokers' real ticks: net +3.9 % (BlackBull) / +3.5 % (OANDA) / +4.1 % (Fusion) / +11 % (IC Markets), and the
+worst five-day stretch at equal profit 5 to 12 % smaller on every one. Nothing else changes.</p>
+<p>Proved before release: the 1.08 defaults place exactly the same deals as the tested trend-following configuration (208 trades, +346.60 on IC Markets real ticks, 1 May - 5 September 2026, where 1.07 made +254.31), and the prop account types carry it.</p>
+<h2 id="3b-what-changed-in-version-107">3b. What changed in version 1.07</h2>
+<p><strong>A wider trailing stop.</strong> Strategies 3, 4, 6 and 7 now trail their stop twice as far behind price (for example
+strategy 3: 1.59 % of price instead of 0.80 %). The old trail was measured to close winners too early in quiet
+markets: measured in a Strategy Tester backtest across four brokers' real tick histories (BlackBull and OANDA 2023-2026, Fusion 2024-2026, IC Markets
+2026) the wider trail earned more on every one - +9.7 % on BlackBull, +8.5 % on OANDA, +5.6 % on Fusion, +4.9 % on
+IC Markets, at 0.01 lot - and on BlackBull its deepest drawdown fell more slowly and was recovered in 28 trading days
+instead of 42. Trails wider still (x2.5 to x4) earned slightly more but lost faster and took about five times longer
+to recover, so they were not chosen. The entries, stops, targets and everything else are unchanged.</p>
+<p><strong>One screen of settings.</strong> The Inputs tab is now ordered 1 Start here (account type, risk level, a new <strong>virtual
+balance</strong> and the spread limit) / 2 Strategies / 3 Prop-firm rules / 4 Trading / 5 Custom sizing (chapter 4). The
+spread limit is now in USD (5.00): the old 500 <em>points</em> meant 5.00 USD on a two-decimal gold quote but only 0.50 USD
+on a three-decimal one. Both new inputs are off or unchanged at their defaults.</p>
+<p>Proved before release: the 1.07 defaults place exactly the same deals as the tested x2.0 configuration (208 trades, +254.31, IC Markets real ticks, 1 May - 5 September 2026), the new inputs change nothing at their defaults, and the prop account types carry the new trail.</p>
+<blockquote>
+<p>The yearly figures in chapter 5 were measured on version 1.05 (the older, tighter trail). They are being
+re-measured on 1.07; until then read them as the conservative case.</p>
+</blockquote>
+<h2 id="3a-prop-firm-accounts-one-choice-since-106">3a. Prop-firm accounts: one choice (since 1.06)</h2>
+<p>The first input, <strong>Account type</strong> (<code>InpAccountMode</code>), is all a prop-firm account needs:</p>
+<table>
+<thead>
+<tr>
+<th>Account type</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Personal</strong> (default)</td>
+<td>the risk level above and the strategy switches apply</td>
+</tr>
+<tr>
+<td><strong>Prop firm 2-step</strong> — challenges with a 5 % daily and 10 % maximum loss</td>
+<td>strategies 4 and 6 off; 3,667 of balance behind each 0.01 lot; daily 5 % and maximum 10 % loss limits on (chapter 5a)</td>
+</tr>
+<tr>
+<td><strong>Prop firm 1-step</strong> — challenges with a 3 % daily and 6 % maximum loss</td>
+<td>strategies 4 and 6 off; 5,500 behind each 0.01 lot; daily 3 % and maximum 6 % loss limits on</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Why strategies 4 and 6 are off in prop modes.</strong> They are the two that put the most loss into the worst days, measured in a Strategy Tester backtest. With both
+off, Karat's worst day on BlackBull 2023–2026 halved, from a 3.4 % to a 1.7 % loss of balance, and its net per unit of worst-week
+risk rose by a quarter (BlackBull) to two-fifths (Vantage). That is why the prop size can be LARGER than the personal
+default and still stay far inside a daily-loss limit.</p>
+<p><strong>What the measurements say</strong> — a simulation that replays the backtest's own days in random blocks (10,000 paths, the
+challenge rules applied at every trade close); a statement about tested history, not a prediction:</p>
+<table>
+<thead>
+<tr>
+<th>raw-spread feed (window)</th>
+<th>account type</th>
+<th>challenge</th>
+<th>passes per attempt</th>
+<th>daily-loss breaches</th>
+<th>median trading days to funded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull (2023–2026)</td>
+<td>Prop firm 2-step</td>
+<td>10 % then 5 % target, 5 % / 10 %</td>
+<td>96.0 %</td>
+<td>none</td>
+<td>211</td>
+</tr>
+<tr>
+<td>Vantage (2025–2026)</td>
+<td>Prop firm 2-step</td>
+<td>same</td>
+<td>100 %</td>
+<td>none</td>
+<td>103</td>
+</tr>
+<tr>
+<td>BlackBull (2023–2026)</td>
+<td>Prop firm 1-step</td>
+<td>10 % target, 3 % / 6 %</td>
+<td>89.3 %</td>
+<td>none</td>
+<td>196</td>
+</tr>
+<tr>
+<td>Vantage (2025–2026)</td>
+<td>Prop firm 1-step</td>
+<td>same</td>
+<td>99.9 %</td>
+<td>none</td>
+<td>98</td>
+</tr>
+<tr>
+<td>BlackBull (2023–2026)</td>
+<td>Personal (all seven, Medium) on a 1-step</td>
+<td>same</td>
+<td>83.4 %</td>
+<td>about 1 attempt in 8</td>
+<td>119</td>
+</tr>
+</tbody>
+</table>
+<p>Read it as: the prop types never broke a daily-loss rule in these histories; the quiet stretches (2023–2024) only cost
+time, so a challenge without a time limit is the right kind. The simulation used the raw-spread feeds the product is
+built for; on a standard-spread account expect slower progress.</p>
+<p><strong>Proof that the prop types are exactly what they say:</strong> on Pepperstone 28 August – 19 September 2026, Prop firm 2-step
+placed the same 32 deals, to the cent, as version 1.05 with strategies 4 and 6 off at 3,667 per 0.01 lot (+261.37), and
+Prop firm 1-step the same 32 deals as 1.05 with strategies 4 and 6 off at Medium (+130.37). With Personal, 1.06 places
+the same 48 deals as 1.05 (+213.78).</p>
+<h2 id="4-all-inputs">4. All inputs</h2>
+<p>The Inputs tab is ordered by how often you should touch it (since 1.07).</p>
+<p><strong>1. Start here</strong></p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account type</td>
+<td>Personal</td>
+<td>Personal, or a prop account type that sets the size and the strategies itself (chapter 3a).</td>
+</tr>
+<tr>
+<td>Risk level</td>
+<td>Medium</td>
+<td>The one knob. Custom hands sizing to section 5.</td>
+</tr>
+<tr>
+<td>Virtual balance</td>
+<td>0 (off)</td>
+<td>Size as if the balance were at most this amount — run a large account at a smaller account's size.</td>
+</tr>
+<tr>
+<td>Maximum spread to place an order, USD</td>
+<td>5.00</td>
+<td>Orders are skipped while the spread is wider. In USD since 1.07, so it means the same on every broker (500 points was 5.00 USD on a two-decimal gold quote but 0.50 USD on a three-decimal one).</td>
+</tr>
+</tbody>
+</table>
+<p><strong>2. Strategies on or off</strong> — see the table below. <strong>3. Prop-firm rules</strong> — chapter 5a.</p>
+<p><strong>4. Trading</strong> — direction filter, magic number, comment, order cap, slippage (table further down).</p>
+<p><strong>5. Custom sizing (Risk level = Custom only)</strong></p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Position sizing method</td>
+<td>Scale with balance</td>
+<td>Scale with balance, or a fixed lot.</td>
+</tr>
+<tr>
+<td>Fixed lot size</td>
+<td>0.01</td>
+<td>Fixed sizing only.</td>
+</tr>
+<tr>
+<td>Balance per 0.01 lot</td>
+<td>5500</td>
+<td>Scale-with-balance sizing only.</td>
+</tr>
+<tr>
+<td>Maximum lot size per order</td>
+<td>10.0</td>
+<td>Hard ceiling on any single order, at every risk level.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Strategies</strong> — seven on/off switches, all on by default. Turning one off removes its trades and nothing else;
+the strategies do not interact.</p>
+<table>
+<thead>
+<tr>
+<th>Switch</th>
+<th>Reads</th>
+<th>Character</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Strategy 1</td>
+<td>Daily levels</td>
+<td>Tight stop, distant target. Few trades.</td>
+</tr>
+<tr>
+<td>Strategy 2</td>
+<td>Daily levels</td>
+<td>Tight stop, wide target. Few trades.</td>
+</tr>
+<tr>
+<td>Strategy 3</td>
+<td>Four-hour levels, at least 0.5% away</td>
+<td>Tight stop, far target.</td>
+</tr>
+<tr>
+<td>Strategy 4</td>
+<td>Two most recent four-hour levels</td>
+<td>Wide stop, near target.</td>
+</tr>
+<tr>
+<td>Strategy 5</td>
+<td>Four-hour levels, checked every five minutes</td>
+<td>Widest stop, small target.</td>
+</tr>
+<tr>
+<td>Strategy 6</td>
+<td>Four-hour levels, entry at the level</td>
+<td>Balanced.</td>
+</tr>
+<tr>
+<td>Strategy 7</td>
+<td>Four-hour levels, shorter confirmation</td>
+<td>Balanced, most active.</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Trading</strong></p>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Allow buy trades / Allow sell trades</td>
+<td>true</td>
+<td>Direction filter.</td>
+</tr>
+<tr>
+<td>Magic number</td>
+<td>89810</td>
+<td>Change it if another EA on the account uses the same number.</td>
+</tr>
+<tr>
+<td>Order comment prefix</td>
+<td>ABG</td>
+<td>The strategy number is appended, so each trade is traceable.</td>
+</tr>
+<tr>
+<td>Maximum resting orders per strategy and side</td>
+<td>4</td>
+<td>Safety cap. In testing one to two were typically live.</td>
+</tr>
+<tr>
+<td>Maximum slippage</td>
+<td>50 points</td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-what-to-expect">5. What to expect</h2>
+<ul>
+<li><strong>Trade frequency.</strong> A few hundred trades per year across the seven strategies, mostly intraday. Median hold
+  is well under an hour; some positions run for several hours.</li>
+<li><strong>Win rate.</strong> The lock-then-trail exit closes many trades for a small gain rather than letting them reach the
+  full target, which keeps the win rate above what the reward-to-risk ratio alone would suggest; the wider trail
+  introduced in 1.07 lets more of them run than the original, tighter trail did.</li>
+<li><strong>Losing streaks and flat periods.</strong> Normal and expected. A breakout system pays for its large moves with a
+  steady stream of small losses; some months are flat or negative.</li>
+<li><strong>Broker sensitivity.</strong> The system's edge per trade is measured in dollars, not cents, so it tolerates normal
+  spread variation. It was tested on four different brokers' real tick histories, and the results differ
+  between them — that difference is the honest range, not a defect.</li>
+<li><strong>The returns are not evenly spread, and this is the most important line in this manual.</strong> The longest
+  record tested, a Strategy Tester backtest on OANDA gold ticks reaching back to 2018 at Medium risk, earned
+  slowly through the quiet years up to the end of 2024 - with stretches of up to two years without a new equity
+  high - and earned most of its total in 2025 and 2026, while gold ran from about 2,658 to about 4,430.</li>
+</ul>
+<p>This is a <strong>trend harvester, not a steady income system</strong>. It waits, pays rent in quiet and choppy markets, and earns when gold makes a
+  real move. If a two-year flat stretch would make you switch it off, this is not the right system for you.</p>
+<ul>
+<li><strong>Direction.</strong> Long and short trades are both enabled by default. In testing the long side was profitable in
+  every period; the short side lost slightly from 2018 to 2024 and was strongly profitable in 2025 and 2026,
+  while gold rose in all three periods. Over the full record the short side is net positive on both long-history
+  brokers tested, which is why it ships enabled — but the switch is there if you hold a different view.</li>
+</ul>
+<p>All figures in this manual come from the MetaTrader 5 Strategy Tester on real broker tick data. Backtest
+results do not represent trading on a live account and do not predict future performance.</p>
+<h2 id="5a-prop-firm-rules-your-firms-own-numbers-since-105">5a. Prop-firm rules: your firm's own numbers (since 1.05)</h2>
+<p>The Account type (chapter 3a) chooses the size. The group right under it, <strong>Prop-firm rules</strong>, enforces your firm's limits. Choosing <em>Prop firm 2-step</em> or <em>Prop firm 1-step</em> already fills in the two loss limits for you (5 % daily and 10 % maximum, or 3 % and 6 %; both fixed, and the EA acts 0.5 % before each); type your firm's own numbers to override them. With <em>Personal</em> every rule is off until you type a number.</p>
+<p>When a limit is about to be reached, the EA <strong>closes its own trades, deletes its own orders and stops opening new
+ones</strong>: until the firm's next day for the daily rules, for good for the maximum loss and the profit target. The
+Journal says which rule acted and at what equity:</p>
+<pre><code>CAPTAIN_KARAT-SMASH prop-firm rule: daily loss limit (equity 95512.40, day start 100020.00, firm limit 95020.00) - trades closed, orders deleted, paused until the firm's next day
+</code></pre>
+<p>and the start line lists what is on:</p>
+<pre><code>CAPTAIN_KARAT-SMASH prop-firm rules: account size 100000.00 | daily loss 5.00% of account size from the higher of day-start balance and equity - the EA acts at 4.50% of account size | maximum loss 10.00% (fixed) - the EA acts at 9.50% | ...
+</code></pre>
+<h3 id="the-inputs-group-3-prop-firm-rules-0-rule-off">The inputs (group "3. Prop-firm rules (0 = rule off)")</h3>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>What to enter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account size (<code>InpPropAccountSize</code>)</td>
+<td>the challenge's account size, e.g. 100000 (0 = the balance when the EA first starts)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Daily loss limit % (<code>InpPropDailyLossPct</code>)</td>
+<td>the firm's daily loss, e.g. 5</td>
+<td>0 = off; a prop account type fills in 5 or 3</td>
+</tr>
+<tr>
+<td>Daily loss limit is a % of (<code>InpPropDailyPctOf</code>)</td>
+<td><em>Account size</em> (the same amount every day - most firms) or <em>the day-start value</em></td>
+<td>Account size</td>
+</tr>
+<tr>
+<td>Daily loss is counted from (<code>InpPropDailyFrom</code>)</td>
+<td>the value at the start of the firm's day: <em>the higher of balance and equity</em> (strictest, safe for every firm), <em>balance</em> or <em>equity</em></td>
+<td>the higher of the two</td>
+</tr>
+<tr>
+<td>Maximum loss limit % (<code>InpPropMaxLossPct</code>)</td>
+<td>the firm's maximum loss, e.g. 10</td>
+<td>0 = off; a prop account type fills in 10 or 6</td>
+</tr>
+<tr>
+<td>Maximum loss limit type (<code>InpPropMaxRule</code>)</td>
+<td><em>Fixed</em> (account size minus the limit - most two-step challenges), <em>Trailing: highest day-start balance</em>, <em>Trailing: highest equity, live</em></td>
+<td>Fixed</td>
+</tr>
+<tr>
+<td>A trailing limit stops rising at the account size (<code>InpPropTrailLock</code>)</td>
+<td>most trailing firms stop moving the limit once it reaches the starting balance</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Act this many % before each loss limit (<code>InpPropSafetyPct</code>)</td>
+<td>the safety margin: 0.5 means the EA acts at 4.5 % when the firm's limit is 5 %</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>Profit target % (<code>InpPropTargetPct</code>)</td>
+<td>close everything and stop when equity reaches the target (0 = keep trading)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Best-day cap % (<code>InpPropDayGainPct</code>)</td>
+<td>close everything and pause for the day once the day's gain reaches this (for firms with a consistency rule)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Hour the firm's day starts (<code>InpPropDayStartHour</code>)</td>
+<td>the hour on your platform's clock (the Market Watch time) at which the firm restarts its daily loss</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Friday: close all at this hour (<code>InpPropFridayCloseHour</code>)</td>
+<td>for firms that do not allow holding over the weekend; trading resumes on Monday</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>New challenge on the same login (<code>InpPropResetState</code>)</td>
+<td>set to <em>true</em> for ONE start when you begin a new challenge on the same login, then back to <em>false</em></td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples-what-to-type">Examples - what to type</h3>
+<p>From the LuxAlgo prop-firm directory on 23 September 2026 (the daily-loss wording is inferred by that directory; your
+firm's own rules page is always the authority, and firms change their rules):</p>
+<table>
+<thead>
+<tr>
+<th>Challenge (100,000 account)</th>
+<th>Daily loss %</th>
+<th>Maximum loss % and type</th>
+<th>Profit target %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FTMO Normal, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>10, then 5</td>
+</tr>
+<tr>
+<td>FTMO Normal, 1-step</td>
+<td>3</td>
+<td>10, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>FundingPips, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>FundingPips, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>The 5%ers High Stakes, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>Blue Guardian Pro, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>All six count the daily loss as a share of the account size from the previous day's closing balance, open trades
+included. Leave <em>counted from</em> at <em>the higher of balance and equity</em> - it is never later than the firm's own meter.</p>
+<p><strong>Profit target: set it for the challenge phases only.</strong> When the target is reached the EA stops for good on that
+login; on the funded account set it back to 0.</p>
+<p><strong>The firm's day.</strong> Most firms restart the daily loss at midnight of the platform's own clock: leave 0. If your firm
+names another time, convert it to the Market Watch clock. Gold is closed for about an hour around the broker's
+midnight on most platforms, so for gold an hour's difference rarely matters; a market that trades through midnight
+(Bitcoin) needs the exact hour.</p>
+<p><strong>Restarts.</strong> The EA remembers the account size, the day's starting value, the highest balance and whether a rule
+stopped it, across restarts of the platform (terminal global variables named <code>PR&lt;login&gt;_&lt;magic&gt;_...</code>). A restart in
+the middle of the day does not give it a fresh daily allowance.</p>
+<h3 id="what-these-rules-do-not-do">What these rules do not do</h3>
+<ul>
+<li>They close <strong>this EA's</strong> trades only. The limits are measured on the whole account's equity, so trades from another
+  EA or by hand count toward them; give every EA on the account the same numbers.</li>
+<li>The EA acts on the first price tick past its limit. A gap or a very fast market can carry the loss a little further
+  before the closing trades fill - that is what the safety margin is for; do not set it to 0 on a real challenge.</li>
+<li><strong>No news filter.</strong> Some funded accounts forbid opening or closing trades a few minutes around high-impact releases.
+  The platform's economic calendar cannot be replayed in the Strategy Tester, so a news rule could not be proved the way
+  every rule above was; pause the EA by hand around those releases if your firm requires it.</li>
+<li>No minimum trade duration and no minimum number of trading days.</li>
+</ul>
+<p><strong>Proof.</strong> With every rule off, this version placed the same deals as the version before it, deal for deal (32 trades, net +261.37, Pepperstone real ticks, 28 August - 19 September 2026). Each rule was then switched on at a level the same weeks reach; at all 8 triggers the EA closed its trades, opened nothing until the pause ended, and placed exactly the same deals as with the rules off up to the first trigger.</p>
+<h2 id="6-troubleshooting">6. Troubleshooting</h2>
+<p>The EA prints a one-line census when it stops, for example:</p>
+<pre><code>Captain Karat-Smash: orders placed 632 | skipped - no level 2, spread 0, price inside stop level 1,
+stop distance 0, lot 0, margin 0, send failed 0
+</code></pre>
+<table>
+<thead>
+<tr>
+<th>Line shows</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>orders placed 0</code> and <code>no level</code> high</td>
+<td>Not enough bar history. Let the terminal download H4 and D1 history.</td>
+</tr>
+<tr>
+<td><code>spread</code> high</td>
+<td>Your spread is regularly above the limit. Raise it, or use a tighter-spread account.</td>
+</tr>
+<tr>
+<td><code>price inside stop level</code> high</td>
+<td>The broker's minimum stop distance is wide relative to the level offset.</td>
+</tr>
+<tr>
+<td><code>lot</code> high</td>
+<td>Sizing returned zero — check the balance-per-0.01 figure and the symbol's volume limits.</td>
+</tr>
+<tr>
+<td><code>margin</code> high</td>
+<td>Not enough free margin for the requested size; lower the risk level.</td>
+</tr>
+<tr>
+<td><code>send failed</code> high</td>
+<td>The broker rejected orders; check the journal for the reason.</td>
+</tr>
+</tbody>
+</table>
+<p>No trades at all on a fresh chart is normal for the first hours: every strategy waits for a <em>new</em> confirmed
+swing before it places anything, and the daily strategies can wait days.</p>
+<h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</h2>
+<p>Generated from the compiled source; enum defaults are the source names — the Inputs tab shows their plain labels.</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Input</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Start here</td>
+<td><code>InpAccountMode</code></td>
+<td>AccountMode</td>
+<td>ACCOUNT_PERSONAL</td>
+<td>Account type (prop modes set size and strategies)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpRisk</code></td>
+<td>RiskLevel</td>
+<td>RISK_MEDIUM</td>
+<td>Risk level</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpVirtualBalance</code></td>
+<td>double</td>
+<td>0</td>
+<td>Size as if the balance were at most this (0 = off)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpMaxSpreadUsd</code></td>
+<td>double</td>
+<td>5.00</td>
+<td>Maximum spread to place an order, USD</td>
+</tr>
+<tr>
+<td>2. Strategies on or off</td>
+<td><code>InpStrategy1</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Strategy 1 - daily level, distant target</td>
+</tr>
+<tr>
+<td>2. Strategies on or off</td>
+<td><code>InpStrategy2</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Strategy 2 - daily level, wide target</td>
+</tr>
+<tr>
+<td>2. Strategies on or off</td>
+<td><code>InpStrategy3</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Strategy 3 - 4-hour level, far target</td>
+</tr>
+<tr>
+<td>2. Strategies on or off</td>
+<td><code>InpStrategy4</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Strategy 4 - 4-hour double level, near target</td>
+</tr>
+<tr>
+<td>2. Strategies on or off</td>
+<td><code>InpStrategy5</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Strategy 5 - 4-hour level, wide stop</td>
+</tr>
+<tr>
+<td>2. Strategies on or off</td>
+<td><code>InpStrategy6</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Strategy 6 - 4-hour level, at the level</td>
+</tr>
+<tr>
+<td>2. Strategies on or off</td>
+<td><code>InpStrategy7</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Strategy 7 - 4-hour level, balanced</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropAccountSize</code></td>
+<td>double</td>
+<td>0</td>
+<td>Account size (0 = balance when the EA first starts)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Daily loss limit % (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyPctOf</code></td>
+<td>PropPctOf</td>
+<td>PROP_PCT_OF_SIZE</td>
+<td>Daily loss limit is a % of</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyFrom</code></td>
+<td>PropDayFrom</td>
+<td>PROP_DAY_HIGHER</td>
+<td>Daily loss is counted from</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropMaxLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Maximum loss limit % (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropMaxRule</code></td>
+<td>PropMaxRule</td>
+<td>PROP_MAX_FIXED</td>
+<td>Maximum loss limit type</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropTrailLock</code></td>
+<td>bool</td>
+<td>true</td>
+<td>A trailing limit stops rising at the account size</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropSafetyPct</code></td>
+<td>double</td>
+<td>0.5</td>
+<td>Act this many % of account size BEFORE each loss limit</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropTargetPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Profit target %: close all and stop for good (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDayGainPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Best-day cap %: close all and pause for the day (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDayStartHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Hour the firm's day starts, broker server time (0-23)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropFridayCloseHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Friday: close all at this hour (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropResetState</code></td>
+<td>bool</td>
+<td>false</td>
+<td>New challenge, same login: true once</td>
+</tr>
+<tr>
+<td>4. Trading</td>
+<td><code>InpAllowBuy</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Allow buy trades</td>
+</tr>
+<tr>
+<td>4. Trading</td>
+<td><code>InpAllowSell</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Allow sell trades</td>
+</tr>
+<tr>
+<td>4. Trading</td>
+<td><code>InpMagic</code></td>
+<td>int</td>
+<td>89810</td>
+<td>Magic number</td>
+</tr>
+<tr>
+<td>4. Trading</td>
+<td><code>InpComment</code></td>
+<td>string</td>
+<td>ABG</td>
+<td>Order comment prefix</td>
+</tr>
+<tr>
+<td>4. Trading</td>
+<td><code>InpMaxOrdersPerSide</code></td>
+<td>int</td>
+<td>4</td>
+<td>Maximum resting orders per strategy and side</td>
+</tr>
+<tr>
+<td>4. Trading</td>
+<td><code>InpSlippagePoints</code></td>
+<td>int</td>
+<td>50</td>
+<td>Maximum slippage (points)</td>
+</tr>
+<tr>
+<td>5. Custom sizing (Risk level = Custom only)</td>
+<td><code>InpLotMode</code></td>
+<td>LotMode</td>
+<td>LOT_BALANCE</td>
+<td>Position sizing method</td>
+</tr>
+<tr>
+<td>5. Custom sizing (Risk level = Custom only)</td>
+<td><code>InpFixedLot</code></td>
+<td>double</td>
+<td>0.01</td>
+<td>Fixed lot size (sizing = Fixed)</td>
+</tr>
+<tr>
+<td>5. Custom sizing (Risk level = Custom only)</td>
+<td><code>InpBalancePer001</code></td>
+<td>double</td>
+<td>5500.0</td>
+<td>Balance per 0.01 lot (sizing = Scale with balance)</td>
+</tr>
+<tr>
+<td>5. Custom sizing (Risk level = Custom only)</td>
+<td><code>InpMaxLot</code></td>
+<td>double</td>
+<td>10.0</td>
+<td>Maximum lot size per order (every risk level)</td>
+</tr>
+</tbody>
+</table>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

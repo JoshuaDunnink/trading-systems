@@ -1,0 +1,118 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jab - Gold level-breakout scalper Expert Advisor for MT5 (XAUUSD M15) | Joshua Dunnink</title><meta name="description" content="Jab is a MetaTrader 5 (MT5) Expert Advisor that runs a level-to-level scalping strategy on gold (XAUUSD). It rests a stop order at the freshest confirmed...">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Jab", "applicationCategory": "FinanceApplication", "operatingSystem": "MetaTrader 5 (Windows)", "description": "Jab is a MetaTrader 5 (MT5) Expert Advisor that runs a level-to-level scalping strategy on gold (XAUUSD). It rests a stop order at the freshest confirmed...", "url": "https://joshuadunnink.github.io/trading-systems/products/jab/", "author": {"@type": "Person", "name": "Joshua Dunnink", "url": "https://www.mql5.com/en/users/joshuadunnink"}, "image": "https://joshuadunnink.github.io/trading-systems/img/jab_hero.jpg"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://joshuadunnink.github.io/trading-systems/"}, {"@type": "ListItem", "position": 2, "name": "Products", "item": "https://joshuadunnink.github.io/trading-systems/products.html"}, {"@type": "ListItem", "position": 3, "name": "Jab", "item": "https://joshuadunnink.github.io/trading-systems/products/jab/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which broker and account type does Jab need?", "acceptedAnswer": {"@type": "Answer", "text": "A raw-spread or ECN account is required, on a hedging account. Jab takes small, frequent profits, so the account's spread decides a large share of the result - choose a tight-spread broker."}}, {"@type": "Question", "name": "What is the minimum deposit?", "acceptedAnswer": {"@type": "Answer", "text": "1,000 in account currency is the recommended minimum. It can trade from a 100 balance, but the manual's deposit ladder recommends 500 or more for a comfortable size relative to the fixed lot."}}, {"@type": "Question", "name": "Which chart and timeframe do I attach it to?", "acceptedAnswer": {"@type": "Answer", "text": "An XAUUSD (gold) M15 chart. No .set file is needed - the compiled defaults are the validated configuration."}}, {"@type": "Question", "name": "Which risk setting should I start with?", "acceptedAnswer": {"@type": "Answer", "text": "Use fixed lot (on by default, at a fixed 0.01 lot) is the validated starting point; switch it off to size from a risk percentage per trade instead, and raise the lot only as the balance grows."}}, {"@type": "Question", "name": "Does Jab use a grid or martingale?", "acceptedAnswer": {"@type": "Answer", "text": "No. It holds at most one position per side, never averages down, and does not use a grid or martingale sizing. Every order carries a hard stop loss from the moment it is placed."}}, {"@type": "Question", "name": "Why does Jab only place a modest number of trades?", "acceptedAnswer": {"@type": "Answer", "text": "It waits for a freshly confirmed swing pivot that has not already been tested more than once, and skips levels that do not qualify. The optional Cadence preset loosens the entry gates to trade more often, but it is not the default because it depends on a tight-spread broker."}}, {"@type": "Question", "name": "Do I need a VPS?", "acceptedAnswer": {"@type": "Answer", "text": "A VPS is recommended. Jab manages its trailing stop on every tick, so it needs to keep running once a position is open."}}, {"@type": "Question", "name": "Can I use Jab on a prop-firm account?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. A prop-firm rules group takes your firm's own daily loss, maximum loss, profit target and Friday-close numbers; every rule is off until a number is entered, and with every rule off Jab trades exactly as described above. ### Important All performance figures published with this product are Strategy Tester backtest results on real broker tick data. Backtests describe the past and are not a promise or a projection of future results. Trading carries risk of loss. Test on a demo account first. This build is designed and validated for gold. On another instrument family it loads, reports that it will not trade, and stays flat rather than trading a market it was not validated on."}}]}</script>
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/jab/"><meta property="og:type" content="website">
+<meta property="og:title" content="Jab - Gold level-breakout scalper Expert Advisor for MT5 (XAUUSD M15) | Joshua Dunnink"><meta property="og:description" content="Jab is a MetaTrader 5 (MT5) Expert Advisor that runs a level-to-level scalping strategy on gold (XAUUSD). It rests a stop order at the freshest confirmed...">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/jab/"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/jab_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<a href="../../img/jab_hero.jpg"><img class="hero" src="../../img/jab_hero.jpg" width="800" height="800" alt="Jab artwork"></a><h1>Jab</h1><p class="lead">XAUUSD · M15 · MetaTrader 5 Expert Advisor</p><p class="note"><strong>Coming soon.</strong> This Expert Advisor is in final testing and is not for sale yet. Its description, manual and research are published so you can follow it before release.</p><p><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 1.82 · worst equity drawdown 0.32% · 262 trades · return +3.5% on 10,000</p><p class="stamp">Backtest, real ticks, Fusion Markets, 2025-07-01 to 2026-09-07, version 1.46. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/jab_headline.png" alt="Jab balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>Jab is a MetaTrader 5 (MT5) Expert Advisor that runs a level-to-level scalping strategy on gold (XAUUSD). It rests a stop order at the freshest confirmed swing pivot on the
+M15 chart and is filled the instant price reaches it, then manages the position with a short, two-stage
+trailing stop. It does not predict direction; it waits at a place on the chart and takes the fill when the
+market brings the price to it.</p>
+<p>How a trade is made:</p>
+<ol>
+<li>Locate the freshest confirmed swing pivot on M15 that is far enough from the current price and has not
+   already been tested more than once since it formed.</li>
+<li>Rest a stop order just beyond that pivot, in the direction of the last closed candle.</li>
+<li>Cancel the order if it has not filled within its patience window.</li>
+<li>On a fill, move the stop once the trade is a set distance ahead.</li>
+<li>Once the trade is a further set distance ahead, switch to a tight trail and give back as little of the
+   move as possible.</li>
+<li>Every order carries a hard stop loss from the moment it is placed.</li>
+</ol>
+<p>Jab holds at most one position per side. It does not average down, does not use a grid, and does not use
+martingale position sizing. A losing trade is closed at its stop and Jab moves on.</p>
+<p>Why the level is chosen this way: the pivot Jab rests on is picked for freshness, not for being the nearest
+price to the current one, and a pivot that has already been tested more than once is skipped. Measured
+against seven other ways to define "the level" - the candle body instead of the wick, a cluster of nearby
+pivots, the prior trading session's high or low, a statistical band drawn from the pivot candle itself, and
+the nearest qualifying pivot regardless of age - the freshest untested wick extreme was the strongest or
+tied-strongest order price on every measure tried, across several live and demo broker feeds. The timing of
+the fill carries the same weight as the level itself: resting the order to fill at first touch, rather than
+waiting for a confirming candle close or a retest of the level, is where the measured edge lives; waiting
+for confirmation is not a cautious version of the same trade, it gave the edge back on every feed tested.</p>
+<p>The two-stage trailing stop shipped here was measured against a faster, tighter exit and against a
+separate genetic-search pick, on every live broker feed available. The shipped exit was the strongest or
+tied-strongest arm on the measure that matters for a compounding account - the number of days between one
+equity high and the next, and the worst of any rolling three-month stretch. The faster exits produced a
+higher win rate on paper, because they cap the winning trades far below the stop, and that trade-off lost
+money once real broker spread was in the numbers. Scaling the stop and target to the day's own volatility
+was tested the same way and dropped: on every live feed it measured, it cost money and made the account's
+worst stretches less predictable, not more.</p>
+<p>Jab shares its engine lineage with two related builds. Heavy Jab runs the same level-to-level mechanism on
+bitcoin, with its own stop and target distances measured from scratch for that market; an earlier attempt to
+simply resize Jab's gold distances for bitcoin traded far fewer trades at a loss, which is why Heavy Jab is a
+separate build rather than a rescaled copy. Jab Savant adds a trained model that screens each qualifying
+level and sits out the ones its scoring expects to fail; Jab, this build, takes every level that passes its
+own gates with no learned filter.</p>
+<h3 id="requirements">Requirements</h3>
+<ul>
+<li>A raw-spread or ECN account is required. Jab takes small, frequent profits, and the same configuration
+  measured on four different live broker feeds produced net results that differed by several multiples on
+  an almost identical number of trades - the per-trade edge is smaller than the gap in cost between
+  brokers, so the account's spread decides more of the outcome than any input on this list.</li>
+<li>Gold (XAUUSD or the broker's equivalent), M15 chart.</li>
+<li>Hedging account.</li>
+<li>VPS recommended; Jab manages its stop on every tick.</li>
+</ul>
+<h3 id="settings">Settings</h3>
+<p>Runs on its defaults with no set file; the compiled defaults are the tested configuration. Inputs are
+grouped as Money, Risk, Gating, Entry, Exit, Calendar and Diagnostics. The default is a fixed 0.01 lot; set
+"Use fixed lot" to false to size from a risk percentage instead. An optional named preset, Cadence, loosens
+the entry gates to trade more often; it is documented in the user manual and is not the default because it
+depends on a tight-spread broker and a market regime that has not held for the whole tested history.</p>
+<p>Prop-firm rules. A second input group takes your firm's own numbers: daily loss limit (a share of the
+account size or of the day-start value, counted from balance, equity or the higher of the two), maximum
+loss limit (fixed or trailing), profit target, best-day cap and a Friday close hour. When a limit is about
+to be reached Jab closes its own trades, deletes its orders and pauses until the firm's next day (daily
+rules) or stops for good (maximum loss, target); the Journal names the rule and the equity. Every rule is
+off until a number is entered, and with every rule off Jab trades exactly as it does above. It is a rule
+guard, not a guarantee: a price gap can carry a loss past a limit, which is why Jab acts half a percent
+early by default.</p>
+<h3 id="results-on-live-broker-tick-data-backtests">Results on live broker tick data (backtests)</h3>
+<p>Results below are Strategy Tester, real broker ticks (100 percent history quality), a 10,000 starting
+balance, compiled defaults, matched window 2025-07-01 to 2026-09-07, measured on build 1.42; every default
+through the current 1.48 build reproduces the same trades:</p>
+<ul>
+<li>Fusion Markets 2025-07-01 to 2026-09-07, the published claim (the worst-performing qualifying live feed): net +348 (+3.5 percent), profit factor 1.82, 262 trades, equity drawdown 0.32 percent.</li>
+<li>BlackBull Markets 2025-07-01 to 2026-09-07: net +536 (+5.4 percent), profit factor 2.59, 264 trades, equity drawdown 0.27 percent.</li>
+<li>Pepperstone EU 2025-07-01 to 2026-09-07: net +676 (+6.8 percent), profit factor 2.86, 269 trades, equity drawdown 0.28 percent.</li>
+<li>Vantage Markets 2025-07-01 to 2026-09-07: net +451 (+4.5 percent), profit factor 2.24, 259 trades, equity drawdown 0.29 percent.</li>
+<li>OANDA 2025-07-01 to 2026-09-07, a demo account shown only as the spread-survival check, never as the headline: net +262 (+2.6 percent), profit factor 1.56, 274 trades, equity drawdown 0.34 percent.</li>
+</ul>
+<p>The published claim is always the worst-performing qualifying live feed, never the strongest feed and never
+an average. Where one configuration takes near-identical trades on every broker and earns different money
+on each, the surviving edge is smaller than the gap between brokers and the headline belongs to the broker,
+not the strategy - choose a tight-spread account before trusting any single number.</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<p><strong>Q: Which broker and account type does Jab need?</strong>
+A: A raw-spread or ECN account is required, on a hedging account. Jab takes small, frequent profits, so the account's spread decides a large share of the result - choose a tight-spread broker.</p>
+<p><strong>Q: What is the minimum deposit?</strong>
+A: 1,000 in account currency is the recommended minimum. It can trade from a 100 balance, but the manual's deposit ladder recommends 500 or more for a comfortable size relative to the fixed lot.</p>
+<p><strong>Q: Which chart and timeframe do I attach it to?</strong>
+A: An XAUUSD (gold) M15 chart. No .set file is needed - the compiled defaults are the validated configuration.</p>
+<p><strong>Q: Which risk setting should I start with?</strong>
+A: Use fixed lot (on by default, at a fixed 0.01 lot) is the validated starting point; switch it off to size from a risk percentage per trade instead, and raise the lot only as the balance grows.</p>
+<p><strong>Q: Does Jab use a grid or martingale?</strong>
+A: No. It holds at most one position per side, never averages down, and does not use a grid or martingale sizing. Every order carries a hard stop loss from the moment it is placed.</p>
+<p><strong>Q: Why does Jab only place a modest number of trades?</strong>
+A: It waits for a freshly confirmed swing pivot that has not already been tested more than once, and skips levels that do not qualify. The optional Cadence preset loosens the entry gates to trade more often, but it is not the default because it depends on a tight-spread broker.</p>
+<p><strong>Q: Do I need a VPS?</strong>
+A: A VPS is recommended. Jab manages its trailing stop on every tick, so it needs to keep running once a position is open.</p>
+<p><strong>Q: Can I use Jab on a prop-firm account?</strong>
+A: Yes. A prop-firm rules group takes your firm's own daily loss, maximum loss, profit target and Friday-close numbers; every rule is off until a number is entered, and with every rule off Jab trades exactly as described above.</p>
+<h3 id="important">Important</h3>
+<p>All performance figures published with this product are Strategy Tester backtest results on real broker
+tick data. Backtests describe the past and are not a promise or a projection of future results. Trading
+carries risk of loss. Test on a demo account first.</p>
+<p>This build is designed and validated for gold. On another instrument family it loads, reports that it will
+not trade, and stays flat rather than trading a market it was not validated on.</p><h2>Evidence</h2><figure><img src="img/01_equity_FUSION.png" alt="equity FUSION (backtest chart)" loading="lazy"><figcaption>equity FUSION - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_BLACKBULL.png" alt="equity BLACKBULL (backtest chart)" loading="lazy"><figcaption>equity BLACKBULL - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_PEPPERSTONE.png" alt="equity PEPPERSTONE (backtest chart)" loading="lazy"><figcaption>equity PEPPERSTONE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_VANTAGE.png" alt="equity VANTAGE (backtest chart)" loading="lazy"><figcaption>equity VANTAGE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_OANDA.png" alt="equity OANDA (backtest chart)" loading="lazy"><figcaption>equity OANDA - Strategy Tester, real ticks, backtest</figcaption></figure>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

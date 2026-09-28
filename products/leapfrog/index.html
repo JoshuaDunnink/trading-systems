@@ -1,0 +1,105 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leapfrog - Gold range-breakout Expert Advisor for MT5 (XAUUSD M15) | Joshua Dunnink</title><meta name="description" content="Leapfrog is an MT5 Expert Advisor for gold (XAUUSD) that trades range breakouts on five rolling ranges at once. Each &quot;ladder&quot; watches the highest high and...">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Leapfrog", "applicationCategory": "FinanceApplication", "operatingSystem": "MetaTrader 5 (Windows)", "description": "Leapfrog is an MT5 Expert Advisor for gold (XAUUSD) that trades range breakouts on five rolling ranges at once. Each \"ladder\" watches the highest high and...", "url": "https://joshuadunnink.github.io/trading-systems/products/leapfrog/", "author": {"@type": "Person", "name": "Joshua Dunnink", "url": "https://www.mql5.com/en/users/joshuadunnink"}, "image": "https://joshuadunnink.github.io/trading-systems/img/leapfrog_hero.jpg"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://joshuadunnink.github.io/trading-systems/"}, {"@type": "ListItem", "position": 2, "name": "Products", "item": "https://joshuadunnink.github.io/trading-systems/products.html"}, {"@type": "ListItem", "position": 3, "name": "Leapfrog", "item": "https://joshuadunnink.github.io/trading-systems/products/leapfrog/"}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which broker and account type does Leapfrog need?", "acceptedAnswer": {"@type": "Answer", "text": "A hedging account - the five ladders can hold positions on both sides at once. A raw-spread or ECN account is preferred, since the partial-profit marks are small fractions of the daily range."}}, {"@type": "Question", "name": "What is the minimum deposit?", "acceptedAnswer": {"@type": "Answer", "text": "5,000 in account currency is the recommended minimum; the published results use 10,000. Below the recommended minimum the broker's own minimum lot limits how far the position-sizing control can reduce a trade."}}, {"@type": "Question", "name": "Which chart and timeframe do I attach it to?", "acceptedAnswer": {"@type": "Answer", "text": "Any XAUUSD chart. Leapfrog reads its own 30-minute, hourly and daily series internally; M15 is the chart the testing used."}}, {"@type": "Question", "name": "Which setting should I start with?", "acceptedAnswer": {"@type": "Answer", "text": "Leave Settings on Recommended in the \"Start here\" section. It uses the validated configuration whatever the other inputs say, so a stray edit cannot change how the EA trades; Custom is for your own testing only."}}, {"@type": "Question", "name": "Does Leapfrog use a grid, martingale or averaging?", "acceptedAnswer": {"@type": "Answer", "text": "No. Each of the five ladders holds at most one position per side, there is no averaging down, no grid and no martingale, and a losing position is closed at its stop."}}, {"@type": "Question", "name": "Why does it sometimes not trade?", "acceptedAnswer": {"@type": "Answer", "text": "It only fills when a rolling range actually breaks, so a quiet gold market with fewer genuine breaks means fewer trades. Two self-calibrating controls also stand new orders down when the prior day's volatility sits at an extreme of its own recent history."}}, {"@type": "Question", "name": "Can I use Leapfrog on a prop-firm account?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. The Account type setting has Prop firm 2-step and Prop firm 1-step options sized for those challenge rules, plus a separate input group for your firm's own daily loss, maximum loss, profit target and Friday-close numbers."}}]}</script>
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/leapfrog/"><meta property="og:type" content="website">
+<meta property="og:title" content="Leapfrog - Gold range-breakout Expert Advisor for MT5 (XAUUSD M15) | Joshua Dunnink"><meta property="og:description" content="Leapfrog is an MT5 Expert Advisor for gold (XAUUSD) that trades range breakouts on five rolling ranges at once. Each &quot;ladder&quot; watches the highest high and...">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/leapfrog/"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/leapfrog_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<a href="../../img/leapfrog_hero.jpg"><img class="hero" src="../../img/leapfrog_hero.jpg" width="800" height="800" alt="Leapfrog artwork"></a><h1>Leapfrog</h1><p class="lead">XAUUSD · M15 · MetaTrader 5 Expert Advisor</p><p class="note"><strong>Coming soon.</strong> This Expert Advisor is in final testing and is not for sale yet. Its description, manual and research are published so you can follow it before release.</p><p><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 1.58 · worst equity drawdown 6.68% · 1,980 trades · return +82.6% on 10,000</p><p class="stamp">Backtest, real ticks, Fusion Markets, 2025-07-01 to 2026-09-07, version 1.23. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/leapfrog_headline.png" alt="Leapfrog balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>Leapfrog is an MT5 Expert Advisor for gold (XAUUSD) that trades range breakouts on five rolling ranges at once.
+Each "ladder" watches the highest high and lowest low of its own rolling time window - about one day, about 30
+hours, about 56 hours, about three days, and about four trading weeks - and rests a stop order just beyond that
+window's edge, so a genuine break of the range fills it in the direction of the move.</p>
+<p>How a trade is made:</p>
+<p>Range. Each ladder keeps its own rolling high and low over its own window. Four windows are measured in hours;
+the longest is measured in trading days.</p>
+<p>Entry. A stop order rests a small percentage of price beyond the range edge and is re-aimed as the range moves.
+Orders are placed only at fixed clock slots, not on every tick, and each ladder holds at most one position per
+side at a time.</p>
+<p>Risk per trade. Every order carries a hard stop loss from the moment it is placed, set as a percentage of the
+gold price. Position size is computed from account value and a lot-per-10,000 setting, shared per ladder.</p>
+<p>Exit. Once a position is in profit the exit engine closes part of it in three stages and then trails the stop
+behind the best price reached. There is no averaging down, no grid and no martingale; a losing position is
+closed at its stop.</p>
+<p>When it does not trade. Two self-calibrating controls read gold's own recent volatility rather than a fixed
+number. New orders are not armed when the prior day's volatility sits at either extreme of its own recent
+history, and position size is scaled down, not switched off, when the shorter-term range is unusually narrow.
+Orders are removed before the weekend.</p>
+<p>What the EA does not do: no grid, no martingale, no averaging down, no position without a stop loss, no news
+trading logic, no files, no DLLs, no external resources.</p>
+<p>The five ladders share the same mechanism family as other level and range breakout systems in this catalogue,
+and each is built differently. One system rests a single stop order beyond one confirmed swing level and manages
+it with a two-stage trailing stop. Another rests several stop orders beyond the nearest unbroken swing high or
+low on two higher timeframes, with a fixed-dollar stop and target and a give-back exit. A third trades the
+breakout of a consolidation range read from three timeframes together. Leapfrog instead runs five ladders side
+by side, each re-arming a stop order at its own rolling window's high or low on a fixed clock rather than at a
+single confirmed swing point, with a percentage-of-price stop and a staged partial-close and trail exit.</p>
+<p>Settings. One short section, "Start here", is the whole setup: Account type (Personal, Prop firm 2-step, Prop
+firm 1-step), Settings (Recommended, Custom), a lot-per-10,000 setting per ladder, a fixed lot, an optional
+balance to size on, and a maximum spread in dollars. With Settings on Recommended the tested configuration is
+used whatever the lower sections say, so a stray edit cannot change it; Custom opens every ladder's window,
+offsets, stop, target and the volatility controls for your own tests. The compiled defaults are the tested
+configuration; the EA needs no .set file. On a chart that is not gold it loads, says why, and stays flat.</p>
+<p>Results below are MetaTrader 5 Strategy Tester runs on real broker ticks (100 percent history quality), 10,000
+starting balance, compiled defaults, and are backtests, not live trading. One binary, four brokers, the same
+fourteen-month window (1 July 2025 to 7 September 2026):</p>
+<ul>
+<li>Vantage Markets: profit factor 1.74, net +9,749 (+97 percent), equity drawdown 5.9 percent</li>
+<li>Pepperstone EU: profit factor 1.65, net +9,241 (+92 percent), equity drawdown 7.9 percent</li>
+<li>BlackBull Markets: profit factor 1.67, net +8,449 (+84 percent), equity drawdown 5.1 percent</li>
+<li>Fusion Markets: profit factor 1.58, net +8,260 (+83 percent), equity drawdown 6.7 percent</li>
+</ul>
+<p>These four rows were measured on version 1.20 of the engine; every version between 1.20 and the current 1.28
+is proved to place the same deals as the version before it under the shipped defaults, so the chain is unbroken
+to what ships today. A Strategy Tester check run directly on the current 1.28 binary agrees: BlackBull, 1 April 2025 to 19
+September 2026, 2,388 trades, net +12,261.24, profit factor 1.77, equity drawdown 5.29 percent.</p>
+<p>The result differs by broker in a narrow band - across the four live feeds above, the low end to the high end
+is 8,260 to 9,749, a factor of about 1.18. That is closer than any single number: it points to the result being
+a property of the strategy rather than of one broker's cost structure. Every feed shown is positive and stays
+under 10 percent equity drawdown.</p>
+<p>Prop-firm accounts. Choose the Account type and nothing else. Prop firm 2-step fixes the size at 0.03 lot per
+10,000 of account value per ladder for challenges with a 5 percent daily and 10 percent maximum loss; Prop firm 1-step
+fixes it at 0.02 for 3 percent / 6 percent challenges. Weekend protection stays on in both modes. A second input
+group takes your firm's own daily loss limit, maximum loss limit, profit target, best-day cap and Friday close
+hour; when a limit is close the EA closes its own trades, deletes its orders, and pauses until the firm's next
+day (daily rules) or stops for good (maximum loss, target). It is a rule guard, not a guarantee: a price gap can
+carry a loss past a limit, which is why the EA acts ahead of the stated limit by default. Details: user manual.</p>
+<h3 id="requirements">Requirements</h3>
+<ul>
+<li>Gold (XAUUSD or your broker's spelling), hedging account, VPS recommended (it maintains resting orders around
+  the clock).</li>
+<li>Raw-spread or ECN account preferred; the partial-profit marks are small fractions of the daily range.</li>
+<li>Recommended minimum 5,000 in account currency; the published figures are on 10,000. On small accounts the
+  broker's minimum lot limits how far the sizing control can reduce a position.</li>
+<li>Needs 250 daily and 200 hourly bars of history to calibrate its volatility measures; on short history it
+  trades ungated rather than standing down on missing data.</li>
+</ul>
+<h3 id="important">Important</h3>
+<p>All performance figures published with this product are Strategy Tester backtest results on real broker tick
+data. Backtests describe the past and are not a promise or a projection of future results. Trading carries risk
+of loss. Test on a demo account first.</p>
+<p>This build is designed and validated for gold. On another instrument it loads and reports that it will not
+trade, rather than trading a market it was not validated on.</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<p><strong>Q: Which broker and account type does Leapfrog need?</strong>
+A: A hedging account - the five ladders can hold positions on both sides at once. A raw-spread or ECN account is preferred, since the partial-profit marks are small fractions of the daily range.</p>
+<p><strong>Q: What is the minimum deposit?</strong>
+A: 5,000 in account currency is the recommended minimum; the published results use 10,000. Below the recommended minimum the broker's own minimum lot limits how far the position-sizing control can reduce a trade.</p>
+<p><strong>Q: Which chart and timeframe do I attach it to?</strong>
+A: Any XAUUSD chart. Leapfrog reads its own 30-minute, hourly and daily series internally; M15 is the chart the testing used.</p>
+<p><strong>Q: Which setting should I start with?</strong>
+A: Leave Settings on Recommended in the "Start here" section. It uses the validated configuration whatever the other inputs say, so a stray edit cannot change how the EA trades; Custom is for your own testing only.</p>
+<p><strong>Q: Does Leapfrog use a grid, martingale or averaging?</strong>
+A: No. Each of the five ladders holds at most one position per side, there is no averaging down, no grid and no martingale, and a losing position is closed at its stop.</p>
+<p><strong>Q: Why does it sometimes not trade?</strong>
+A: It only fills when a rolling range actually breaks, so a quiet gold market with fewer genuine breaks means fewer trades. Two self-calibrating controls also stand new orders down when the prior day's volatility sits at an extreme of its own recent history.</p>
+<p><strong>Q: Can I use Leapfrog on a prop-firm account?</strong>
+A: Yes. The Account type setting has Prop firm 2-step and Prop firm 1-step options sized for those challenge rules, plus a separate input group for your firm's own daily loss, maximum loss, profit target and Friday-close numbers.</p><h2>Evidence</h2><figure><img src="img/01_equity_VANTAGE.png" alt="equity VANTAGE (backtest chart)" loading="lazy"><figcaption>equity VANTAGE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_PEPPERSTONE.png" alt="equity PEPPERSTONE (backtest chart)" loading="lazy"><figcaption>equity PEPPERSTONE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_BLACKBULL.png" alt="equity BLACKBULL (backtest chart)" loading="lazy"><figcaption>equity BLACKBULL - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_FUSION.png" alt="equity FUSION (backtest chart)" loading="lazy"><figcaption>equity FUSION - Strategy Tester, real ticks, backtest</figcaption></figure>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

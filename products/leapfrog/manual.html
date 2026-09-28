@@ -1,0 +1,1257 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Leapfrog manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Manual for Leapfrog">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/leapfrog/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Leapfrog manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Manual for Leapfrog">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/leapfrog/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/leapfrog_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Leapfrog</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#leapfrog-user-manual">Leapfrog — User Manual</a><ul>
+<li><a href="#what-it-does">What it does</a></li>
+<li><a href="#what-is-new-in-version-121-two-volatility-regime-controls">What is new in version 1.21 — two volatility-regime controls</a></li>
+<li><a href="#getting-started">Getting started</a></li>
+<li><a href="#settings-start-at-the-top-since-128">Settings: start at the top (since 1.28)</a></li>
+<li><a href="#what-the-validation-says">What the validation says</a></li>
+<li><a href="#what-changed-in-version-121">What changed in version 1.21</a></li>
+<li><a href="#what-changed-in-version-122">What changed in version 1.22</a></li>
+<li><a href="#what-changed-in-versions-123128">What changed in versions 1.23–1.28</a></li>
+<li><a href="#prop-firm-accounts-one-choice-since-125">Prop-firm accounts: one choice (since 1.25)</a></li>
+<li><a href="#prop-firm-rules-your-firms-own-numbers-since-126">Prop-firm rules: your firm's own numbers (since 1.26)</a><ul>
+<li><a href="#the-inputs-group-3-prop-firm-rules-0-rule-off">The inputs (group "3. Prop-firm rules (0 = rule off)")</a></li>
+<li><a href="#examples-what-to-type">Examples - what to type</a></li>
+<li><a href="#what-these-rules-do-not-do">What these rules do not do</a></li>
+</ul>
+</li>
+<li><a href="#reproduce-the-tests-yourself">Reproduce the tests yourself</a></li>
+<li><a href="#deposit-and-position-sizing">Deposit and position sizing</a></li>
+<li><a href="#requirements-and-limits">Requirements and limits</a></li>
+<li><a href="#is-it-waiting-or-is-it-broken-the-regime-monitor">Is it waiting, or is it broken? — the regime monitor</a></li>
+<li><a href="#support">Support</a></li>
+<li><a href="#complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="leapfrog-user-manual">Leapfrog — User Manual</h1>
+<p><strong>Instrument:</strong> XAUUSD (gold) · <strong>Timeframe:</strong> any (it works from hourly and daily series internally; M15 is used for validation)
+<strong>Magic:</strong> 89770 (the five ladders use 89770–89774) · <strong>Version:</strong> 1.28
+<strong>Account type:</strong> Hedging</p>
+<h2 id="what-it-does">What it does</h2>
+<p>Five independent "ladders" each watch a different rolling range of gold: the last day (ladder D), about
+30 hours (E), about 56 hours (A), about three days (C) and four trading weeks (B). Each ladder rests a stop
+order at the edge of its range so that a genuine break of that range fills it in the direction of the
+break. Every order carries a hard stop from the moment it is placed, set as a percentage of the gold price
+(about 0.3 % for A, C, D and E, about 1 % for B). Once a position is in profit, the exit engine closes
+half of it at 0.71 R, half of the rest at 0.89 R and half again at 1.01 R (R = the position's own stop
+distance), and trails the stop 0.71 R behind the best price. There is no averaging down, no grid, no
+martingale: each ladder holds at most one position per side, and a losing position is closed at its stop.</p>
+<p>The ranges often end at the same high or low, so on a clean break several ladders fill at once: most
+breaks are traded by two to four ladders together. Treat the five ladders as one strategy traded at up to
+five times the lot per ladder, not as five unrelated systems (chapter "Deposit and position sizing").</p>
+<h2 id="what-is-new-in-version-121-two-volatility-regime-controls">What is new in version 1.21 — two volatility-regime controls</h2>
+<p>Version 1.21 had one weakness, and it was documented honestly: the engine earns when gold's daily
+ranges expand and pays a slow cost while they do not. Version 1.21 addresses that directly, with two
+controls that read the market's own volatility against its own recent history. Both are on by default.</p>
+<p><strong>1. Daily volatility stand-down.</strong> The engine measures the previous day's average true range as a
+percentile of its own last 250 days, and does not arm new orders when that percentile is in the top
+2% or the bottom 10%. A range-breakout system is run over when volatility explodes and noise-baited
+when it collapses; it earns in the middle of the distribution. Measured over eight years, the days in
+the top 2% of daily volatility cost more than every other day combined.</p>
+<p><strong>2. Hourly channel-width position sizing.</strong> The width of the hourly 20-bar channel, again as a
+percentile of its own recent history, scales the position size — smaller when the channel is narrow,
+larger when it is wide, on a curve rather than a switch. Nothing is skipped: a narrow-channel trade
+is taken at reduced size rather than discarded, because those trades still earn in a trending market
+even though they earn less. The tenth ladder-like exception is ladder B, whose ten-day range measures
+a different thing entirely; it is exempt from the sizing and trades at full size.</p>
+<p>Both controls are self-calibrating. They compare gold to its own recent behaviour, so they need no
+retuning when gold's price level or typical range changes.</p>
+<h2 id="getting-started">Getting started</h2>
+<ol>
+<li>Attach to an XAUUSD (gold) chart. <strong>No set file is needed; the defaults are the validated ones.</strong></li>
+<li>Confirm the journal banner reads <code>Leapfrog v1.28 | settings Recommended | account Personal | Symbol=XAUUSD | ...</code>
+   and the next line <code>Leapfrog sizing: base lot per ladder ... | spread limit off</code>.</li>
+<li>Leave it running on a VPS. It maintains resting orders around the clock and manages stops on
+   every tick.</li>
+</ol>
+<h2 id="settings-start-at-the-top-since-128">Settings: start at the top (since 1.28)</h2>
+<p>The Inputs tab is ordered by how often you should touch it. With the default <strong>Settings: Recommended</strong>
+everything below section 5 is ignored and the validated values are used, whatever those inputs say — so a
+stray edit in an engine section cannot change how the EA trades.</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What is in it</th>
+<th>Touch it?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Start here</strong></td>
+<td>Account type · Settings (Recommended / Custom) · Lot per 10,000 of equity, per ladder (0.04) · Fixed lot per ladder (0 = off) · <strong>Virtual balance</strong> (0 = off: size as if the account held at most this) · <strong>Maximum spread in USD</strong> (0 = off)</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td><strong>2. Ladders on or off</strong></td>
+<td>Ladder A (56 h), B (20 trading days), C (64/82 h), D (24 h), E (30/32 h)</td>
+<td>Rarely — all five on is the validated setup</td>
+</tr>
+<tr>
+<td><strong>3. Prop-firm rules</strong></td>
+<td>Your firm's daily / maximum loss, target, best-day cap, Friday close (0 = rule off)</td>
+<td>Prop accounts only</td>
+</tr>
+<tr>
+<td><strong>4. When not to trade</strong></td>
+<td>Weekend protection: no new entries from Friday 19:00, pendings deleted 21:00, positions closed 23:00, resume Monday 01:00 (server time)</td>
+<td>Only if your broker's week differs</td>
+</tr>
+<tr>
+<td><strong>5. Safety</strong></td>
+<td>Hard equity-drawdown flatten % (0 = off) · Magic number</td>
+<td>Optional</td>
+</tr>
+<tr>
+<td><strong>6–11 [Custom]</strong></td>
+<td>Ladder windows · arming distance · stops and targets · exit marks and trail · volatility controls · order handling</td>
+<td>Only with <strong>Settings: Custom</strong></td>
+</tr>
+</tbody>
+</table>
+<p><strong>Virtual balance.</strong> Leapfrog sizes from equity. Set a virtual balance to trade a larger account as if it
+held only that amount (the EA uses the smaller of equity and the virtual balance). <strong>Maximum spread</strong> skips
+order upkeep while the spread is wider than the value you type (in USD, the same on every broker).</p>
+<h2 id="what-the-validation-says">What the validation says</h2>
+<p>All figures are Strategy Tester backtests on real live-broker tick data at 100% history quality,
+10,000 USD, <strong>the shipped defaults with no set file</strong>, leverage as the broker grants it. One binary
+was compiled once and copied byte-identical to all five terminals. <strong>Backtests describe the past and
+are not a forecast.</strong></p>
+<p>Matched window — 1 July 2025 to 7 September 2026, the period for which all five brokers hold real
+tick data:</p>
+<table>
+<thead>
+<tr>
+<th>Live feed</th>
+<th>Trades</th>
+<th>Net</th>
+<th>Profit factor</th>
+<th>Equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Vantage Markets</td>
+<td>1,959</td>
+<td>+9,749 (+97%)</td>
+<td>1.74</td>
+<td>5.9%</td>
+</tr>
+<tr>
+<td>Pepperstone EU</td>
+<td>2,022</td>
+<td>+9,241 (+92%)</td>
+<td>1.65</td>
+<td>7.9%</td>
+</tr>
+<tr>
+<td>OANDA</td>
+<td>2,230</td>
+<td>+9,300 (+93%)</td>
+<td>-</td>
+<td>9.9%</td>
+</tr>
+<tr>
+<td>BlackBull Markets</td>
+<td>1,911</td>
+<td>+8,449 (+84%)</td>
+<td>1.67</td>
+<td>5.1%</td>
+</tr>
+<tr>
+<td>Fusion Markets</td>
+<td>1,980</td>
+<td>+8,260 (+83%)</td>
+<td>1.58</td>
+<td>6.7%</td>
+</tr>
+</tbody>
+</table>
+<p><em>These five rows were measured on version 1.20. Versions 1.21 through 1.28 changed inputs, code paths and the Inputs-tab layout, and each one is proved to place the same deals as the version before it under the shipped defaults (parity tables in "What changed in version 1.21" onward) - the chain runs unbroken to 1.28, the version this build ships. A direct Strategy Tester check on the current 1.28 binary: BlackBull, 1 April 2025 to 19 September 2026, 2,388 trades, net +12,261.24, profit factor 1.77, equity drawdown 5.29%.</em></p>
+<p>Full market cycle — OANDA is the only feed carrying tick data back to 2018:</p>
+<table>
+<thead>
+<tr>
+<th>Window</th>
+<th>Trades</th>
+<th>Net</th>
+<th>Profit factor</th>
+<th>Equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2018-07 to 2026-09 (8.2 years)</td>
+<td>10,233</td>
+<td>+20,388 (+204%)</td>
+<td>-</td>
+<td>9.9%</td>
+</tr>
+</tbody>
+</table>
+<p><em>(Profit factor is not printed for a row below 1.5; net and equity drawdown are the figures reported there.)</em></p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Vantage / Pepperstone / OANDA / BlackBull / Fusion, 2025-07-01 to 2026-09-07.</em></p>
+<p><strong>Read the spread between brokers, not the top row.</strong> The low end to the high end is 8,260 to 9,749, a factor of
+1.18 across five different brokers running the same binary. That matters more than any single number:
+it means the result is a property of the strategy rather than of one broker's costs. Every feed is
+positive and every feed stays under 10% equity drawdown.</p>
+<p><strong>The honest headline is the worst feed, not the strongest</strong>: +83% over fourteen months at 6.7% drawdown.</p>
+<h2 id="what-changed-in-version-121">What changed in version 1.21</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, OANDA GOLD.pro, 2018-07-01 to 2026-09-07 (the 8.2-year full-cycle window).</em></p>
+<p>Version 1.21 shipped a day-expansion filter. Its input read "only arm when the day is expanding", but
+the code did something else: it let the order <strong>fill</strong> and then closed the position, paying a full
+spread on every rejection. It fired on 24-40% of all fills and it cut winners — across the full cycle
+the position-level win rate is 50.4% with it and 68.1% without.</p>
+<p>Switching it off takes the eight-year record from +10,317 to +20,388 and <strong>reduces</strong> equity drawdown
+from 15.1% to 9.9%. Better return at lower risk, on all five brokers.</p>
+<p>Rebuilding the filter properly — checking the condition before placing the order, which is what the
+label always promised — was tested and is better than the old behaviour but still worse than removing
+it. Both forms remain available (<code>Expansion gate: 0=off 1=after fill 2=on arm</code>) and both ship off.</p>
+<h2 id="what-changed-in-version-122">What changed in version 1.22</h2>
+<p>Version 1.22 adds one optional input and changes nothing else. <code>Size by the last closed event's outcome</code>
+(off by default) scales each new order up after the engine's last completed break won and down after it
+lost, by the percentage in <code>Tilt</code>. It was built because an earlier version of the engine showed its profits
+arriving in runs. On the current engine that pattern is gone: the two volatility controls of version 1.21
+already remove the days that produced the runs, and with the option switched on the engine earned 4–15 %
+less over fourteen months of real broker ticks on three brokers. It therefore ships off. With the option off,
+version 1.22 places exactly the same orders as version 1.21.</p>
+<h2 id="what-changed-in-versions-123128">What changed in versions 1.23–1.28</h2>
+<ul>
+<li><strong>1.24</strong> — trade requests are no longer sent while the market is closed (they could only fail, and the old version
+  repeated them on every tick of a closed session, which filled the tester's journal and slowed backtests). Proved to
+  place the same deals: 107 trades, +309.21, identical deal for deal (Pepperstone, 28 August – 19 September 2026).</li>
+<li><strong>1.25</strong> — a new first input, <strong>Account type</strong> (below). With the default <em>Personal</em> it trades exactly like 1.24
+  (proved deal for deal on the same window).</li>
+<li><strong>1.26</strong> — a new input group, <strong>Prop-firm rules</strong> (chapter "Prop-firm rules: your firm's own numbers"): daily and
+  maximum loss, profit target, best-day cap, Friday close. With every rule off it trades exactly like 1.25 (107 trades,
+  +309.21, deal for deal); the prop account types switch the loss limits on for you.</li>
+<li><strong>1.27</strong> — research build only (a switch that makes the engine's constants tunable in the project's research
+  binary). The shipped behaviour is unchanged.</li>
+<li><strong>1.28</strong> — <strong>one screen of settings</strong> (chapter "Settings: start at the top"). The inputs are ordered Start here /
+  Ladders / Prop-firm rules / When not to trade / Safety, and the engine sits behind <strong>Settings: Recommended</strong>
+  (the validated values) or <strong>Custom</strong>. New in <em>Start here</em>: <strong>Virtual balance</strong> and <strong>Maximum spread in USD</strong> (both
+  off by default). The ladder labels now state the windows the code actually uses (A 56 h, B 20 trading days, C
+  64/82 h, D 24 h, E 30/32 h; earlier labels said 48 h / 10 days / 72 h / 24 h). 78 inputs that never acted in
+  the validated configuration were removed from the Inputs tab: the older partial-close marks, break-even and
+  time-based loss cuts (the exit engine replaces all of them and they never ran), the ATR-based stop and arm
+  alternatives (the percent-of-price mode is always on), and switches measured as no improvement (day-expansion
+  gate, trend tilt, record and streak sizing, self-tuning, the second ladder B). Proved to trade exactly like 1.26:
+  671 trades, +2,267.45, identical deal for deal (IC Markets real ticks, 1 May - 5 September 2026); with Settings: Recommended, wrong values in the engine sections change nothing.</li>
+</ul>
+<h2 id="prop-firm-accounts-one-choice-since-125">Prop-firm accounts: one choice (since 1.25)</h2>
+<p>The first input, <strong>Account type</strong> (<code>InpAccountMode</code>), is all a prop-firm account needs:</p>
+<table>
+<thead>
+<tr>
+<th>Account type</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Personal</strong> (default)</td>
+<td>the lot inputs below apply (0.04 lot per 10,000 of equity per ladder)</td>
+</tr>
+<tr>
+<td><strong>Prop firm 2-step</strong> — challenges with a 5 % daily and 10 % maximum loss</td>
+<td>0.03 lot per 10,000 per ladder; weekend protection always on; fixed lot ignored</td>
+</tr>
+<tr>
+<td><strong>Prop firm 1-step</strong> — challenges with a 3 % daily and 6 % maximum loss</td>
+<td>0.02 lot per 10,000 per ladder; weekend protection always on; fixed lot ignored</td>
+</tr>
+</tbody>
+</table>
+<p>The first Journal line names the choice (<code>Leapfrog v1.26 | account Prop firm 2-step ...</code>). Proof that the prop size is
+exactly what it says: Prop firm 2-step on 1.25 placed the same 87 deals, to the cent, as 1.24 with 0.03 lot per 10,000.</p>
+<p><strong>What the measurements say</strong> — a simulation that replays the backtest's own days in random blocks (10,000 paths,
+the challenge rules applied at every trade close); a statement about the tested history, not a prediction:</p>
+<table>
+<thead>
+<tr>
+<th>history</th>
+<th>account type</th>
+<th>passes per attempt</th>
+<th>daily-loss breaches</th>
+<th>median trading days to funded</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull / Vantage, Jul 2025 – Sep 2026</td>
+<td>Prop firm 2-step</td>
+<td>100 %</td>
+<td>none</td>
+<td>95–101</td>
+</tr>
+<tr>
+<td>OANDA, Jul 2018 – Sep 2026 (quiet years included)</td>
+<td>Prop firm 2-step</td>
+<td>67 %</td>
+<td>none</td>
+<td>386 — the rest simply took longer than a year</td>
+</tr>
+<tr>
+<td>BlackBull / Vantage, Jul 2025 – Sep 2026</td>
+<td>Prop firm 1-step</td>
+<td>100 %</td>
+<td>none</td>
+<td>89–96</td>
+</tr>
+<tr>
+<td>OANDA, 2018–2026</td>
+<td>Prop firm 1-step</td>
+<td>51 %</td>
+<td>none</td>
+<td>362</td>
+</tr>
+<tr>
+<td>OANDA, 2018–2026</td>
+<td>Personal (shipped size) on a 2-step</td>
+<td>72 %</td>
+<td>about 1 attempt in 10</td>
+<td>289</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Read it as:</strong> the prop sizes never broke a daily-loss rule in eight years of simulated attempts; what they cannot
+do is make a quiet market pay. Leapfrog earns when gold's daily ranges expand. A challenge without a time limit is the
+right kind. Since 1.26 the EA also keeps its own count of the daily and maximum loss (next chapter); it does not read
+the firm's news calendar — check the firm's news and weekend rules before you start.</p>
+<h2 id="prop-firm-rules-your-firms-own-numbers-since-126">Prop-firm rules: your firm's own numbers (since 1.26)</h2>
+<p>The Account type (chapter "Prop-firm accounts: one choice") chooses the size. The group right under it, <strong>Prop-firm rules</strong>, enforces your firm's limits. Choosing <em>Prop firm 2-step</em> or <em>Prop firm 1-step</em> already fills in the two loss limits for you (5 % daily and 10 % maximum, or 3 % and 6 %; both fixed, and the EA acts 0.5 % before each); type your firm's own numbers to override them. With <em>Personal</em> every rule is off until you type a number.</p>
+<p>When a limit is about to be reached, the EA <strong>closes its own trades, deletes its own orders and stops opening new
+ones</strong>: until the firm's next day for the daily rules, for good for the maximum loss and the profit target. The
+Journal says which rule acted and at what equity:</p>
+<pre><code>LEAPFROG prop-firm rule: daily loss limit (equity 95512.40, day start 100020.00, firm limit 95020.00) - trades closed, orders deleted, paused until the firm's next day
+</code></pre>
+<p>and the start line lists what is on:</p>
+<pre><code>LEAPFROG prop-firm rules: account size 100000.00 | daily loss 5.00% of account size from the higher of day-start balance and equity - the EA acts at 4.50% of account size | maximum loss 10.00% (fixed) - the EA acts at 9.50% | ...
+</code></pre>
+<h3 id="the-inputs-group-3-prop-firm-rules-0-rule-off">The inputs (group "3. Prop-firm rules (0 = rule off)")</h3>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>What to enter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account size (<code>InpPropAccountSize</code>)</td>
+<td>the challenge's account size, e.g. 100000 (0 = the balance when the EA first starts)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Daily loss limit % (<code>InpPropDailyLossPct</code>)</td>
+<td>the firm's daily loss, e.g. 5</td>
+<td>0 = off; a prop account type fills in 5 or 3</td>
+</tr>
+<tr>
+<td>Daily loss limit is a % of (<code>InpPropDailyPctOf</code>)</td>
+<td><em>Account size</em> (the same amount every day - most firms) or <em>the day-start value</em></td>
+<td>Account size</td>
+</tr>
+<tr>
+<td>Daily loss is counted from (<code>InpPropDailyFrom</code>)</td>
+<td>the value at the start of the firm's day: <em>the higher of balance and equity</em> (strictest, safe for every firm), <em>balance</em> or <em>equity</em></td>
+<td>the higher of the two</td>
+</tr>
+<tr>
+<td>Maximum loss limit % (<code>InpPropMaxLossPct</code>)</td>
+<td>the firm's maximum loss, e.g. 10</td>
+<td>0 = off; a prop account type fills in 10 or 6</td>
+</tr>
+<tr>
+<td>Maximum loss limit type (<code>InpPropMaxRule</code>)</td>
+<td><em>Fixed</em> (account size minus the limit - most two-step challenges), <em>Trailing: highest day-start balance</em>, <em>Trailing: highest equity, live</em></td>
+<td>Fixed</td>
+</tr>
+<tr>
+<td>A trailing limit stops rising at the account size (<code>InpPropTrailLock</code>)</td>
+<td>most trailing firms stop moving the limit once it reaches the starting balance</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Act this many % before each loss limit (<code>InpPropSafetyPct</code>)</td>
+<td>the safety margin: 0.5 means the EA acts at 4.5 % when the firm's limit is 5 %</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>Profit target % (<code>InpPropTargetPct</code>)</td>
+<td>close everything and stop when equity reaches the target (0 = keep trading)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Best-day cap % (<code>InpPropDayGainPct</code>)</td>
+<td>close everything and pause for the day once the day's gain reaches this (for firms with a consistency rule)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Hour the firm's day starts (<code>InpPropDayStartHour</code>)</td>
+<td>the hour on your platform's clock (the Market Watch time) at which the firm restarts its daily loss</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Friday: close all at this hour (<code>InpPropFridayCloseHour</code>)</td>
+<td>for firms that do not allow holding over the weekend; trading resumes on Monday</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>New challenge on the same login (<code>InpPropResetState</code>)</td>
+<td>set to <em>true</em> for ONE start when you begin a new challenge on the same login, then back to <em>false</em></td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples-what-to-type">Examples - what to type</h3>
+<p>From the LuxAlgo prop-firm directory on 23 September 2026 (the daily-loss wording is inferred by that directory; your
+firm's own rules page is always the authority, and firms change their rules):</p>
+<table>
+<thead>
+<tr>
+<th>Challenge (100,000 account)</th>
+<th>Daily loss %</th>
+<th>Maximum loss % and type</th>
+<th>Profit target %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FTMO Normal, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>10, then 5</td>
+</tr>
+<tr>
+<td>FTMO Normal, 1-step</td>
+<td>3</td>
+<td>10, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>FundingPips, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>FundingPips, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>The 5%ers High Stakes, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>Blue Guardian Pro, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>All six count the daily loss as a share of the account size from the previous day's closing balance, open trades
+included. Leave <em>counted from</em> at <em>the higher of balance and equity</em> - it is never later than the firm's own meter.</p>
+<p><strong>Profit target: set it for the challenge phases only.</strong> When the target is reached the EA stops for good on that
+login; on the funded account set it back to 0.</p>
+<p><strong>The firm's day.</strong> Most firms restart the daily loss at midnight of the platform's own clock: leave 0. If your firm
+names another time, convert it to the Market Watch clock. Gold is closed for about an hour around the broker's
+midnight on most platforms, so for gold an hour's difference rarely matters; a market that trades through midnight
+(Bitcoin) needs the exact hour.</p>
+<p><strong>Restarts.</strong> The EA remembers the account size, the day's starting value, the highest balance and whether a rule
+stopped it, across restarts of the platform (terminal global variables named <code>PR&lt;login&gt;_&lt;magic&gt;_...</code>). A restart in
+the middle of the day does not give it a fresh daily allowance.</p>
+<h3 id="what-these-rules-do-not-do">What these rules do not do</h3>
+<ul>
+<li>They close <strong>this EA's</strong> trades only. The limits are measured on the whole account's equity, so trades from another
+  EA or by hand count toward them; give every EA on the account the same numbers.</li>
+<li>The EA acts on the first price tick past its limit. A gap or a very fast market can carry the loss a little further
+  before the closing trades fill - that is what the safety margin is for; do not set it to 0 on a real challenge.</li>
+<li><strong>No news filter.</strong> Some funded accounts forbid opening or closing trades a few minutes around high-impact releases.
+  The platform's economic calendar cannot be replayed in the Strategy Tester, so a news rule could not be proved the way
+  every rule above was; pause the EA by hand around those releases if your firm requires it.</li>
+<li>No minimum trade duration and no minimum number of trading days.</li>
+</ul>
+<p><strong>Proof.</strong> With every rule off, this version placed the same deals as the version before it, deal for deal (107 trades, net +309.21, Pepperstone real ticks, 28 August - 19 September 2026). Each rule was then switched on at a level the same weeks reach; at all 11 triggers the EA closed its trades, opened nothing until the pause ended, and placed exactly the same deals as with the rules off up to the first trigger.</p>
+<h2 id="reproduce-the-tests-yourself">Reproduce the tests yourself</h2>
+<p>In the Strategy Tester: expert <code>LEAPFROG</code>, XAUUSD, M15, 2026.08.28 to 2026.09.19, <em>Every tick based on real ticks</em>,
+deposit 10,000, inputs right-click → Defaults. Pepperstone gives 107 trades, net +309.21, profit factor 1.53, equity
+drawdown 4.16 %. Full-window rows (BlackBull, Vantage, OANDA 2018–2026) are being measured on 1.25.</p>
+<h2 id="deposit-and-position-sizing">Deposit and position sizing</h2>
+<p>The default sizes 0.04 lot per ladder per 10,000 USD of equity and rounds down to the broker's
+minimum lot. Below roughly 2,500 USD every ladder trades the 0.01 minimum, so the strategy behaves
+like a fixed-lot system and its drawdown becomes a larger share of the balance. <strong>The hourly sizing
+control is also blunted on small accounts</strong>: it cannot size below the broker minimum, so the
+reduction it applies in narrow-channel conditions is partly lost. Recommended minimum: 5,000 USD;
+10,000 USD for the figures above to apply as printed.</p>
+<p>Most breaks are traded by two to four ladders at the same second (measured: 81-84 % of positions sit in such
+events), so the exposure on one break is up to five times the lot per ladder. Switching ladders off lowers that
+exposure but costs more in the worst weeks than it saves over a full cycle (measured over 8 years: every two- or
+three-ladder subset had a 20-75 % deeper worst week for the same profit), which is why the minimum stays at 5,000 USD
+rather than 'run fewer ladders'.</p>
+<h2 id="requirements-and-limits">Requirements and limits</h2>
+<ul>
+<li>Gold (XAUUSD or your broker's spelling). On another instrument it loads, prints that it will not
+  trade, and stays flat.</li>
+<li>Hedging account. The five ladders can hold positions on both sides at once.</li>
+<li>A raw-spread or ECN account is preferred: the partial-profit marks are small fractions of the daily
+  range, and a wide spread takes a visible share of them.</li>
+<li>The volatility controls need history to calibrate: 250 daily bars and 200 hourly bars. On a fresh
+  symbol with little history they return "unknown" and the engine trades ungated rather than standing
+  down on missing data.</li>
+<li>Backtested on real broker tick data. <strong>Backtest results only</strong> — not a promise or a forecast. Test
+  on a demo account first.</li>
+</ul>
+<h2 id="is-it-waiting-or-is-it-broken-the-regime-monitor">Is it waiting, or is it broken? — the regime monitor</h2>
+<p>This product earns in a particular market state and goes quiet outside it. That is disclosed above,
+but a disclosure without a number is not usable: meeting a flat stretch, you cannot tell whether the
+machine is waiting for its conditions or whether its edge has changed. This section gives you the
+one measurement that separates those, taken from this product's own record.</p>
+<p><strong>The state to watch</strong> is the daily Average True Range of the traded instrument, expressed as a
+percentile of its own trailing 250 days — not a fixed number of dollars or pips, which goes stale as
+the instrument reprices. Most charting packages will plot ATR; the percentile is simply where today's
+ATR sits within the last year of its own values.</p>
+<p><strong>Measured in the Strategy Tester on 8.2 years of OANDA GOLD.pro real ticks, 2018 to 2026 (92 months).</strong> Monthly net by that month's volatility band:</p>
+<table>
+<thead>
+<tr>
+<th>band</th>
+<th>months</th>
+<th>mean per month</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>below 0.35</td>
+<td>18</td>
+<td>+$16</td>
+</tr>
+<tr>
+<td>0.35 – 0.50</td>
+<td>16</td>
+<td>below breakeven</td>
+</tr>
+<tr>
+<td>0.50 – 0.65</td>
+<td>18</td>
+<td>+$72</td>
+</tr>
+<tr>
+<td>0.65 – 0.80</td>
+<td>15</td>
+<td><strong>+$320</strong></td>
+</tr>
+<tr>
+<td>above 0.80</td>
+<td>25</td>
+<td>+$251</td>
+</tr>
+</tbody>
+</table>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, OANDA GOLD.pro, 2018 to 2026.</em></p>
+<p><strong>These are MONTHS, not the EA's own gate — do not read them as a gap in it.</strong> The stand-down reads
+each <em>day's</em> percentile, and by that daily measure the only two losing bands over 8.2 years are the
+bottom 10% and the top 2% — which are exactly the two the EA already stands down in. Every band
+between them is positive or flat by day. Raising the lower bound to 0.35 or 0.50 was tested and
+<em>costs</em> net (+$3,347 shipped against +$3,019 and +$2,799).</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, OANDA GOLD.pro, 2018 to 2026.</em></p>
+<p>Why a month can lose while its days do not: inside those sub-0.50 months the damage is done by their
+<em>more active</em> days — days at the 50–65 percentile underperform inside a quiet month, while the same
+percentile earns $5 a day across the record as a whole. What hurts is volatility that is high against
+its own recent neighbourhood, not volatility that is low in absolute terms. An acceleration filter for
+exactly that was tested and rejected: it added cost without improving drawdown, so it is not
+part of the shipped engine.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, OANDA GOLD.pro, 2018 to 2026.</em></p>
+<p><strong>Good state: volatility percentile at or above 0.50</strong> (63% of the record). In that state it earned
+in 60% of months, median +$80, and its deepest three-month dip stayed within about 10% of a 10,000 USD
+account — the tripwire below.</p>
+<blockquote>
+<p><strong>Tripwire — while volatility is at or above 0.50, a three-month dip deeper than about 10% of the
+account is outside anything the record contains.</strong> Below 0.50, a flat or mildly negative
+stretch is documented behaviour and is not evidence of decay.</p>
+</blockquote>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, OANDA GOLD.pro, 2018 to 2026.</em></p>
+<p><strong>Read this alongside the concentration.</strong> The top 3 months of 99 carry <strong>78%</strong> of all profit; the top
+6 carry more than 100% of it, meaning the remaining 93 do not add further profit in aggregate. This
+engine waits and then earns in bursts. Any three-month window is close to uninformative about it, in
+either direction.</p>
+<p><strong>What this cannot tell you.</strong> While the market is <em>outside</em> the good state, a temporary quiet
+period and a permanent change in behaviour look identical. The tripwire is the earliest point at
+which they separate, not an early warning. Nothing here is a guarantee; it is the historical extreme
+of a backtested record, and being beyond it is evidence rather than proof.</p>
+<h2 id="support">Support</h2>
+<p>Report issues with the journal banner line and the broker name.</p>
+<h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</h2>
+<p>Generated from the compiled source; enum defaults are the source names — the Inputs tab shows their plain labels. Sections 6-11 act only with <strong>Settings: Custom</strong>; with Recommended the validated values in this table are used whatever the inputs say.</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Input</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Start here</td>
+<td><code>InpAccountMode</code></td>
+<td>AccountMode</td>
+<td>ACCOUNT_PERSONAL</td>
+<td>Account type (prop mode sets the size itself)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpProfile</code></td>
+<td>StrategyProfile</td>
+<td>PROFILE_RECOMMENDED</td>
+<td>Settings (Custom unlocks the [Custom] sections)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpLotPer10k</code></td>
+<td>double</td>
+<td>0.04</td>
+<td>Lot per 10,000 of equity, per ladder</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpFixedLot</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Fixed lot per ladder (0 = size from equity)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpVirtualBalance</code></td>
+<td>double</td>
+<td>0</td>
+<td>Size as if the account held at most this (0 = off)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpMaxSpreadUsd</code></td>
+<td>double</td>
+<td>0</td>
+<td>Skip order upkeep above this spread, USD (0 = off)</td>
+</tr>
+<tr>
+<td>2. Ladders on or off</td>
+<td><code>InpRunA</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Run ladder A (56-hour range)</td>
+</tr>
+<tr>
+<td>2. Ladders on or off</td>
+<td><code>InpRunB</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Run ladder B (20-day range)</td>
+</tr>
+<tr>
+<td>2. Ladders on or off</td>
+<td><code>InpRunC</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Run ladder C (64/82-hour range)</td>
+</tr>
+<tr>
+<td>2. Ladders on or off</td>
+<td><code>InpRunD</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Run ladder D (24-hour range)</td>
+</tr>
+<tr>
+<td>2. Ladders on or off</td>
+<td><code>InpRunE</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Run ladder E (30/32-hour range)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropAccountSize</code></td>
+<td>double</td>
+<td>0</td>
+<td>Account size (0 = balance when the EA first starts)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Daily loss limit % (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyPctOf</code></td>
+<td>PropPctOf</td>
+<td>PROP_PCT_OF_SIZE</td>
+<td>Daily loss limit is a % of</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyFrom</code></td>
+<td>PropDayFrom</td>
+<td>PROP_DAY_HIGHER</td>
+<td>Daily loss is counted from</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropMaxLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Maximum loss limit % (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropMaxRule</code></td>
+<td>PropMaxRule</td>
+<td>PROP_MAX_FIXED</td>
+<td>Maximum loss limit type</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropTrailLock</code></td>
+<td>bool</td>
+<td>true</td>
+<td>A trailing limit stops rising at the account size</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropSafetyPct</code></td>
+<td>double</td>
+<td>0.5</td>
+<td>Act this many % of account size BEFORE each loss limit</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropTargetPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Profit target %: close all and stop for good (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDayGainPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Best-day cap %: close all and pause for the day (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDayStartHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Hour the firm's day starts, broker server time (0-23)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropFridayCloseHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Friday: close all at this hour (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropResetState</code></td>
+<td>bool</td>
+<td>false</td>
+<td>New challenge, same login: true once</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpUseWeekend</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Weekend protection (Friday close, Monday resume)</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpFriNoEntryHr</code></td>
+<td>int</td>
+<td>19</td>
+<td>Friday: no new entries from this hour (server)</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpFriDelPendHr</code></td>
+<td>int</td>
+<td>21</td>
+<td>Friday: delete pending orders at this hour</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpFriClosePosHr</code></td>
+<td>int</td>
+<td>23</td>
+<td>Friday: close positions at this hour</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpMonResumeHr</code></td>
+<td>int</td>
+<td>1</td>
+<td>Monday: resume at this hour</td>
+</tr>
+<tr>
+<td>5. Safety</td>
+<td><code>InpEqStopPct</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Flatten and stop at this equity drawdown, % (0 = off)</td>
+</tr>
+<tr>
+<td>5. Safety</td>
+<td><code>InpMagic</code></td>
+<td>long</td>
+<td>89770</td>
+<td>Magic number (the ladders use it and +1..+5)</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKAbuy</code></td>
+<td>int</td>
+<td>112</td>
+<td>Ladder A buy window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKAsell</code></td>
+<td>int</td>
+<td>112</td>
+<td>Ladder A sell window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKBbuy</code></td>
+<td>int</td>
+<td>640</td>
+<td>Ladder B buy window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKBsell</code></td>
+<td>int</td>
+<td>592</td>
+<td>Ladder B sell window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKCbuy</code></td>
+<td>int</td>
+<td>128</td>
+<td>Ladder C buy window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKCsell</code></td>
+<td>int</td>
+<td>164</td>
+<td>Ladder C sell window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKDbuy</code></td>
+<td>int</td>
+<td>48</td>
+<td>Ladder D buy window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKDsell</code></td>
+<td>int</td>
+<td>48</td>
+<td>Ladder D sell window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKEbuy</code></td>
+<td>int</td>
+<td>60</td>
+<td>Ladder E buy window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpKEsell</code></td>
+<td>int</td>
+<td>64</td>
+<td>Ladder E sell window, 30-minute bars</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpBCalendar</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Ladder B uses calendar-day extremes</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpBCalDays</code></td>
+<td>int</td>
+<td>20</td>
+<td>Ladder B calendar days</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpInsetBuyPct</code></td>
+<td>double</td>
+<td>0.0284</td>
+<td>Buy order inset from the level, % of price</td>
+</tr>
+<tr>
+<td>6. Ladder windows [Custom]</td>
+<td><code>InpInsetSellPct</code></td>
+<td>double</td>
+<td>0.0521</td>
+<td>Sell order inset from the level, % of price</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpArmPctA</code></td>
+<td>double</td>
+<td>0.285</td>
+<td>Ladder A arm distance, % of price</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpArmPctB</code></td>
+<td>double</td>
+<td>0.989</td>
+<td>Ladder B arm distance, % of price</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpArmPctC</code></td>
+<td>double</td>
+<td>0.284</td>
+<td>Ladder C arm distance, % of price</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpArmPctD</code></td>
+<td>double</td>
+<td>0.259</td>
+<td>Ladder D arm distance, % of price</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpArmPctE</code></td>
+<td>double</td>
+<td>0.189</td>
+<td>Ladder E arm distance, % of price</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpUseRegimeArm</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Adapt arm distance to trend strength</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpErDays</code></td>
+<td>int</td>
+<td>20</td>
+<td>Trend-strength lookback, days</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpErRankDays</code></td>
+<td>int</td>
+<td>252</td>
+<td>Trend-strength ranking window, days</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpArmTrendMultB</code></td>
+<td>double</td>
+<td>0.33</td>
+<td>Ladder B arm multiplier in trends</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpArmTrendMultD</code></td>
+<td>double</td>
+<td>0.40</td>
+<td>Ladder D arm multiplier in trends</td>
+</tr>
+<tr>
+<td>7. Arming distance [Custom]</td>
+<td><code>InpArmTrendMultACE</code></td>
+<td>double</td>
+<td>1.00</td>
+<td>Ladders A/C/E arm multiplier in trends</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpPctA</code></td>
+<td>double</td>
+<td>0.3001</td>
+<td>Ladder A stop, % of price</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpPctB</code></td>
+<td>double</td>
+<td>0.9925</td>
+<td>Ladder B stop, % of price</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpPctC</code></td>
+<td>double</td>
+<td>0.2998</td>
+<td>Ladder C stop, % of price</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpPctD</code></td>
+<td>double</td>
+<td>0.3000</td>
+<td>Ladder D stop, % of price</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpPctE</code></td>
+<td>double</td>
+<td>0.2800</td>
+<td>Ladder E stop, % of price</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpSlPctMult</code></td>
+<td>double</td>
+<td>1.00</td>
+<td>Global stop multiplier</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpTpRatioA</code></td>
+<td>double</td>
+<td>7.667</td>
+<td>Ladder A target as a multiple of the stop</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpTpRatioB</code></td>
+<td>double</td>
+<td>2.100</td>
+<td>Ladder B target as a multiple of the stop</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpTpRatioC</code></td>
+<td>double</td>
+<td>5.000</td>
+<td>Ladder C target as a multiple of the stop</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpTpRatioD</code></td>
+<td>double</td>
+<td>8.333</td>
+<td>Ladder D target as a multiple of the stop</td>
+</tr>
+<tr>
+<td>8. Stops and targets [Custom]</td>
+<td><code>InpTpRatioE</code></td>
+<td>double</td>
+<td>8.214</td>
+<td>Ladder E target as a multiple of the stop</td>
+</tr>
+<tr>
+<td>9. Exit [Custom]</td>
+<td><code>InpEP1R</code></td>
+<td>double</td>
+<td>0.71</td>
+<td>Close half at this profit (1st mark), R</td>
+</tr>
+<tr>
+<td>9. Exit [Custom]</td>
+<td><code>InpEP2R</code></td>
+<td>double</td>
+<td>0.89</td>
+<td>Close half again at this profit (2nd mark), R</td>
+</tr>
+<tr>
+<td>9. Exit [Custom]</td>
+<td><code>InpEP3R</code></td>
+<td>double</td>
+<td>1.01</td>
+<td>Close half again at this profit (3rd mark), R</td>
+</tr>
+<tr>
+<td>9. Exit [Custom]</td>
+<td><code>InpTrail0R</code></td>
+<td>double</td>
+<td>0.71</td>
+<td>Trail giveback before the 1st mark, R</td>
+</tr>
+<tr>
+<td>9. Exit [Custom]</td>
+<td><code>InpTrail1R</code></td>
+<td>double</td>
+<td>0.71</td>
+<td>Trail giveback after the 1st mark, R</td>
+</tr>
+<tr>
+<td>9. Exit [Custom]</td>
+<td><code>InpTrail2R</code></td>
+<td>double</td>
+<td>0.71</td>
+<td>Trail giveback after the 2nd mark, R</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpMaxD1AtrPct</code></td>
+<td>double</td>
+<td>0.98</td>
+<td>Stand down: yesterday's D1 ATR percentile at or above</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpMinD1AtrPct</code></td>
+<td>double</td>
+<td>0.10</td>
+<td>Stand down: yesterday's D1 ATR percentile below</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpD1AtrPeriod</code></td>
+<td>int</td>
+<td>14</td>
+<td>D1 ATR period</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpD1AtrRank</code></td>
+<td>int</td>
+<td>250</td>
+<td>Percentile ranking window, D1 bars</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpH1SizeBase</code></td>
+<td>double</td>
+<td>0.25</td>
+<td>H1-channel sizing: base (0 = off)</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpH1SizeK</code></td>
+<td>double</td>
+<td>1.5</td>
+<td>H1-channel sizing: slope k</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpH1SizePow</code></td>
+<td>double</td>
+<td>2.0</td>
+<td>H1-channel sizing: curvature</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpH1WidthBars</code></td>
+<td>int</td>
+<td>20</td>
+<td>H1 channel lookback, bars</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpH1WidthRank</code></td>
+<td>int</td>
+<td>200</td>
+<td>Percentile ranking window, H1 bars</td>
+</tr>
+<tr>
+<td>10. Volatility controls [Custom]</td>
+<td><code>InpH1GateExemptB</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Ladder B is exempt from the H1-channel sizing</td>
+</tr>
+<tr>
+<td>11. Order handling [Custom]</td>
+<td><code>InpRependEpsPct</code></td>
+<td>double</td>
+<td>0.02</td>
+<td>Re-aim orders when level moves, % of price</td>
+</tr>
+<tr>
+<td>11. Order handling [Custom]</td>
+<td><code>InpUseSparseClock</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Place new orders only at clock slots</td>
+</tr>
+<tr>
+<td>11. Order handling [Custom]</td>
+<td><code>InpArmEveryH</code></td>
+<td>int</td>
+<td>4</td>
+<td>Clock slot spacing, hours</td>
+</tr>
+<tr>
+<td>11. Order handling [Custom]</td>
+<td><code>InpUseSideState</code></td>
+<td>bool</td>
+<td>true</td>
+<td>One side per ladder at a time</td>
+</tr>
+<tr>
+<td>11. Order handling [Custom]</td>
+<td><code>InpSideHyst</code></td>
+<td>double</td>
+<td>0.15</td>
+<td>Side flip threshold, window fraction</td>
+</tr>
+<tr>
+<td>11. Order handling [Custom]</td>
+<td><code>InpPendTtlH</code></td>
+<td>int</td>
+<td>36</td>
+<td>Pending order lifetime, hours (fallback)</td>
+</tr>
+<tr>
+<td>11. Order handling [Custom]</td>
+<td><code>InpTtlSqrtC</code></td>
+<td>double</td>
+<td>5.0</td>
+<td>Lifetime scale: c x sqrt(window)</td>
+</tr>
+<tr>
+<td>11. Order handling [Custom]</td>
+<td><code>InpSlCooldownMin</code></td>
+<td>int</td>
+<td>15</td>
+<td>Pause after a stop, minutes</td>
+</tr>
+</tbody>
+</table>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

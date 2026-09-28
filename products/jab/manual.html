@@ -1,0 +1,992 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Jab manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Manual for Jab">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/jab/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Jab manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Manual for Jab">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/jab/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/jab_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Jab</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#jab-user-manual">Jab — User Manual</a><ul>
+<li><a href="#what-it-does">What it does</a></li>
+<li><a href="#getting-started">Getting started</a></li>
+<li><a href="#settings-that-matter">Settings that matter</a></li>
+<li><a href="#optional-preset-cadence">Optional preset: Cadence</a></li>
+<li><a href="#deposit-and-position-sizing">Deposit and position sizing</a></li>
+<li><a href="#requirements-and-limits">Requirements and limits</a></li>
+<li><a href="#is-it-waiting-or-is-it-broken-the-regime-monitor">Is it waiting, or is it broken? — the regime monitor</a></li>
+<li><a href="#prop-firm-rules-your-firms-own-numbers-since-148">Prop-firm rules: your firm's own numbers (since 1.48)</a><ul>
+<li><a href="#the-inputs-group-prop-firm-rules-your-firms-numbers">The inputs (group "Prop-firm rules - your firm's numbers")</a></li>
+<li><a href="#examples-what-to-type">Examples - what to type</a></li>
+<li><a href="#what-these-rules-do-not-do">What these rules do not do</a></li>
+</ul>
+</li>
+<li><a href="#support">Support</a></li>
+<li><a href="#leverage-changes-the-minimum-more-than-anything-else">Leverage changes the minimum more than anything else</a></li>
+<li><a href="#complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="jab-user-manual">Jab — User Manual</h1>
+<p><strong>Instrument:</strong> XAUUSD (gold) · <strong>Timeframe:</strong> M15 · <strong>Magic:</strong> 89721
+<strong>Account type:</strong> Hedging, <strong>raw-spread / ECN required</strong>
+<strong>Version:</strong> 1.48</p>
+<h2 id="what-it-does">What it does</h2>
+<p>Rests a stop order beyond a confirmed M15 swing level, in the direction of the last closed
+candle. On a fill, the position is managed by a two-stage trailing stop: a first stop move
+once the trade is 6 $/oz ahead, then a 2 $/oz trail once it is 4 $/oz ahead. Every order
+carries a hard stop 5 $/oz from entry the moment it is placed. Version 1.43 widened this exit:
+the earlier 0.37 $/oz trail sat inside the spread of most live feeds and gave back the edge.
+At most one position per side. No averaging, no grid, no martingale.</p>
+<h2 id="getting-started">Getting started</h2>
+<ol>
+<li>Attach to an XAUUSD (gold) M15 chart. No set file is needed; the defaults are the validated ones.</li>
+<li>Confirm the journal banner shows your broker's clock and the resolved profile.</li>
+<li>Leave it running. It manages its own stop on every tick, so a VPS is recommended.</li>
+</ol>
+<h2 id="settings-that-matter">Settings that matter</h2>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>Notes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Use fixed lot</td>
+<td>true</td>
+<td>Ships with a fixed 0.01 lot</td>
+</tr>
+<tr>
+<td>Fixed lot size</td>
+<td>0.01</td>
+<td>Raise only with balance to match</td>
+</tr>
+<tr>
+<td>Risk per trade %</td>
+<td>1.0</td>
+<td>Used only when <em>Use fixed lot</em> is false</td>
+</tr>
+<tr>
+<td>Initial stop distance</td>
+<td>5.0</td>
+<td>$/oz on gold, scaled per instrument automatically</td>
+</tr>
+<tr>
+<td>First stop move</td>
+<td>6.0</td>
+<td>Profit at which the stop first moves, $/oz</td>
+</tr>
+<tr>
+<td>Arming profit</td>
+<td>4.0</td>
+<td>Profit at which the tight trail starts, $/oz</td>
+</tr>
+<tr>
+<td>Trail distance</td>
+<td>2.0</td>
+<td>Tight trail distance once armed, $/oz</td>
+</tr>
+<tr>
+<td>Pending order expiry</td>
+<td>1200 min</td>
+<td>Unfilled orders are cancelled</td>
+</tr>
+</tbody>
+</table>
+<p>Advanced inputs (gating, level selection, exit geometry) are grouped in the panel and
+documented in their labels. The defaults are what was validated; change them only
+deliberately.</p>
+<h2 id="optional-preset-cadence">Optional preset: Cadence</h2>
+<p><code>presets/Cadence.set</code> loosens three entry inputs (<code>Minimum room</code> 8, <code>Extreme lookback</code> 36 hours, <code>Maximum
+rejections</code> 3) and leaves everything else at the defaults. Strategy Tester, real broker ticks, Fusion Markets /
+Vantage Markets / Pepperstone EU / BlackBull Markets, 2025-2026: it roughly doubles the number of trades and
+earned 31-56 % more than the defaults at a lower profit factor on every feed, with the same time between
+equity highs. It is a cadence choice, not a better trade: each
+trade earns less, there are more of them, and the extra trades are the ones that suffer most from a wide
+spread — on a demo feed with a poor spread the preset barely kept pace with its own cost while the defaults
+stayed clear of it. Use it only on a tight-spread broker, and expect a rougher curve.</p>
+<h2 id="deposit-and-position-sizing">Deposit and position sizing</h2>
+<p>It ships with a fixed 0.01 lot. The strategy never refuses to trade on a small balance; what
+changes with the deposit is how large its drawdown feels. The table below is Strategy Tester, real
+broker ticks (100% history quality), the shipped 0.01 lot, expressed against different balances.</p>
+<table>
+<thead>
+<tr>
+<th>Live feed (window)</th>
+<th>Trades</th>
+<th>Net at 0.01 lot</th>
+<th>Profit factor</th>
+<th>Deepest equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fusion Markets, 2024-01 to 2026-06</td>
+<td>483</td>
+<td>+599 USD</td>
+<td>1.78</td>
+<td>41 USD</td>
+</tr>
+<tr>
+<td>Vantage Markets, 2025-06 to 2026-06</td>
+<td>253</td>
+<td>+459 USD</td>
+<td>2.29</td>
+<td>29 USD</td>
+</tr>
+<tr>
+<td>Pepperstone EU, 2025-01 to 2026-06</td>
+<td>361</td>
+<td>+795 USD</td>
+<td>2.48</td>
+<td>40 USD</td>
+</tr>
+<tr>
+<td>OANDA <em>(demo, spread-survival check only)</em>, 2024-01 to 2026-06</td>
+<td>505</td>
+<td>+351 USD</td>
+<td>*</td>
+<td>63 USD</td>
+</tr>
+</tbody>
+</table>
+<p>* OANDA's profit factor over this window sits under the floor this manual quotes; the feed still closed
+positive over the window and is shown only as the spread-survival check, never as a performance claim.</p>
+<table>
+<thead>
+<tr>
+<th>Deposit</th>
+<th>The deepest live-feed drawdown as a share of balance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>100 USD</td>
+<td>29% to 63% - too large; not recommended</td>
+</tr>
+<tr>
+<td>500 USD</td>
+<td>6% to 13%</td>
+</tr>
+<tr>
+<td>1,000 USD</td>
+<td>3% to 6% (recommended minimum)</td>
+</tr>
+<tr>
+<td>10,000 USD</td>
+<td>under 1%</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Note on risk percent.</strong> Below roughly 2,000 USD, a 1% risk calculation produces a position
+smaller than the broker's 0.01 minimum lot, so it floors there and behaves exactly like the
+fixed lot. The risk knob only starts doing anything once the balance can express a larger
+position. Compounding multiplies the end balance and the drawdown together; judge a setting by
+its drawdown, not by its end balance.</p>
+<p><strong>Quiet gold.</strong> Strategy Tester, real ticks, OANDA (a demo account, shown only as era context),
+2021-2023: the only feed that carries that period's tick data. Jab sat flat across those three quiet years
+at 0.01 lot, with a shallow deepest drawdown of 1.7% of a 10,000 deposit. It earns when gold ranges expand
+and preserves capital when they do not.</p>
+<h2 id="requirements-and-limits">Requirements and limits</h2>
+<ul>
+<li><strong>Raw-spread/ECN account is required.</strong> On a wide-spread dealing account the strategy's
+  small, frequent profits do not survive the cost. This is a measured dependency.</li>
+<li>Backtested on real broker tick data. <strong>Backtest results only</strong> — not a promise or forecast
+  of future performance. Trading carries risk of loss.</li>
+<li>This build is designed for its own instrument family. Loaded on another symbol it will
+  report that fact and remain flat rather than trade an unvalidated market.</li>
+</ul>
+<h2 id="is-it-waiting-or-is-it-broken-the-regime-monitor">Is it waiting, or is it broken? — the regime monitor</h2>
+<p>This product earns in a particular market state and goes quiet outside it. That is disclosed above,
+but a disclosure without a number is not usable: meeting a flat stretch, you cannot tell whether the
+machine is waiting for its conditions or whether its edge has changed. This section gives you the
+one measurement that separates those, taken from this product's own record.</p>
+<p><strong>The state to watch</strong> is the daily Average True Range of the traded instrument, expressed as a
+percentile of its own trailing 250 days — not a fixed number of dollars or pips, which goes stale as
+the instrument reprices. Most charting packages will plot ATR; the percentile is simply where today's
+ATR sits within the last year of its own values.</p>
+<p><strong>Not yet measured on this product.</strong> The tripwire requires a real-tick record of at least 36 months
+so the good-state sample can bound anything; the validation runs behind this manual are shorter than
+that. Rather than print a number from a sample too thin to support it, this section states the method
+and leaves the threshold open.</p>
+<p><strong>What to do in the meantime.</strong> Track the daily ATR percentile as described above alongside your
+monthly result. A flat stretch while the percentile is low is the behaviour this manual already
+describes. A flat stretch while the percentile is <em>high</em> is the case worth reporting, because that is
+the combination that would indicate a change rather than a wait.</p>
+<p><strong>What this cannot tell you.</strong> While the market is <em>outside</em> the good state, a temporary quiet
+period and a permanent change in behaviour look identical. The tripwire is the earliest point at
+which they separate, not an early warning. Nothing here is a guarantee; it is the historical extreme
+of a backtested record, and being beyond it is evidence rather than proof.</p>
+<h2 id="prop-firm-rules-your-firms-own-numbers-since-148">Prop-firm rules: your firm's own numbers (since 1.48)</h2>
+<p>The input group <strong>Prop-firm rules</strong> enforces your firm's limits. Every rule is off (0) until you type your firm's number, and with every rule off the EA trades exactly as it did before the group existed.</p>
+<p>When a limit is about to be reached, the EA <strong>closes its own trades, deletes its own orders and stops opening new
+ones</strong>: until the firm's next day for the daily rules, for good for the maximum loss and the profit target. The
+Journal says which rule acted and at what equity:</p>
+<pre><code>JAB prop-firm rule: daily loss limit (equity 95512.40, day start 100020.00, firm limit 95020.00) - trades closed, orders deleted, paused until the firm's next day
+</code></pre>
+<p>and the start line lists what is on:</p>
+<pre><code>JAB prop-firm rules: account size 100000.00 | daily loss 5.00% of account size from the higher of day-start balance and equity - the EA acts at 4.50% of account size | maximum loss 10.00% (fixed) - the EA acts at 9.50% | ...
+</code></pre>
+<h3 id="the-inputs-group-prop-firm-rules-your-firms-numbers">The inputs (group "Prop-firm rules - your firm's numbers")</h3>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>What to enter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account size (<code>InpPropAccountSize</code>)</td>
+<td>the challenge's account size, e.g. 100000 (0 = the balance when the EA first starts)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Daily loss limit % (<code>InpPropDailyLossPct</code>)</td>
+<td>the firm's daily loss, e.g. 5</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Daily loss limit is a % of (<code>InpPropDailyPctOf</code>)</td>
+<td><em>Account size</em> (the same amount every day - most firms) or <em>the day-start value</em></td>
+<td>Account size</td>
+</tr>
+<tr>
+<td>Daily loss is counted from (<code>InpPropDailyFrom</code>)</td>
+<td>the value at the start of the firm's day: <em>the higher of balance and equity</em> (strictest, safe for every firm), <em>balance</em> or <em>equity</em></td>
+<td>the higher of the two</td>
+</tr>
+<tr>
+<td>Maximum loss limit % (<code>InpPropMaxLossPct</code>)</td>
+<td>the firm's maximum loss, e.g. 10</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Maximum loss limit type (<code>InpPropMaxRule</code>)</td>
+<td><em>Fixed</em> (account size minus the limit - most two-step challenges), <em>Trailing: highest day-start balance</em>, <em>Trailing: highest equity, live</em></td>
+<td>Fixed</td>
+</tr>
+<tr>
+<td>A trailing limit stops rising at the account size (<code>InpPropTrailLock</code>)</td>
+<td>most trailing firms stop moving the limit once it reaches the starting balance</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Act this many % before each loss limit (<code>InpPropSafetyPct</code>)</td>
+<td>the safety margin: 0.5 means the EA acts at 4.5 % when the firm's limit is 5 %</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>Profit target % (<code>InpPropTargetPct</code>)</td>
+<td>close everything and stop when equity reaches the target (0 = keep trading)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Best-day cap % (<code>InpPropDayGainPct</code>)</td>
+<td>close everything and pause for the day once the day's gain reaches this (for firms with a consistency rule)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Hour the firm's day starts (<code>InpPropDayStartHour</code>)</td>
+<td>the hour on your platform's clock (the Market Watch time) at which the firm restarts its daily loss</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Friday: close all at this hour (<code>InpPropFridayCloseHour</code>)</td>
+<td>for firms that do not allow holding over the weekend; trading resumes on Monday</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>New challenge on the same login (<code>InpPropResetState</code>)</td>
+<td>set to <em>true</em> for ONE start when you begin a new challenge on the same login, then back to <em>false</em></td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples-what-to-type">Examples - what to type</h3>
+<p>From the LuxAlgo prop-firm directory on 23 September 2026 (the daily-loss wording is inferred by that directory; your
+firm's own rules page is always the authority, and firms change their rules):</p>
+<table>
+<thead>
+<tr>
+<th>Challenge (100,000 account)</th>
+<th>Daily loss %</th>
+<th>Maximum loss % and type</th>
+<th>Profit target %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FTMO Normal, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>10, then 5</td>
+</tr>
+<tr>
+<td>FTMO Normal, 1-step</td>
+<td>3</td>
+<td>10, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>FundingPips, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>FundingPips, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>The 5%ers High Stakes, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>Blue Guardian Pro, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>All six count the daily loss as a share of the account size from the previous day's closing balance, open trades
+included. Leave <em>counted from</em> at <em>the higher of balance and equity</em> - it is never later than the firm's own meter.</p>
+<p><strong>Profit target: set it for the challenge phases only.</strong> When the target is reached the EA stops for good on that
+login; on the funded account set it back to 0.</p>
+<p><strong>The firm's day.</strong> Most firms restart the daily loss at midnight of the platform's own clock: leave 0. If your firm
+names another time, convert it to the Market Watch clock. Gold is closed for about an hour around the broker's
+midnight on most platforms, so for gold an hour's difference rarely matters; a market that trades through midnight
+(Bitcoin) needs the exact hour.</p>
+<p><strong>Restarts.</strong> The EA remembers the account size, the day's starting value, the highest balance and whether a rule
+stopped it, across restarts of the platform (terminal global variables named <code>PR&lt;login&gt;_&lt;magic&gt;_...</code>). A restart in
+the middle of the day does not give it a fresh daily allowance.</p>
+<h3 id="what-these-rules-do-not-do">What these rules do not do</h3>
+<ul>
+<li>They close <strong>this EA's</strong> trades only. The limits are measured on the whole account's equity, so trades from another
+  EA or by hand count toward them; give every EA on the account the same numbers.</li>
+<li>The EA acts on the first price tick past its limit. A gap or a very fast market can carry the loss a little further
+  before the closing trades fill - that is what the safety margin is for; do not set it to 0 on a real challenge.</li>
+<li><strong>No news filter.</strong> Some funded accounts forbid opening or closing trades a few minutes around high-impact releases.
+  The platform's economic calendar cannot be replayed in the Strategy Tester, so a news rule could not be proved the way
+  every rule above was; pause the EA by hand around those releases if your firm requires it.</li>
+<li>No minimum trade duration and no minimum number of trading days.</li>
+</ul>
+<p><strong>Proof.</strong> With every rule off, this version placed the same deals as the version before it, deal for deal (20 trades, net +12.19, Pepperstone real ticks, 28 August - 19 September 2026). Each rule was then switched on at a level the same weeks reach; at all 3 triggers the EA closed its trades, opened nothing until the pause ended, and placed exactly the same deals as with the rules off up to the first trigger.</p>
+<h2 id="support">Support</h2>
+<p>Questions and issue reports through the MQL5 Market product page.</p>
+<h2 id="leverage-changes-the-minimum-more-than-anything-else">Leverage changes the minimum more than anything else</h2>
+<p>The deposit table above assumes a broker that grants 1:500 on gold, where one 0.01 lot ties up about 8 USD
+of margin and the binding constraint is drawdown. On an EU-regulated account the retail cap for gold is
+1:20, where the same 0.01 lot ties up about <strong>202 USD</strong>. This EA rests up to two pending orders, so on such
+an account it needs roughly <strong>600 USD</strong> before it can operate at all, regardless of how well it performs.</p>
+<p>On a broker offering 1:20 (the EU retail cap for gold) a 100 USD deposit cannot open even one
+pending order - the server rejects it for insufficient margin, and Jab takes no trades. On a 1:500 broker
+the same 100 USD deposit trades normally; see the deposit ladder above (Strategy Tester, real ticks, OANDA)
+for how its drawdown grows as the balance shrinks. That is the broker's margin rule, not the EA's: Jab
+never refuses to trade because a balance is small - it narrows to the broker's minimum volume and sends
+the order.</p>
+<h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</h2>
+<p>Generated from the compiled source; enum defaults are the source names — the Inputs tab shows their plain labels.</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Input</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropAccountSize</code></td>
+<td>double</td>
+<td>0</td>
+<td>Account size (0 = balance when the EA first starts)</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropDailyLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Daily loss limit % (0 = off; a prop account type fills it in)</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropDailyPctOf</code></td>
+<td>PropPctOf</td>
+<td>PROP_PCT_OF_SIZE</td>
+<td>Daily loss limit is a % of</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropDailyFrom</code></td>
+<td>PropDayFrom</td>
+<td>PROP_DAY_HIGHER</td>
+<td>Daily loss is counted from</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropMaxLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Maximum loss limit % of account size (0 = off; a prop account type fills it in)</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropMaxRule</code></td>
+<td>PropMaxRule</td>
+<td>PROP_MAX_FIXED</td>
+<td>Maximum loss limit type</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropTrailLock</code></td>
+<td>bool</td>
+<td>true</td>
+<td>A trailing limit stops rising at the account size</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropSafetyPct</code></td>
+<td>double</td>
+<td>0.5</td>
+<td>Act this many % of account size BEFORE each loss limit</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropTargetPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Profit target %: close all and stop for good (0 = off)</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropDayGainPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Best-day cap %: close all and pause for the day (0 = off)</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropDayStartHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Hour the firm's day starts, broker server time (0-23)</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropFridayCloseHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Friday: close all at this server hour, resume Monday (0 = off)</td>
+</tr>
+<tr>
+<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td><code>InpPropResetState</code></td>
+<td>bool</td>
+<td>false</td>
+<td>New challenge on the same login: true for ONE start, then false</td>
+</tr>
+<tr>
+<td>MONEY</td>
+<td><code>InpFixedLot</code></td>
+<td>double</td>
+<td>0.01</td>
+<td>Fixed lot size (used when 'Use fixed lot' is true)</td>
+</tr>
+<tr>
+<td>MONEY</td>
+<td><code>InpUseFixedLot</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Use a fixed lot instead of risk-based sizing</td>
+</tr>
+<tr>
+<td>MONEY</td>
+<td><code>InpRiskPercent</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Risk per trade, % of balance (when fixed lot is off)</td>
+</tr>
+<tr>
+<td>MONEY</td>
+<td><code>InpMagic</code></td>
+<td>long</td>
+<td>89721</td>
+<td>Magic number (identifies this EA's orders)</td>
+</tr>
+<tr>
+<td>##### Who decides the size #####</td>
+<td><code>InpSizePolicy</code></td>
+<td>ENUM_SIZE_POLICY</td>
+<td>SIZE_AUTO</td>
+<td>Sizing: Automatic (validated) or Exact (my numbers)</td>
+</tr>
+<tr>
+<td>##### Who decides the size #####</td>
+<td><code>InpComment</code></td>
+<td>string</td>
+<td>ALG</td>
+<td>Order comment</td>
+</tr>
+<tr>
+<td>RISK</td>
+<td><code>InpStopDist</code></td>
+<td>double</td>
+<td>5.0</td>
+<td>Initial stop distance, price units (gold $/oz)</td>
+</tr>
+<tr>
+<td>RISK</td>
+<td><code>InpMaxPendings</code></td>
+<td>int</td>
+<td>2</td>
+<td>Maximum resting pending orders</td>
+</tr>
+<tr>
+<td>RISK</td>
+<td><code>InpOnePerSide</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Allow at most ONE resting pending per side</td>
+</tr>
+<tr>
+<td>RISK</td>
+<td><code>InpRefuseIfBlocked</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Refuse to trade if the trail sits inside the floor (default OFF: warns instead)</td>
+</tr>
+<tr>
+<td>RISK</td>
+<td><code>InpGeomScale</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Instrument size scale (1.0 = gold; auto-set by the symbol profile)</td>
+</tr>
+<tr>
+<td>RISK</td>
+<td><code>InpUseSymbolProfile</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Auto-detect the symbol and apply its measured profile</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpUseCostGate</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Trade only when the bar range clears the round-trip cost</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpMinRangeCost</code></td>
+<td>double</td>
+<td>25.0</td>
+<td>minimum range / cost ratio required</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpCostPx</code></td>
+<td>double</td>
+<td>0.140</td>
+<td>round-trip cost, price units (declared, not measured live)</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpCommissionPx</code></td>
+<td>double</td>
+<td>0.060</td>
+<td>commission only, added to a live spread blow-out</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpRangeLookback</code></td>
+<td>int</td>
+<td>480</td>
+<td>bars used for the rolling range median</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpMaxQualPivots</code></td>
+<td>int</td>
+<td>0</td>
+<td>Trade only when few levels qualify (0 = off, 2 = vendor-like)</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpUseAtrGate</code></td>
+<td>bool</td>
+<td>false</td>
+<td>ATR floor gate (OFF - rejected, acts as a date filter)</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpMinAtrUsd</code></td>
+<td>double</td>
+<td>80.0</td>
+<td>ATR floor value</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpUseAtrScale</code></td>
+<td>bool</td>
+<td>false</td>
+<td>ATR scaling of the geometry (OFF - rejected)</td>
+</tr>
+<tr>
+<td>GATING</td>
+<td><code>InpAtrRefUsd</code></td>
+<td>double</td>
+<td>105.0</td>
+<td>ATR reference</td>
+</tr>
+<tr>
+<td>ENTRY</td>
+<td><code>InpPivotK</code></td>
+<td>int</td>
+<td>4</td>
+<td>Pivot strength: bars either side that must not exceed it</td>
+</tr>
+<tr>
+<td>ENTRY</td>
+<td><code>InpExtremeHours</code></td>
+<td>int</td>
+<td>61</td>
+<td>How far back to search for a pivot, hours</td>
+</tr>
+<tr>
+<td>ENTRY</td>
+<td><code>InpMinRoom</code></td>
+<td>double</td>
+<td>10.36</td>
+<td>Minimum distance from price to the level, price units</td>
+</tr>
+<tr>
+<td>ENTRY</td>
+<td><code>InpLevelMode</code></td>
+<td>int</td>
+<td>1</td>
+<td>Level choice: 0=nearest 1=prefer-fresh 2=tie-break 3=overnight-extreme 4=prior-day-first</td>
+</tr>
+<tr>
+<td>ENTRY</td>
+<td><code>InpCandPivots</code></td>
+<td>int</td>
+<td>3</td>
+<td>candidates to choose among (modes 2 and 3)</td>
+</tr>
+<tr>
+<td>ENTRY</td>
+<td><code>InpUseRejectGate</code></td>
+<td>bool</td>
+<td>true</td>
+<td>mode 1: skip levels price has already tested</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpUseDxyCorrGate</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Skip entries when gold has decoupled from the Dollar</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpDxyCorrLookback</code></td>
+<td>int</td>
+<td>50</td>
+<td>Bars in the correlation measurement</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpDxyCorrRank</code></td>
+<td>int</td>
+<td>252</td>
+<td>Days the correlation is ranked against (self-calibrating)</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpDxyCorrPct</code></td>
+<td>double</td>
+<td>0.67</td>
+<td>Skip when correlation ranks above this percentile (least inverse)</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpDxySymEURUSD</code></td>
+<td>string</td>
+<td>EURUSD</td>
+<td>Dollar-index component</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpDxySymUSDJPY</code></td>
+<td>string</td>
+<td>USDJPY</td>
+<td>Dollar-index component</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpDxySymGBPUSD</code></td>
+<td>string</td>
+<td>GBPUSD</td>
+<td>Dollar-index component</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpDxySymUSDCAD</code></td>
+<td>string</td>
+<td>USDCAD</td>
+<td>Dollar-index component</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpMaxReject</code></td>
+<td>int</td>
+<td>1</td>
+<td>mode 1: how many tests are still acceptable</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpRejectGap</code></td>
+<td>int</td>
+<td>4</td>
+<td>mode 1: minimum bars between counted tests</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpRecheckIncumbent</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Decline a new pending while a resting one has drifted near price</td>
+</tr>
+<tr>
+<td>##### Dollar-correlation gate (cross-EA transfer from Polaris) #####</td>
+<td><code>InpDriftRoomMult</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Cancel a resting pending once price is this many rooms away (0 = never)</td>
+</tr>
+<tr>
+<td>EXIT</td>
+<td><code>InpTakeDist</code></td>
+<td>double</td>
+<td>30.00</td>
+<td>Take profit distance, price units (rarely reached)</td>
+</tr>
+<tr>
+<td>EXIT</td>
+<td><code>InpTrailFirst</code></td>
+<td>double</td>
+<td>6.0</td>
+<td>Distance of the FIRST stop move, price units</td>
+</tr>
+<tr>
+<td>EXIT</td>
+<td><code>InpArmProfit</code></td>
+<td>double</td>
+<td>4.0</td>
+<td>Profit at which the trail tightens, price units</td>
+</tr>
+<tr>
+<td>EXIT</td>
+<td><code>InpTrailDist</code></td>
+<td>double</td>
+<td>2.0</td>
+<td>Tight trail distance once armed, price units</td>
+</tr>
+<tr>
+<td>EXIT</td>
+<td><code>InpTrailStep</code></td>
+<td>double</td>
+<td>0.30</td>
+<td>Minimum stop modification, price units</td>
+</tr>
+<tr>
+<td>EXIT</td>
+<td><code>InpMinStepSpreads</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>and at least this many live spreads</td>
+</tr>
+<tr>
+<td>EXIT</td>
+<td><code>InpBarResExit</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Evaluate the trail on closed bars only (OFF - changes the strategy)</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpServerGmtOffset</code></td>
+<td>int</td>
+<td>3</td>
+<td>Broker server GMT offset (Vantage = 3)</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpExpiryMinutes</code></td>
+<td>int</td>
+<td>1845</td>
+<td>Pending order expiry, minutes</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpFridayFlush</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Cancel all pendings before the weekend</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpFridayFlushHour</code></td>
+<td>int</td>
+<td>19</td>
+<td>server hour of the weekend flush</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpUseSessionGuard</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Guard the daily session break (indices only)</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpSessionCloseHour</code></td>
+<td>int</td>
+<td>23</td>
+<td>server hour the market closes</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpSessionCloseMin</code></td>
+<td>int</td>
+<td>59</td>
+<td>server minute the market closes</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpNoEntryBeforeMin</code></td>
+<td>int</td>
+<td>15</td>
+<td>stop placing new pendings this many minutes before it</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpFlattenBeforeMin</code></td>
+<td>int</td>
+<td>2</td>
+<td>close any open position this many minutes before it</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpFloutEndHour</code></td>
+<td>int</td>
+<td>7</td>
+<td>Overnight window ends at this server hour</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpFloutSpanHours</code></td>
+<td>int</td>
+<td>9</td>
+<td>and spans this many hours</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpSkipHourZero</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Skip server hour 0 (no effect on Vantage)</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpFloorExitToStops</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Floor the trail at the spread (opt-in; shipping products validated OFF)</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpExitFloorMult</code></td>
+<td>double</td>
+<td>1.5</td>
+<td>and keep it this many times clear of it</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpUseCashSession</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Trade only inside the cash session (indices - H2')</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpCashStartHour</code></td>
+<td>int</td>
+<td>16</td>
+<td>session start, server hour</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpCashStartMin</code></td>
+<td>int</td>
+<td>30</td>
+<td>session start, server minute</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpCashEndHour</code></td>
+<td>int</td>
+<td>23</td>
+<td>session end, server hour</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpParkRollover</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Cancel pendings across the 00:00 rollover (FX - H4)</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpParkFromHHMM</code></td>
+<td>int</td>
+<td>2355</td>
+<td>park from this server HHMM</td>
+</tr>
+<tr>
+<td>CALENDAR &amp; SESSIONS</td>
+<td><code>InpParkToHHMM</code></td>
+<td>int</td>
+<td>105</td>
+<td>re-arm at this server HHMM</td>
+</tr>
+<tr>
+<td>DIAGNOSTICS</td>
+<td><code>InpDebug</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Print detailed order and trail decisions to the journal</td>
+</tr>
+</tbody>
+</table>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
