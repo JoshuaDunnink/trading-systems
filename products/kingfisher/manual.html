@@ -1,0 +1,1804 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KingFisher EA manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="User manual for KingFisher EA">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="KingFisher EA manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="User manual for KingFisher EA">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html">
+<link rel="stylesheet" href="../../assets/style.css"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; KingFisher EA</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#kingfisher-user-manual">KINGFISHER — user manual</a><ul>
+<li><a href="#1-what-it-does-in-plain-words">1. What it does, in plain words</a></li>
+<li><a href="#2-installation-five-minutes">2. Installation (five minutes)</a></li>
+<li><a href="#2a-the-inputs-at-a-glance-since-110">2a. The inputs at a glance (since 1.10)</a></li>
+<li><a href="#3-the-only-setting-that-matters-risk-level">3. The only setting that matters: risk level</a></li>
+<li><a href="#3a-prop-firm-accounts-one-choice-since-108">3a. Prop-firm accounts: one choice (since 1.08)</a></li>
+<li><a href="#3b-prop-firm-rules-your-firms-own-numbers-since-109">3b. Prop-firm rules: your firm's own numbers (since 1.09)</a><ul>
+<li><a href="#the-inputs-group-4-prop-firm-rules-0-rule-off">The inputs (group "4. Prop-firm rules (0 = rule off)")</a></li>
+<li><a href="#examples-what-to-type">Examples - what to type</a></li>
+<li><a href="#what-these-rules-do-not-do">What these rules do not do</a></li>
+</ul>
+</li>
+<li><a href="#4-your-first-week">4. Your first week</a></li>
+<li><a href="#5-reading-the-chart-and-the-journal">5. Reading the chart and the journal</a></li>
+<li><a href="#6-when-it-does-not-trade-and-why-that-is-usually-right">6. When it does not trade — and why that is usually right</a></li>
+<li><a href="#7-exit-modes">7. Exit modes</a><ul>
+<li><a href="#70-since-111-on-a-high-volatility-day-the-skim-hunter-rides">7.0 Since 1.11: on a high-volatility day the Skim hunter rides</a></li>
+<li><a href="#71-one-exit-per-hunter-inpd1exit-inps1exit-since-105">7.1 One exit per hunter (InpD1Exit … InpS1Exit, since 1.05)</a></li>
+<li><a href="#72-the-smoothest-path-on-a-tight-fill-broker-presetskingfisher_high_gripset">7.2 The smoothest path on a tight-fill broker: presets/KINGFISHER_high_grip.set</a></li>
+<li><a href="#73-since-112-rebound-reverse-after-a-skim-stop-out-opt-in-inprebound-off-by-default">7.3 Since 1.12: Rebound - reverse after a Skim stop-out (opt-in, InpRebound, off by default)</a></li>
+</ul>
+</li>
+<li><a href="#8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</a></li>
+<li><a href="#9-sizing-and-margin">9. Sizing and margin</a></li>
+<li><a href="#10-optimising-for-advanced-users">10. Optimising (for advanced users)</a></li>
+<li><a href="#11-what-is-saved-and-what-is-not">11. What is saved and what is not</a></li>
+<li><a href="#12-troubleshooting">12. Troubleshooting</a></li>
+<li><a href="#13-final-checklist-and-disclaimer">13. Final checklist and disclaimer</a></li>
+<li><a href="#14-reproduce-the-tests-yourself">14. Reproduce the tests yourself</a></li>
+<li><a href="#complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="kingfisher-user-manual">KINGFISHER — user manual</h1>
+<p><em>Version 1.11 · XAUUSD · MetaTrader 5 · THE AEGIS ARCADE</em></p>
+<p>KINGFISHER sits still above the water and dives once, when the fish breaks the surface. On a gold chart it waits at the nearest price level that has not been broken yet, rests a small order just inside it, and is filled at the moment the level gives way. Every trade has a fixed stop loss and take profit from the second it opens. When the market is too quiet for that stop loss to make sense, KINGFISHER does not trade at all.</p>
+<p>This manual is written for someone who has never run an expert advisor before. If you only read one chapter, read chapter 3.</p>
+<hr />
+<h2 id="1-what-it-does-in-plain-words">1. What it does, in plain words</h2>
+<p>Gold moves in bursts. Before a burst, price usually sits under a recent high or above a recent low that it has not managed to break. A lot of traders have stop orders waiting just beyond those levels. When price finally breaks through, those stops fire and the move accelerates for a moment.</p>
+<p>KINGFISHER places its own order a hair <em>inside</em> that level, so it is already in the trade when the crowd's orders go off. Five "hunters" do this at the same time:</p>
+<table>
+<thead>
+<tr>
+<th>Hunter</th>
+<th>Watches</th>
+<th>Patience</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Dive 1</td>
+<td>the 4-hour chart's nearest unbroken high and low</td>
+<td>30 hours</td>
+</tr>
+<tr>
+<td>Dive 2</td>
+<td>the same 4-hour level, slightly different distance</td>
+<td>20 hours</td>
+</tr>
+<tr>
+<td>Dive 3</td>
+<td>the same 4-hour level, tight on the buy side</td>
+<td>60 hours</td>
+</tr>
+<tr>
+<td>Dive 4</td>
+<td>the same 4-hour level, wide on both sides</td>
+<td>55 hours</td>
+</tr>
+<tr>
+<td>Skim</td>
+<td>the 1-hour chart's nearest unbroken high and low</td>
+<td>15 hours</td>
+</tr>
+</tbody>
+</table>
+<p>The four Dives rest on the <em>same</em> level and usually fill on the <em>same</em> break — that is deliberate, and it is why KINGFISHER sizes risk per <strong>level</strong>, not per order (chapter 3).</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, 2022 to 2026.</em></p>
+<p><strong>What each hunter contributes.</strong> In four years of live-tick testing on four brokers, Skim placed about 60 % of all trades and won 17–20 % of them (profit factor 1.3–1.6); the four Dives won 32–40 % of theirs (profit factor 2.5–4.3) and earned three-quarters of the money. Skim is the busy one; the Dives are the profitable ones. Two per-hunter inputs let you tune this without touching anything else: <code>Inp&lt;Hunter&gt;RiskWeight</code> scales that hunter's position size (1.0 = as tested; 0.25 = a quarter), and <code>Inp&lt;Hunter&gt;GateStopAtr</code> gives that hunter its own quiet-market threshold (0 = use the global 0.20), and <code>Inp&lt;Hunter&gt;GateActivity</code> makes that hunter stand aside while the market is calm at the minute scale (average one-minute range of the last 15 minutes divided by the last four hours; 1.0 = only trade when the last quarter hour is at least as active as the afternoon behind it; 0 = off). In four years of testing, Skim's fills that arrived on a calm quarter hour won 12–14 % — below breakeven — and its fills on an active one won 20–25 %. The tested configuration keeps all five at weight 1.0 and the activity gates off.</p>
+<p>Every position opens with a stop loss of 2.00 and a take profit of 15.00 (14.00 for Dive 2) in account currency per 0.01 lot. Nothing is averaged, nothing is added to a loser, no grid, no martingale.</p>
+<p><strong>Two things make it different from a plain breakout robot:</strong></p>
+<ol>
+<li><strong>It knows when to stay out.</strong> The stop loss is a fixed amount of money. When gold is quiet and the hourly range is small, a 2.00 stop is inside the noise and gets hit before the move starts — that is where breakout robots bleed. KINGFISHER trades only while the stop is at most 20 % of the hourly range. In a quiet month it may place a handful of orders; in a quiet year, almost none.</li>
+<li><strong>It reads how the fill happened.</strong> A fill that arrives on a fast push is allowed to ride to the full target. A fill that arrives slowly is handled by the <em>Grip</em>: once the trade is 1.00 ahead per 0.01 lot, KINGFISHER tracks the best profit and closes the trade if it gives back half of it.</li>
+</ol>
+<h2 id="2-installation-five-minutes">2. Installation (five minutes)</h2>
+<ol>
+<li>Open MetaTrader 5. <strong>File → Open Data Folder</strong>, then open <code>MQL5\Experts</code>. Copy <code>KINGFISHER.ex5</code> there (or into any subfolder).</li>
+<li>In MetaTrader, right-click the <strong>Navigator</strong> panel → <strong>Refresh</strong>. KINGFISHER appears under Expert Advisors.</li>
+<li>Open a <strong>XAUUSD</strong> chart. Any timeframe is fine — KINGFISHER reads the 4-hour, 1-hour and 15-minute bars itself. The M15 chart is what all the testing used.</li>
+<li>Drag KINGFISHER onto the chart. In the window that opens, tick <strong>Allow Algo Trading</strong> on the <em>Common</em> tab. On the <em>Inputs</em> tab only section <strong>1. Start here</strong> needs you (chapter 2a); the defaults are the validated configuration. Click OK.</li>
+<li>Make sure the <strong>Algo Trading</strong> button in the toolbar is green. A smiling face in the chart's top-right corner means the EA is running.</li>
+</ol>
+<p>The journal (<strong>Toolbox → Experts</strong>) shows one line on start, for example:</p>
+<pre><code>KINGFISHER v1.11 | account Personal | settings Recommended | XAUUSD | 5 of 5 hunters | risk Medium (1.00% per level) | exit Smart, Skim Grip | trade while stop &lt;= 0.20 x hourly ATR | max lot 5.00 | THE AEGIS ARCADE
+KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker minimum 0.01)
+</code></pre>
+<p>If your account is a <strong>netting</strong> account (one position per symbol) the EA prints a note; see chapter 6.</p>
+<p>Your broker's symbol may carry a suffix (<code>XAUUSD+</code>, <code>XAUUSDp</code>, <code>GOLD.pro</code>). That is fine — attach to whatever your broker calls spot gold against USD.</p>
+<h2 id="2a-the-inputs-at-a-glance-since-110">2a. The inputs at a glance (since 1.10)</h2>
+<p>The Inputs tab is ordered by how often you should touch it. Most users change only section 1.</p>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What it holds</th>
+<th>Touch it?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>1. Start here</strong></td>
+<td>Account type · Strategy settings · Risk level · Size as if the balance were · Max spread</td>
+<td>yes - this is the whole setup</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td>the five hunters, the Rebound switch (off; chapter 7.3), buy/sell</td>
+<td>rarely</td>
+</tr>
+<tr>
+<td>3. Exit [Custom]</td>
+<td>how trades close</td>
+<td>only with Strategy settings = Custom</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules</td>
+<td>your firm's limits (chapter 3b)</td>
+<td>prop accounts, or as a daily-loss floor on any account</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td>weekend times (your broker's clock); the quiet-market gates [Custom]</td>
+<td>weekend times only if your broker's clock differs</td>
+</tr>
+<tr>
+<td>6. Safety</td>
+<td>maximum lot, margin cap, gold-only lock, magic number</td>
+<td>a second chart needs its own magic number</td>
+</tr>
+<tr>
+<td>7. Custom sizing</td>
+<td>fixed lot, lots per 1,000, risk per order</td>
+<td>only with Risk level = Custom</td>
+</tr>
+<tr>
+<td>8.-13. Engine, Dive 1-4, Skim [Custom]</td>
+<td>every value of every hunter</td>
+<td>only with Strategy settings = Custom</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Strategy settings</strong> (<code>InpProfile</code>) decides whether the [Custom] sections count:</p>
+<ul>
+<li><strong>Recommended</strong> (default) - the validated configuration. Every [Custom] input is ignored and the tested value is used,
+  so a stray edit cannot change the machine. The four 4-hour Dives ride fast fills to the target; the Skim hunter locks
+  its gains (the Grip, chapter 7). Measured best on the tight-fill brokers (Pepperstone, Vantage).</li>
+<li><strong>Classic</strong> - the 1.05-1.09 behaviour: Skim rides like the Dives. Measured better on a wide-fill feed (Fusion).</li>
+<li><strong>Custom</strong> - every [Custom] input counts. Custom with untouched inputs is exactly Recommended.</li>
+</ul>
+<p><strong>Size as if the balance were</strong> (<code>InpVirtualBalance</code>, 0 = off): the EA sizes on this figure instead of the balance, never
+above the account's equity - for example 2,000 on a 10,000 account, or the balance plus a broker credit.</p>
+<p><strong>Max spread</strong> (<code>InpMaxSpreadUsd</code>): new orders wait while the spread is wider than this many dollars (5.00 = effectively
+off for gold). Before 1.10 it was in points, which is ten times tighter on a broker quoting gold with three decimals.</p>
+<p><strong>Gold only</strong>: on a live chart that is not gold KINGFISHER loads, prints why, and places nothing (section 6 can allow
+other symbols; in the Strategy Tester it always runs, so the Market validator can test it).</p>
+<p><strong>The second Journal line</strong> says what your risk level buys at your balance, for example
+<code>a Dive order is 0.01 lot (broker minimum 0.01) - the minimum lot sets the risk here</code>. On a small account every risk
+level trades the same minimum lot until the balance grows (about 1,200 at Medium, 2,400 at Low).</p>
+<h2 id="3-the-only-setting-that-matters-risk-level">3. The only setting that matters: risk level</h2>
+<p><code>InpRisk</code> — one choice, four levels plus Custom.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion, 2024 to 2026 (Low, Medium, High rows). Hot is not separately tested; its drawdown figure is extrapolated from the same three feeds.</em></p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Risk per level (Skim at a quarter of it)</th>
+<th>What the testing showed (three live-tick feeds, 2024–2026, 10,000 start)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td>0.5 % of balance</td>
+<td>×4–7 in 15–30 months at a 4–5 % worst drawdown</td>
+</tr>
+<tr>
+<td><strong>Medium (default)</strong></td>
+<td><strong>1.0 %</strong></td>
+<td><strong>×17–22 in 15–30 months; worst drawdown 8–10 %</strong> (Pepperstone ×20 / 9.3 %, Vantage ×22 / 7.9 %, Fusion ×17 / 10.2 %)</td>
+</tr>
+<tr>
+<td>High</td>
+<td>1.5 %</td>
+<td>×27–53; worst drawdown 12–15 % (Pepperstone ×27 / 12.1 %, Fusion ×53 / 15.3 %)</td>
+</tr>
+<tr>
+<td>Hot</td>
+<td>2.0 %</td>
+<td>drawdown can exceed 20 % of balance — experienced users, risk capital only</td>
+</tr>
+<tr>
+<td>Custom</td>
+<td>your own</td>
+<td>use the sizing inputs below the risk level</td>
+</tr>
+</tbody>
+</table>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion, 2024 to 2026.</em></p>
+<p>Version 1.04 changed the default split: Skim (the busy 1-hour hunter, 60 % of trades, profit factor 1.3–1.6) now carries a quarter of a level's budget and the four Dives (profit factor 2.5–4.3) the full one. At the same drawdown this compounds faster on every broker tested; the old 1.02 behaviour is <code>InpS1RiskWeight = 1.0</code> with <code>InpRisk = Low</code>.</p>
+<p><strong>Which exits these figures used.</strong> The table was measured with the Classic exits (1.05-1.09). With the 1.10 default (Recommended: Skim on Grip) at Medium: Pepperstone x20.6 at a 5.3 % worst drawdown (same growth, drawdown down 43 %), Vantage x15.8 at 5.9 % (smoother, slower on a 10,000 account), Fusion x11.2 at 12.4 % (choose Classic there); BlackBull is being re-measured on 1.10. On a small account Recommended is both smoother and faster (chapter 7).</p>
+<p>"Per level" means: when the four Dives fill on the same break, together they risk that percentage — not four times it. That is the setting that turns the 40 % drawdowns of per-order sizing into the 8–15 % above.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, 2022 to 2026 (bootstrap resample of the same four-broker backtest history).</em></p>
+<p><strong>What you should expect at each account size</strong> (Medium):</p>
+<ul>
+<li>10,000 and up: the numbers in the table.</li>
+<li>1,000: one 0.01 lot already risks 2.00 per hunter; the EA never trades below the broker minimum, so the real risk per level is about 0.8 % — the drawdown will be proportionally larger (up to ~16 %).</li>
+<li>500: about 1.6 % per level; a 2025-type stretch can produce a 20 % drawdown. Start on Low.</li>
+<li>100: the minimum lot rules everything — each fill risks $2.10 (2.1 %), a four-Dive burst 8.4 %. Replayed on four brokers' real ticks a $100 account never hit a stop-out at 1:200 or higher, reached $1,000 in 98–100 % of resampled histories, and grew to $2,600–13,000 in 1.2–3.5 years — but it fell to $57–92 first, and in a fair-game year (2025-type) one history in three dips below $50. Leverage matters here: at 1:100 the broker refuses part of each burst for margin and the stop-out sits at ~$44; at 1:30 a $100 account cannot open a single 0.01 lot (about $300 is the floor). Above ~$400 the percentage sizing takes over and the drawdown falls back to the 10–15 % of the table.</li>
+</ul>
+<p><strong>The honest sentence.</strong> These are backtests on real broker ticks, not results from live trading. KINGFISHER made its money in one kind of market — gold moving in large daily bursts, the way it has since late 2025. In quiet years (2023, 2024 on the four-year feed) it placed 18 trades in two years and finished flat. It should not lose much in a quiet year; it will not earn much either. Do not run it for income you need next month.</p>
+<h2 id="3a-prop-firm-accounts-one-choice-since-108">3a. Prop-firm accounts: one choice (since 1.08)</h2>
+<p>The first input, <strong>Account type</strong> (<code>InpAccountMode</code>), is all a prop-firm account needs:</p>
+<table>
+<thead>
+<tr>
+<th>Account type</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Personal</strong> (default)</td>
+<td>the risk level of chapter 3 applies</td>
+</tr>
+<tr>
+<td><strong>Prop firm 2-step</strong> — for challenges with a 5 % daily and 10 % maximum loss (FTMO-class)</td>
+<td>size fixed at 0.5 % of balance per level (the Low level); orders removed before every weekend</td>
+</tr>
+<tr>
+<td><strong>Prop firm 1-step</strong> — for challenges with a 3 % daily and 6 % maximum loss, <em>and</em> for any challenge on a standard-spread account</td>
+<td>size fixed at 0.25 % per level; orders removed before every weekend</td>
+</tr>
+</tbody>
+</table>
+<p>Nothing else to set: the account type overrides the risk level, and the first line of the Journal names the one that is
+running (<code>KINGFISHER v1.08 | account Prop firm 2-step | ...</code>).</p>
+<p><em>Simulation on backtest history, MetaTrader 5 Strategy Tester, real ticks, BlackBull / Vantage / OANDA, 2023 to 2026 (day-block bootstrap over the tested trade record; see the table below).</em></p>
+<p><strong>Why the size is fixed.</strong> The shipped Medium level is built for a personal account. On a 5 %/10 % two-step challenge it
+passed only about 4 attempts in 5 and lost about 1 funded account in 7 within 90 days, because a single fast
+day can cost more than 5 % at that size. The prop sizes below are the measured answer.</p>
+<p><strong>What the measurements say</strong> — a simulation that replays the backtest's own days in random blocks (10,000 paths, the
+challenge's rules applied tick-close by tick-close); a statement about the tested history, not a prediction:</p>
+<table>
+<thead>
+<tr>
+<th>broker type (feed, window)</th>
+<th>account type</th>
+<th>challenge</th>
+<th>passes per attempt</th>
+<th>median trading days to funded</th>
+<th>funded account lost within 90 days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>raw spread (BlackBull, 2023–2026)</td>
+<td>Prop firm 2-step</td>
+<td>5 % / 10 %, 10 % then 5 % target</td>
+<td>98.5 %</td>
+<td>117 (42 in the active 2025–26 market)</td>
+<td>0.5 %</td>
+</tr>
+<tr>
+<td>raw spread (Vantage, 2025–2026)</td>
+<td>Prop firm 2-step</td>
+<td>same</td>
+<td>100 %</td>
+<td>34</td>
+<td>0 %</td>
+</tr>
+<tr>
+<td>standard spread (~$0.25, OANDA-class, 2025–2026)</td>
+<td>Prop firm 2-step</td>
+<td>same</td>
+<td>73 %</td>
+<td>96</td>
+<td>22 %</td>
+</tr>
+<tr>
+<td>standard spread (same)</td>
+<td><strong>Prop firm 1-step</strong></td>
+<td>same</td>
+<td>96 %</td>
+<td>204</td>
+<td>0.1 %</td>
+</tr>
+<tr>
+<td>raw spread (BlackBull, 2023–2026)</td>
+<td>Prop firm 1-step</td>
+<td>3 % / 6 %, 10 % target</td>
+<td>97.6 %</td>
+<td>132</td>
+<td>0.1 %</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Read the table as three rules:</strong></p>
+<ol>
+<li><strong>Raw-spread account (gold spread about $0.10 or less): choose Prop firm 2-step</strong> for a 5 %/10 % challenge.</li>
+<li><strong>Standard-spread account, or a tighter challenge: choose Prop firm 1-step.</strong> The wider spread consumes a larger
+   share of the fixed 2.00 stop; the same entries are stopped out more often (chapter 8), so the smaller size is the
+   one that survives the daily limit.</li>
+<li><strong>It can take months.</strong> KINGFISHER stands aside in quiet markets (chapter 6). In a quiet stretch it may place few
+   trades for weeks; a challenge without a time limit is the right kind.</li>
+</ol>
+<p><strong>What the EA does not do for you</strong> — check your firm's rules before you start:</p>
+<ul>
+<li>it does not read the firm's <strong>news calendar</strong>; some funded accounts forbid opening or closing trades a few minutes
+  around high-impact releases;</li>
+<li>it keeps its own count of the firm's <strong>daily and maximum loss</strong> (chapter 3b: the prop account types fill in 5 %/10 % or 3 %/6 %,
+  and you can type your firm's numbers); the size is what keeps a normal bad day far inside it;</li>
+<li>trades often last <strong>seconds to minutes</strong>; firms that set a minimum trade duration are not suitable;</li>
+<li>one chart, one instance (a second chart needs its own magic number, chapter 12).</li>
+</ul>
+<p>Source of every figure: the project's research journal (entries J11, J19, J21, J29) and <code>scripts/_prop_sim.py</code>
+(FTMO-class rules, day-block bootstrap), cross-checked against an independent prop-firm simulator within one
+percentage point.</p>
+<h2 id="3b-prop-firm-rules-your-firms-own-numbers-since-109">3b. Prop-firm rules: your firm's own numbers (since 1.09)</h2>
+<p>The Account type (chapter 3a) chooses the size. The group right under it, <strong>Prop-firm rules</strong>, enforces your firm's limits. Choosing <em>Prop firm 2-step</em> or <em>Prop firm 1-step</em> already fills in the two loss limits for you (5 % daily and 10 % maximum, or 3 % and 6 %; both fixed, and the EA acts 0.5 % before each); type your firm's own numbers to override them. With <em>Personal</em> every rule is off until you type a number.</p>
+<p>When a limit is about to be reached, the EA <strong>closes its own trades, deletes its own orders and stops opening new
+ones</strong>: until the firm's next day for the daily rules, for good for the maximum loss and the profit target. The
+Journal says which rule acted and at what equity:</p>
+<pre><code>KINGFISHER prop-firm rule: daily loss limit (equity 95512.40, day start 100020.00, firm limit 95020.00) - trades closed, orders deleted, paused until the firm's next day
+</code></pre>
+<p>and the start line lists what is on:</p>
+<pre><code>KINGFISHER prop-firm rules: account size 100000.00 | daily loss 5.00% of account size from the higher of day-start balance and equity - the EA acts at 4.50% of account size | maximum loss 10.00% (fixed) - the EA acts at 9.50% | ...
+</code></pre>
+<h3 id="the-inputs-group-4-prop-firm-rules-0-rule-off">The inputs (group "4. Prop-firm rules (0 = rule off)")</h3>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>What to enter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account size (<code>InpPropAccountSize</code>)</td>
+<td>the challenge's account size, e.g. 100000 (0 = the balance when the EA first starts)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Daily loss limit % (<code>InpPropDailyLossPct</code>)</td>
+<td>the firm's daily loss, e.g. 5</td>
+<td>0 = off; a prop account type fills in 5 or 3</td>
+</tr>
+<tr>
+<td>Daily loss limit is a % of (<code>InpPropDailyPctOf</code>)</td>
+<td><em>Account size</em> (the same amount every day - most firms) or <em>the day-start value</em></td>
+<td>Account size</td>
+</tr>
+<tr>
+<td>Daily loss is counted from (<code>InpPropDailyFrom</code>)</td>
+<td>the value at the start of the firm's day: <em>the higher of balance and equity</em> (strictest, safe for every firm), <em>balance</em> or <em>equity</em></td>
+<td>the higher of the two</td>
+</tr>
+<tr>
+<td>Maximum loss limit % (<code>InpPropMaxLossPct</code>)</td>
+<td>the firm's maximum loss, e.g. 10</td>
+<td>0 = off; a prop account type fills in 10 or 6</td>
+</tr>
+<tr>
+<td>Maximum loss limit type (<code>InpPropMaxRule</code>)</td>
+<td><em>Fixed</em> (account size minus the limit - most two-step challenges), <em>Trailing: highest day-start balance</em>, <em>Trailing: highest equity, live</em></td>
+<td>Fixed</td>
+</tr>
+<tr>
+<td>A trailing limit stops rising at the account size (<code>InpPropTrailLock</code>)</td>
+<td>most trailing firms stop moving the limit once it reaches the starting balance</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Act this many % before each loss limit (<code>InpPropSafetyPct</code>)</td>
+<td>the safety margin: 0.5 means the EA acts at 4.5 % when the firm's limit is 5 %</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>Profit target % (<code>InpPropTargetPct</code>)</td>
+<td>close everything and stop when equity reaches the target (0 = keep trading)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Best-day cap % (<code>InpPropDayGainPct</code>)</td>
+<td>close everything and pause for the day once the day's gain reaches this (for firms with a consistency rule)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Hour the firm's day starts (<code>InpPropDayStartHour</code>)</td>
+<td>the hour on your platform's clock (the Market Watch time) at which the firm restarts its daily loss</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Friday: close all at this hour (<code>InpPropFridayCloseHour</code>)</td>
+<td>for firms that do not allow holding over the weekend; trading resumes on Monday</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>New challenge on the same login (<code>InpPropResetState</code>)</td>
+<td>set to <em>true</em> for ONE start when you begin a new challenge on the same login, then back to <em>false</em></td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples-what-to-type">Examples - what to type</h3>
+<p>From the LuxAlgo prop-firm directory on 23 September 2026 (the daily-loss wording is inferred by that directory; your
+firm's own rules page is always the authority, and firms change their rules):</p>
+<table>
+<thead>
+<tr>
+<th>Challenge (100,000 account)</th>
+<th>Daily loss %</th>
+<th>Maximum loss % and type</th>
+<th>Profit target %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FTMO Normal, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>10, then 5</td>
+</tr>
+<tr>
+<td>FTMO Normal, 1-step</td>
+<td>3</td>
+<td>10, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>FundingPips, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>FundingPips, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>The 5%ers High Stakes, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>Blue Guardian Pro, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>All six count the daily loss as a share of the account size from the previous day's closing balance, open trades
+included. Leave <em>counted from</em> at <em>the higher of balance and equity</em> - it is never later than the firm's own meter.</p>
+<p><strong>Profit target: set it for the challenge phases only.</strong> When the target is reached the EA stops for good on that
+login; on the funded account set it back to 0.</p>
+<p><strong>The firm's day.</strong> Most firms restart the daily loss at midnight of the platform's own clock: leave 0. If your firm
+names another time, convert it to the Market Watch clock. Gold is closed for about an hour around the broker's
+midnight on most platforms, so for gold an hour's difference rarely matters; a market that trades through midnight
+(Bitcoin) needs the exact hour.</p>
+<p><strong>Restarts.</strong> The EA remembers the account size, the day's starting value, the highest balance and whether a rule
+stopped it, across restarts of the platform (terminal global variables named <code>PR&lt;login&gt;_&lt;magic&gt;_...</code>). A restart in
+the middle of the day does not give it a fresh daily allowance.</p>
+<h3 id="what-these-rules-do-not-do">What these rules do not do</h3>
+<ul>
+<li>They close <strong>this EA's</strong> trades only. The limits are measured on the whole account's equity, so trades from another
+  EA or by hand count toward them; give every EA on the account the same numbers.</li>
+<li>The EA acts on the first price tick past its limit. A gap or a very fast market can carry the loss a little further
+  before the closing trades fill - that is what the safety margin is for; do not set it to 0 on a real challenge.</li>
+<li><strong>No news filter.</strong> Some funded accounts forbid opening or closing trades a few minutes around high-impact releases.
+  The platform's economic calendar cannot be replayed in the Strategy Tester, so a news rule could not be proved the way
+  every rule above was; pause the EA by hand around those releases if your firm requires it.</li>
+<li>No minimum trade duration and no minimum number of trading days.</li>
+</ul>
+<p><strong>Proof.</strong> With every rule off, this version placed the same deals as the version before it, deal for deal (82 trades, net +884.24, Pepperstone real ticks, 28 August - 19 September 2026). Each rule was then switched on at a level the same weeks reach; at all 19 triggers the EA closed its trades, opened nothing until the pause ended, and placed exactly the same deals as with the rules off up to the first trigger.</p>
+<h2 id="4-your-first-week">4. Your first week</h2>
+<ol>
+<li><strong>Run it on a demo account first</strong>, same broker, same settings, for at least four weeks. Nothing in this manual replaces watching it on your own broker's prices.</li>
+<li>On the demo, note two numbers each day from the account history:
+   - <strong>Fills per day.</strong> In an active market, 2–4. In a quiet week, zero is normal — that is the gate working, not a fault.
+   - <strong>How far past the stop loss the losers closed.</strong> The stop is placed at 2.00; on the tested brokers the median loser closed at 2.06–2.30 and one in ten at 3.45–4.45. If your broker's median is past 2.60, your costs are materially worse than anything tested — stay on demo or change broker.</li>
+<li>When you go live, <strong>start at Low</strong> for the first eight trading weeks, or set Custom with <code>InpRiskPct = 0.25</code>.</li>
+<li>Move to Medium only after at least 60 closed trades with a profit factor above 1.4 and no single day worse than −3 % of balance.</li>
+</ol>
+<h2 id="5-reading-the-chart-and-the-journal">5. Reading the chart and the journal</h2>
+<p>KINGFISHER draws nothing on the chart. You will see:</p>
+<ul>
+<li><strong>Pending orders</strong> (dotted lines): buy stops above price, sell stops below, comment <code>KF D1</code> … <code>KF D4</code> (the Dives) and <code>KF S1</code> (Skim). Up to three per hunter and side.</li>
+<li><strong>Open positions</strong> with a stop loss and take profit line each.</li>
+<li>Orders <strong>disappearing</strong> — normal: they expire after each hunter's patience, they are removed on Friday evening, and they are cancelled when the hourly range shrinks below the gate.</li>
+</ul>
+<p>Journal lines you may see:</p>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KINGFISHER v1.04 …</code></td>
+<td>started; the banner repeats the risk level and exit mode</td>
+</tr>
+<tr>
+<td><code>Note: this account is in netting mode …</code></td>
+<td>see chapter 6</td>
+</tr>
+<tr>
+<td><code>Note: Hot risk level …</code></td>
+<td>you chose Hot; the warning is deliberate</td>
+</tr>
+<tr>
+<td><code>KINGFISHER: orders placed N \| skipped - quiet hour …</code></td>
+<td>printed when the EA is removed; a summary of why orders were or were not placed</td>
+</tr>
+</tbody>
+</table>
+<h2 id="6-when-it-does-not-trade-and-why-that-is-usually-right">6. When it does not trade — and why that is usually right</h2>
+<table>
+<thead>
+<tr>
+<th>Situation</th>
+<th>What happens</th>
+<th>Setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Quiet market: 2.00 stop &gt; 20 % of the hourly range</td>
+<td>no new orders; resting orders are cancelled</td>
+<td><code>InpGateStopAtr</code> (0 = trade always)</td>
+</tr>
+<tr>
+<td>Weekend</td>
+<td>orders removed Friday 19:55 broker time; new orders from Monday 05:01</td>
+<td><code>InpWeekendShield</code>, <code>InpFriCutoff*</code>, <code>InpMonResume*</code></td>
+</tr>
+<tr>
+<td>Spread wider than 500 points</td>
+<td>order not placed</td>
+<td><code>InpMaxSpreadPoints</code></td>
+</tr>
+<tr>
+<td>Broker rejects for margin</td>
+<td>order skipped, counted in the summary</td>
+<td><code>InpMaxRestingMarginPct</code>; see below</td>
+</tr>
+<tr>
+<td>Hunter already in a trade</td>
+<td>that hunter places nothing until it closes</td>
+<td>by design</td>
+</tr>
+<tr>
+<td>Level is broken or price is past it</td>
+<td>no order until a new unbroken level forms</td>
+<td>by design</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Netting accounts.</strong> KINGFISHER rests several orders at once. On a netting account with a small balance the broker may reject some of them for margin. Set <code>InpMaxRestingMarginPct</code> to, say, 60: the EA then refuses to add an order when the margin of open positions plus all resting orders would exceed 60 % of equity. On hedging accounts this is rarely needed (0 = off, the tested setting).</p>
+<p><strong>News.</strong> KINGFISHER has no news filter. Its stop loss is fixed and always on the server; a news spike either fills the order and runs to the target, or stops it out at 2.00 plus slippage. The tested numbers include every news event of 2024–2026.</p>
+<h2 id="7-exit-modes">7. Exit modes</h2>
+<p><strong>Since 1.10 the default (Strategy settings = Recommended) is: the four Dives on Smart, the Skim hunter on Grip.</strong> The
+Skim hunter's fills arrive with less push and most of its losses were full 2.00 stops; the Grip lets it keep its small
+gains instead. On a small account this matters most, because there Skim trades the same minimum lot as a Dive (its
+quarter weight cannot go below the broker minimum). Measured on Vantage, MetaTrader 5 Strategy Tester, real ticks, 600 balance, 7 July - 18 September 2026:</p>
+<table>
+<thead>
+<tr>
+<th>600 balance, Vantage</th>
+<th>net</th>
+<th>days in profit</th>
+<th>worst day</th>
+<th>worst drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Recommended (Skim on Grip)</strong></td>
+<td><strong>+558 (+93 %)</strong></td>
+<td><strong>70 %</strong></td>
+<td><strong>-12.0</strong></td>
+<td><strong>15.9</strong></td>
+</tr>
+<tr>
+<td>Classic (Skim rides)</td>
+<td>+500 (+83 %)</td>
+<td>43 %</td>
+<td>-21.6</td>
+<td>54.1</td>
+</tr>
+<tr>
+<td>Skim switched off</td>
+<td>+401 (+67 %)</td>
+<td>50 %</td>
+<td>-15.5</td>
+<td>31.5</td>
+</tr>
+</tbody>
+</table>
+<p>Over 18 months at the minimum lot (Pepperstone): net 3,129 vs 3,194, worst drawdown 47 vs 82, days in profit 62 vs 50 %.
+On a wide-fill feed (Fusion) the Grip's small wins are eaten by the fill cost - there choose <strong>Classic</strong>.</p>
+<p><code>InpExitMode</code> (section 3, Strategy settings = Custom):</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion, 2024 to 2026 (comparative ranking across exit modes).</em></p>
+<ul>
+<li><strong>Smart (default).</strong> The fill is read on the first tick after it opens. If price arrived on a push (the last 5 seconds moved at least 4.5 % of the hourly range — <code>InpSmartPushAtr</code>), the trade rides to the 15.00 target. Otherwise the Grip manages it.</li>
+<li><strong>Grip every trade.</strong> The Grip on all trades: once 1.00 ahead per 0.01 lot (<code>InpGripStart</code>), close if profit falls to 50 % of its best (<code>InpGripKeepPct</code>). Highest win rate, lowest net — it sells the big winners.</li>
+<li><strong>Target only.</strong> Hold every trade to the stop or the target. Highest net, widest drawdown.</li>
+</ul>
+<p>In the testing, Smart kept Target-only's profit at about a quarter less drawdown, on four brokers.</p>
+<p><strong>Which exit compounds fastest depends on your broker's stop fills.</strong> Where the losers fill close to the $2.00 stop (Vantage, Pepperstone in our tests), <em>Grip every trade</em> at the High level was the smoothest and fastest path (Vantage: ×27 in 15 months at a 5.7 % worst drawdown; Pepperstone ×20 at 7.0 %). Where the fills are wide (Fusion), the Grip's small wins are eaten by the fill cost and <em>Smart</em> at the High level is the fast path (×53 at 15.3 %). Run four weeks on demo, read the median fill distance past $2.00 (chapter 4): under ~$2.15 → Grip; above → Smart.</p>
+<h3 id="70-since-111-on-a-high-volatility-day-the-skim-hunter-rides">7.0 Since 1.11: on a high-volatility day the Skim hunter rides</h3>
+<p>The Grip on the Skim hunter pays in quiet and ordinary markets, where a break stalls and Grip keeps what a ride would give
+back. On days whose volatility is in the top third of the past year (yesterday's daily range against its own last 250
+days), breaks run far, and gripping at half the best profit cuts the runners - there the Classic exit earns more. From 1.11
+the Skim hunter uses the Exit section's mode (Smart) on those days and Grip on all others. Nothing to set; it follows the
+market by itself.</p>
+<table>
+<thead>
+<tr>
+<th>Medium, 10,000, April 2025 - September 2026, backtest (BlackBull / Fusion)</th>
+<th>growth</th>
+<th>worst drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull, 1.10 (Grip always)</td>
+<td>x13.6</td>
+<td>8.8 %</td>
+</tr>
+<tr>
+<td>BlackBull, Classic (ride always)</td>
+<td>x18.0</td>
+<td>16.1 %</td>
+</tr>
+<tr>
+<td><strong>BlackBull, 1.11 (ride on high-volatility days)</strong></td>
+<td><strong>x18.8</strong></td>
+<td><strong>8.8 %</strong></td>
+</tr>
+<tr>
+<td>Fusion, 1.10 / Classic / <strong>1.11</strong></td>
+<td>x11.0 / x16.3 / <strong>x16.2</strong></td>
+<td>8.8 % / 11.5 % / <strong>8.8 %</strong></td>
+</tr>
+</tbody>
+</table>
+<p>On a small account the switch changes nothing in quiet months: on 600 at the minimum lot from 7 July to 18 September 2026
+it placed exactly the same deals as 1.10 on two brokers, because no day reached the top third.</p>
+<p>On a 600 account at the minimum lot through the volatile October 2025 - May 2026 stretch, 1.11 made +2,346 against +1,471 for 1.10, with smaller dips (worst five days -43.7 against -58.7 per 0.01 lot). Proved before release: 1.11 places exactly the same deals as the tested configuration (524 trades, +24,186.66 on IC Markets real ticks, April - September 2026, where 1.10 made +23,451.24), and the Classic and prop settings carry it.</p>
+<h3 id="71-one-exit-per-hunter-inpd1exit-inps1exit-since-105">7.1 One exit per hunter (<code>InpD1Exit</code> … <code>InpS1Exit</code>, since 1.05)</h3>
+<p>Each hunter can override the global exit: <strong>Global</strong> (the default: whatever <code>InpExitMode</code> says), <strong>Smart</strong>, <strong>Grip every trade</strong> or <strong>Target only</strong>. The one that matters is the Skim hunter (1-hour level). Its fills arrive with less push than the 4-hour fills and lose more often at the stop (57–66 % of its trades under Smart); on the Grip it closes 35 % at the stop and keeps most of the rest as small wins. Whether that pays depends, again, on your broker's stop fills:</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion, 2024 to 2026.</em></p>
+<table>
+<thead>
+<tr>
+<th><code>InpS1Exit</code> = Grip every trade, Dives on Smart</th>
+<th>Medium growth · worst drawdown</th>
+<th>vs the shipped default (Medium, Smart)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Pepperstone, 2025-01 → 2026-09</td>
+<td><strong>×20.6 · 5.3 %</strong> (PF 3.57)</td>
+<td>×20.4 · 9.3 % — same growth, drawdown down 43 %</td>
+</tr>
+<tr>
+<td>Vantage, 2025-06 → 2026-09</td>
+<td>×15.8 · 5.9 % (PF 3.06)</td>
+<td>×22.4 · 7.9 % — growth down 29 %, drawdown down 25 %</td>
+</tr>
+<tr>
+<td>Fusion, 2024-01 → 2026-09</td>
+<td>×11.2 · 12.4 % (PF 2.15)</td>
+<td>×17.3 · 10.2 % — worse on both</td>
+</tr>
+</tbody>
+</table>
+<p>Backtests on real broker ticks, 10,000 start, compiled defaults otherwise. Read it as: where the losers fill close to the 2.00 stop, set the Skim hunter to <em>Grip every trade</em> and keep the Dives on Smart — same or smoother path; where the fills are wide, leave every hunter on Global. The four-week demo rule of chapter 4 (median fill distance past 2.00 under about 2.15 → tight) is the test. At High on a tight-fill broker, <em>Grip every trade</em> for all hunters (chapter 7 above) remains the smoothest path; Skim-only Grip at High lands between the two pure exits (Pepperstone ×26.7 at 9.8 %; Vantage ×49.8 at 8.6 % against Smart-High ×64.1 at 11.9 % and Grip-High ×27.0 at 5.7 %).</p>
+<p><strong>A second tight-fill lever: <code>InpSmartPushAtr</code>.</strong> Raising the Smart threshold from 0.045 to 0.09 hands more fills to the Grip without touching the Dives' rides on real pushes. At Medium: Pepperstone ×18.7 at 6.9 % (vs ×20.4 at 9.3 %), Vantage ×20.3 at 5.9 % (vs ×22.4 at 7.9 %), Fusion ×12.7 at 9.2 % (vs ×17.3 at 10.2 % — not worth it there). Growth per unit of drawdown +30 % on both tight-fill brokers. The Grip's arming level (<code>InpGripStart</code>) is not a lever: 2.5 instead of 1.00 changed nothing on any broker. Do not loosen the quiet-market gate to buy fills: 0.48 instead of 0.20 gave the same growth at 18–35 % drawdowns on the three brokers.</p>
+<h3 id="72-the-smoothest-path-on-a-tight-fill-broker-presetskingfisher_high_gripset">7.2 The smoothest path on a tight-fill broker: <code>presets/KINGFISHER_high_grip.set</code></h3>
+<p>High level with <em>Grip every trade</em>. On Vantage (2025-06 → 2026-09, 10,000 start) it was the fastest <strong>and</strong> the shallowest of every arm tested: ×27.0 at a 5.7 % worst drawdown, profit factor 3.83, 72 % of trades closed in profit; at a fixed 0.01 lot it closes 28 % of trades at the stop against 62 % for Smart, and its worst 30-day loss is 14.00 per 0.01 lot against 17.00. On Pepperstone it is ×20.3 at 7.0 %. On a wide-fill broker (Fusion) it is the worst arm: ×10.6 at 17.7 %; do not use it there.</p>
+<p><strong>Do not use this preset on a small account.</strong> Below about 2,000 every fill is the 0.01 minimum lot whatever the risk level says, so the Grip's advantage — which is that it lets you run a larger risk fraction for the same drawdown — cannot be taken, while its cost is paid in full. Measured on a 600 balance over 3 August to 18 September 2026 at the minimum lot: compiled defaults made 250 (Pepperstone) and 365 (Vantage) while this preset made 145 and 224, because the month's profit came from a few large pushed moves and the Grip sells exactly those. On a small account run the compiled defaults, or the per-hunter setting in 7.1, and come back to this preset when the balance is large enough for the risk level to change the lot size. The 15-month Vantage replay from 600 at 1:500 that reaches 10,606 assumes the balance grows past the minimum-lot floor early and stays there; it is a statement about the whole path, not about the first months, which is where the paragraph above applies.</p>
+<h3 id="73-since-112-rebound-reverse-after-a-skim-stop-out-opt-in-inprebound-off-by-default">7.3 Since 1.12: Rebound - reverse after a Skim stop-out (opt-in, <code>InpRebound</code>, off by default)</h3>
+<p>A Skim order is a bet that the 1-hour level breaks. When it is stopped out, the break has failed: price went through the
+level, turned, and came back through the Skim's entry. Traders who bought that break have their stops just inside the
+level, and when those stops fill they push price further back into the range. <strong>Rebound</strong> trades that return leg. When a
+Skim trade closes at its stop, KINGFISHER places one opposite stop order 2.50 beyond the Skim's entry (0.50 past the
+Skim's stop):</p>
+<ul>
+<li><strong>stop</strong> 1.00 beyond the furthest point the Skim trade reached, so the order does not sit where the failed break just turned;</li>
+<li><strong>target</strong> 15.00 per 0.01 lot, the same as the Skim;</li>
+<li><strong>size</strong> set so the order risks the same amount of money as the Skim trade it follows;</li>
+<li><strong>life</strong> 3 hours. It is also removed early if a 15-minute candle pushes hard back in the Skim's direction (a body at least
+  the 15-minute ATR(14)); while it waits, its stop follows a new Skim extreme.</li>
+</ul>
+<p>It never hedges. If any KINGFISHER trade opens the other way, a waiting Rebound order is deleted, and an open Rebound
+trade is closed. The Skim hunter keeps trading as before: switching Rebound on removes none of its trades. A Skim
+closed by the Grip or by Smart gets no Rebound. Neither does a Dive: both were tested and neither held up.</p>
+<table>
+<thead>
+<tr>
+<th>Medium, 10,000, April 2025 - September 2026, real-tick backtest</th>
+<th>profit with Rebound, against off</th>
+<th>worst drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull</td>
+<td><strong>+14 %</strong></td>
+<td>about the same (x0.97)</td>
+</tr>
+<tr>
+<td>Fusion</td>
+<td><strong>+19 %</strong></td>
+<td>19 % smaller (x0.81)</td>
+</tr>
+<tr>
+<td>OANDA (wide spread)</td>
+<td>-5 %</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Dukascopy gold history 2013 - 2015, replayed at today's price</td>
+<td>flat (-0.1 %)</td>
+<td>about the same</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Switch it on only if all three are true:</strong></p>
+<ol>
+<li><strong>Your broker fills tight.</strong> The Rebound order sits close to the Skim's stop, so the spread is a large share of what it
+   can earn. It paid on the two raw-spread brokers and lost on the wide-spread feed. Use the four-week fill test in
+   chapter 4.</li>
+<li><strong>Your account is well above the minimum lot.</strong> The Rebound stop is at least 3.50 away and usually more. At 0.01 lot it
+   therefore risks more than the Skim did. It was not tested on a small account: leave it off below about 2,000.</li>
+<li><strong>You accept a slower quiet stretch.</strong> On BlackBull the Rebound trades were behind in the quiet summer of 2025
+   (May - October). The dips were deeper there before they led from November on. On Fusion the dips were no deeper
+   at any time.</li>
+</ol>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull / Fusion / OANDA / Dukascopy, 2015 to 2025 (fresh out-of-sample windows).</em></p>
+<p>What it is not: a proven law. Before 2025 the same trades were flat to negative. On 53 stop-out Rebounds in earlier gold
+windows never used to build it (2015, 2018 - early 2025) the average was -0.28 of the amount risked. The gain above
+belongs to the volatile gold market of 2025 - 2026. It is a choice for traders who expect that market to continue, which
+is why it ships off.</p>
+<p>Proved before release: with Rebound off, 1.12 places exactly the same deals as 1.11. With it on, 1.12 places exactly the
+same deals as the research build the table above was measured on, including under the Prop 2-step account type.</p>
+<h2 id="8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</h2>
+<p>Same entries, same hit rate on every broker tested; what differs is how far past the 2.00 stop you are filled on a fast move. Measured medians (2026, losers): 2.06, 2.11, 2.17, 2.30 on the four live feeds; the widest feed earned about 25 % less per trade than the tightest. Execution delay of 100–500 ms was tested and changed the result by at most 1 %; it is the broker's quote path, not latency, that costs.</p>
+<p><strong>Spread is the bigger cost, and it is visible before you trade.</strong> KINGFISHER's stop is a fixed 2.00 per 0.01 lot, so
+the spread takes a fixed share of it. Measured on the same entries on two brokers (2025–26): on a feed whose gold
+spread was about $0.24 at the median, 8.5 % of fills were stopped out within one second of the fill (0.1–3.0 % on
+raw-spread feeds) and the shared entries earned about half as much per trade (0.99 against 2.08 per 0.01 lot). Across
+four feeds, fills taken while the spread was at most 3 % of the stop earned the most on every feed.</p>
+<p>Choose a broker with tight gold spreads (a raw-spread / ECN account) and fast stop execution. Prefer a <strong>hedging</strong>
+account. The input <code>InpMaxSpreadPoints</code> (500) is in <strong>points</strong>: 500 points is a 5.00 spread on a two-decimal gold quote
+and 0.50 on a three-decimal one — look at your symbol's digits before relying on it.</p>
+<h2 id="9-sizing-and-margin">9. Sizing and margin</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, 2024 to 2026 (per-order vs per-level risk sizing comparison).</em></p>
+<ul>
+<li>The size of each order is computed from the risk level, the balance, the 2.00 stop and the broker's tick value, then shared among the hunters on that level (<code>LOT_RISK_PER_LEVEL</code>).</li>
+<li><code>InpMaxLot</code> (5.0) caps every order. In the tests it only came into play after the balance had grown twenty-fold.</li>
+<li>Custom mode also offers fixed lots (<code>LOT_FIXED</code> + <code>InpFixedLot</code>), lots per 1,000 of balance, and risk per order (each fill risks the full percentage — in the same tests this took the drawdown past 40 %; not recommended).</li>
+<li>Leverage: 1:100 or higher is comfortable. At 1:30 and Medium the resting orders can exhaust free margin on small accounts; use Low or set <code>InpMaxRestingMarginPct</code>.</li>
+</ul>
+<h2 id="10-optimising-for-advanced-users">10. Optimising (for advanced users)</h2>
+<p>Every value that moves a trade is an input, so the Strategy Tester's genetic optimiser can search any of them: the five hunters' offsets, stops, targets, patience, swing width and timeframe; the gate; the exit thresholds; the weekend times. Two warnings from the people who built it:</p>
+<ul>
+<li>The defaults are the values that survived out-of-sample tests, random-control tests and four brokers. A parameter that looks better on last quarter alone is usually curve-fitting.</li>
+<li>The first thing worth optimising is not an offset but the per-hunter risk weights (<code>InpS1RiskWeight</code> in particular) — they change how the risk budget is split between the busy hunter and the profitable ones, and a change there is a sizing decision, not a curve fit.</li>
+<li>Optimise on <strong>real ticks</strong> ("Every tick based on real ticks"), never on OHLC — the entries depend on the tick path.</li>
+</ul>
+<h2 id="11-what-is-saved-and-what-is-not">11. What is saved and what is not</h2>
+<p>KINGFISHER keeps no files. After a restart it re-adopts its own orders and positions by magic number and comment. The Grip's "best profit so far" for an open trade is <em>not</em> saved: after a restart it starts tracking again from the moment the trade is next seen, and the Smart read of "fast or slow fill" is taken again on that first tick.</p>
+<h2 id="12-troubleshooting">12. Troubleshooting</h2>
+<table>
+<thead>
+<tr>
+<th>Symptom</th>
+<th>Cause</th>
+<th>Fix</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>No orders for days</td>
+<td>quiet market — the gate</td>
+<td>expected; watch the hourly range on the H1 chart; set <code>InpGateStopAtr = 0</code> only if you accept the drawdown that comes with trading quiet markets</td>
+</tr>
+<tr>
+<td>Orders appear and vanish within minutes</td>
+<td>hourly range dropping below the gate, or the weekend shield</td>
+<td>expected</td>
+</tr>
+<tr>
+<td><code>not enough money</code> in the journal</td>
+<td>netting account or low leverage</td>
+<td><code>InpMaxRestingMarginPct = 60</code>, or Low risk</td>
+</tr>
+<tr>
+<td>Fills much worse than 2.00 on losers</td>
+<td>broker execution</td>
+<td>compare brokers on demo (chapter 4)</td>
+</tr>
+<tr>
+<td>No orders; Journal says "trades gold only"</td>
+<td>attached to a chart that is not gold</td>
+<td>attach it to your broker's XAUUSD chart (section 6 can allow other symbols)</td>
+</tr>
+<tr>
+<td>Changing a hunter's stop or offset changes nothing</td>
+<td>Strategy settings = Recommended ignores the [Custom] sections</td>
+<td>set Strategy settings = Custom (chapter 2a)</td>
+</tr>
+<tr>
+<td>Every risk level gives the same lot</td>
+<td>small account: the broker's minimum lot</td>
+<td>expected; the second Journal line says so (chapter 2a)</td>
+</tr>
+<tr>
+<td>Different results than the screenshots</td>
+<td>different broker, window, or model</td>
+<td>the figures are Strategy Tester runs on specific brokers' real ticks; results differ by feed — chapter 14 reproduces them exactly</td>
+</tr>
+<tr>
+<td>Two charts cancel each other's orders</td>
+<td>two instances with the same magic number</td>
+<td>give the second chart its own <code>InpMagic</code> (for example 89831)</td>
+</tr>
+<tr>
+<td>Prop mode seems to ignore the risk level</td>
+<td>expected</td>
+<td>the account type overrides the risk level; set Personal to use chapter 3</td>
+</tr>
+</tbody>
+</table>
+<h2 id="13-final-checklist-and-disclaimer">13. Final checklist and disclaimer</h2>
+<ul>
+<li>[ ] Demo run of at least four weeks on your broker</li>
+<li>[ ] Hedging account, or <code>InpMaxRestingMarginPct</code> set on netting</li>
+<li>[ ] Risk level Low for the first eight live weeks</li>
+<li>[ ] Algo Trading enabled; VPS or a PC that stays on (orders are server-side, but the Grip and the gate need the EA running)</li>
+<li>[ ] You accept that a quiet year can mean months without trades</li>
+<li>[ ] Prop-firm account: Account type set (chapter 3a), and the firm's news, weekend and trade-duration rules checked</li>
+</ul>
+<p><strong>Disclaimer.</strong> Trading leveraged products carries a high level of risk and may not be suitable for all investors. All performance figures in this manual and its listing are Strategy Tester results on historical broker tick data; they are not results from live trading and do not predict future performance. Past performance is not indicative of future results. Only trade with money you can afford to lose.</p>
+<h2 id="14-reproduce-the-tests-yourself">14. Reproduce the tests yourself</h2>
+<p>Every figure the listing quotes comes with the exact settings that produced it. Reproducing one takes a few minutes
+and needs no .set file.</p>
+<p><strong>By hand, in MetaTrader 5</strong> (the BlackBull holdout row; open the Strategy Tester with Ctrl+R):</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Expert: <code>KINGFISHER</code> — the Journal's first line must name the version below</td>
+</tr>
+<tr>
+<td>2</td>
+<td>Symbol: XAUUSD on your terminal (the row was measured on BlackBull, symbol <code>XAUUSDp</code>)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Timeframe: M15</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Date: Custom period, 2026.07.01 to 2026.09.19</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Forward: No · Delays: Zero latency, ideal execution</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Modelling: <strong>Every tick based on real ticks</strong></td>
+</tr>
+<tr>
+<td>7</td>
+<td>Deposit: 10000 USD (leverage is your account's own)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Inputs tab: right-click → <strong>Defaults</strong>, then set <strong>Strategy settings = Classic</strong> (this row was recorded with the 1.05-1.09 exits)</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Start. On BlackBull this is a backtest of <strong>284 trades, net +6,576.13, profit factor 1.89, equity drawdown 15.60 %</strong> (v1.05; 1.10 Classic is identical, proved deal for deal). The same row on the 1.10 defaults (Recommended) is being recorded</td>
+</tr>
+</tbody>
+</table>
+<p>On another broker the entries are the same but the numbers are not (chapter 8): expect the same order of magnitude,
+not the same cent. The Journal must say "real ticks" for the whole window — a tester that fills a gap with generated
+ticks produces a different, invalid result.</p>
+<p><strong>With one command</strong> (the project's own tester harness):</p>
+<pre><code>python scripts/reproduce.py --product KINGFISHER --list
+python scripts/reproduce.py --product KINGFISHER --manual BB_HOLDOUT
+python scripts/reproduce.py --product KINGFISHER --run --feed BLACKBULL
+</code></pre>
+<p><code>--run</code> starts a fresh pass (never a cached one) and prints PASS, FAIL or FEED CHANGED (the broker's tick history no
+longer covers the window). The rows live in <code>MANIFEST.json → reproduce</code>.</p>
+<h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</h2>
+<p>Generated from the compiled source (<code>scripts/_manual_from_inputs.py</code>); enum defaults are the source names — the Inputs tab shows their plain labels.</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Input</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Start here</td>
+<td><code>InpAccountMode</code></td>
+<td>AccountMode</td>
+<td>ACCOUNT_PERSONAL</td>
+<td>Account type</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpProfile</code></td>
+<td>StrategyProfile</td>
+<td>PROFILE_RECOMMENDED</td>
+<td>Strategy settings</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpRisk</code></td>
+<td>RiskLevel</td>
+<td>RISK_MEDIUM</td>
+<td>Risk level</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpVirtualBalance</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Size as if the balance were (0 = real)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpMaxSpreadUsd</code></td>
+<td>double</td>
+<td>5.00</td>
+<td>Max spread for new orders, USD (0 = off)</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpDive1</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Dive 1 - 4-hour level, 30 h patience</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpDive2</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Dive 2 - 4-hour level, 20 h patience</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpDive3</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Dive 3 - 4-hour level, 60 h patience</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpDive4</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Dive 4 - 4-hour level, 55 h patience</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpSkim</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Skim - 1-hour level, 15 h patience</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpRebound</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Rebound - reverse after a Skim stop-out (opt-in; raw-ECN brokers)</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpAllowBuy</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Allow buy trades</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpAllowSell</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Allow sell trades</td>
+</tr>
+<tr>
+<td>3. Exit [Custom]</td>
+<td><code>InpExitMode</code></td>
+<td>ExitMode</td>
+<td>EXIT_SMART</td>
+<td>How trades close</td>
+</tr>
+<tr>
+<td>3. Exit [Custom]</td>
+<td><code>InpGripStart</code></td>
+<td>double</td>
+<td>1.00</td>
+<td>Grip starts at this profit per 0.01 lot</td>
+</tr>
+<tr>
+<td>3. Exit [Custom]</td>
+<td><code>InpGripKeepPct</code></td>
+<td>double</td>
+<td>50.0</td>
+<td>Grip closes at this % of the best profit</td>
+</tr>
+<tr>
+<td>3. Exit [Custom]</td>
+<td><code>InpSmartPushAtr</code></td>
+<td>double</td>
+<td>0.045</td>
+<td>Smart: a fast fill moved &gt;= this x ATR</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropAccountSize</code></td>
+<td>double</td>
+<td>0</td>
+<td>Account size (0 = balance when the EA first starts)</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Daily loss limit % (0 = off)</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyPctOf</code></td>
+<td>PropPctOf</td>
+<td>PROP_PCT_OF_SIZE</td>
+<td>Daily loss limit is a % of</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyFrom</code></td>
+<td>PropDayFrom</td>
+<td>PROP_DAY_HIGHER</td>
+<td>Daily loss is counted from</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropMaxLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Maximum loss limit % (0 = off)</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropMaxRule</code></td>
+<td>PropMaxRule</td>
+<td>PROP_MAX_FIXED</td>
+<td>Maximum loss limit type</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropTrailLock</code></td>
+<td>bool</td>
+<td>true</td>
+<td>A trailing limit stops rising at the account size</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropSafetyPct</code></td>
+<td>double</td>
+<td>0.5</td>
+<td>Act this many % of account size BEFORE each loss limit</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropTargetPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Profit target %: close all and stop for good (0 = off)</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDayGainPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Best-day cap %: close all and pause for the day (0 = off)</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDayStartHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Hour the firm's day starts, broker server time (0-23)</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropFridayCloseHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Friday: close all at this hour (0 = off)</td>
+</tr>
+<tr>
+<td>4. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropResetState</code></td>
+<td>bool</td>
+<td>false</td>
+<td>New challenge, same login: true once</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpWeekendShield</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Remove orders before the weekend</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpFriCutoffHour</code></td>
+<td>int</td>
+<td>19</td>
+<td>Friday: no new orders after (broker hour)</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpFriCutoffMinute</code></td>
+<td>int</td>
+<td>55</td>
+<td>Friday: ... and minute</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpMonResumeHour</code></td>
+<td>int</td>
+<td>5</td>
+<td>Monday: resume at (broker hour)</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpMonResumeMinute</code></td>
+<td>int</td>
+<td>1</td>
+<td>Monday: ... and minute</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpGateStopAtr</code></td>
+<td>double</td>
+<td>0.20</td>
+<td>[Custom] Quiet market: stop &gt; this x ATR</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpGateSpreadAtr</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>[Custom] Skip if spread &gt; x ATR (0 = off)</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpGateSpreadSl</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>[Custom] Skip if spread &gt; x stop (0 = off)</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpGatePushAtr</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>[Custom] Skip slow approaches (0 = off)</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpGateNearDollars</code></td>
+<td>double</td>
+<td>0.50</td>
+<td>[Custom] Slow approach = within this $</td>
+</tr>
+<tr>
+<td>6. Safety</td>
+<td><code>InpMaxLot</code></td>
+<td>double</td>
+<td>5.0</td>
+<td>Maximum lot per order</td>
+</tr>
+<tr>
+<td>6. Safety</td>
+<td><code>InpMaxRestingMarginPct</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Max margin in use, % of equity (0 = off)</td>
+</tr>
+<tr>
+<td>6. Safety</td>
+<td><code>InpAllowOtherSymbols</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Allow live trading on non-gold symbols</td>
+</tr>
+<tr>
+<td>6. Safety</td>
+<td><code>InpMagic</code></td>
+<td>int</td>
+<td>89830</td>
+<td>Magic number (a 2nd chart needs another)</td>
+</tr>
+<tr>
+<td>6. Safety</td>
+<td><code>InpComment</code></td>
+<td>string</td>
+<td>KF</td>
+<td>Order comment prefix</td>
+</tr>
+<tr>
+<td>6. Safety</td>
+<td><code>InpSlippagePoints</code></td>
+<td>int</td>
+<td>50</td>
+<td>Maximum slippage, points</td>
+</tr>
+<tr>
+<td>7. Custom sizing (Risk level = Custom)</td>
+<td><code>InpLotMode</code></td>
+<td>LotMode</td>
+<td>LOT_RISK_PER_LEVEL</td>
+<td>Sizing method</td>
+</tr>
+<tr>
+<td>7. Custom sizing (Risk level = Custom)</td>
+<td><code>InpRiskPct</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Risk %, per level or per order</td>
+</tr>
+<tr>
+<td>7. Custom sizing (Risk level = Custom)</td>
+<td><code>InpFixedLot</code></td>
+<td>double</td>
+<td>0.01</td>
+<td>Fixed lot size</td>
+</tr>
+<tr>
+<td>7. Custom sizing (Risk level = Custom)</td>
+<td><code>InpLotPer1000</code></td>
+<td>double</td>
+<td>0.01</td>
+<td>Lots per 1,000 of balance</td>
+</tr>
+<tr>
+<td>8. Engine [Custom]</td>
+<td><code>InpAtrTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_H1</td>
+<td>ATR timeframe (quiet gate and exit)</td>
+</tr>
+<tr>
+<td>8. Engine [Custom]</td>
+<td><code>InpAtrPeriod</code></td>
+<td>int</td>
+<td>14</td>
+<td>ATR period</td>
+</tr>
+<tr>
+<td>8. Engine [Custom]</td>
+<td><code>InpPushSec</code></td>
+<td>int</td>
+<td>5</td>
+<td>Push window, seconds</td>
+</tr>
+<tr>
+<td>8. Engine [Custom]</td>
+<td><code>InpMaxOrdersPerSide</code></td>
+<td>int</td>
+<td>3</td>
+<td>Max resting orders per hunter and side</td>
+</tr>
+<tr>
+<td>8. Engine [Custom]</td>
+<td><code>InpActivityFastMin</code></td>
+<td>int</td>
+<td>15</td>
+<td>Activity: fast window, minutes</td>
+</tr>
+<tr>
+<td>8. Engine [Custom]</td>
+<td><code>InpActivitySlowMin</code></td>
+<td>int</td>
+<td>240</td>
+<td>Activity: slow window, minutes</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1SwingTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_H4</td>
+<td>Swing timeframe</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1Width</code></td>
+<td>int</td>
+<td>4</td>
+<td>Swing width, bars each side</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1OffBuy</code></td>
+<td>double</td>
+<td>0.0456</td>
+<td>Buy stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1OffSell</code></td>
+<td>double</td>
+<td>0.0430</td>
+<td>Sell stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1Stop</code></td>
+<td>double</td>
+<td>2.0</td>
+<td>Stop loss per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1Target</code></td>
+<td>double</td>
+<td>15.0</td>
+<td>Take profit per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1ExpiryH</code></td>
+<td>double</td>
+<td>30</td>
+<td>Order patience, hours (0 = no expiry)</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1CheckTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_M15</td>
+<td>Re-check the level at each close of</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1Lookback</code></td>
+<td>int</td>
+<td>48</td>
+<td>Swing search depth, bars</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1RiskWeight</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Risk weight (1 = as tested, 0 = min lot)</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1GateStopAtr</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own quiet gate, x ATR (0 = global)</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1GateActivity</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own activity gate (0 = off)</td>
+</tr>
+<tr>
+<td>9. Dive 1 - 4-hour level [Custom]</td>
+<td><code>InpD1Exit</code></td>
+<td>HunterExit</td>
+<td>HEXIT_GLOBAL</td>
+<td>Own exit mode</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2SwingTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_H4</td>
+<td>Swing timeframe</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2Width</code></td>
+<td>int</td>
+<td>5</td>
+<td>Swing width, bars each side</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2OffBuy</code></td>
+<td>double</td>
+<td>0.0472</td>
+<td>Buy stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2OffSell</code></td>
+<td>double</td>
+<td>0.0619</td>
+<td>Sell stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2Stop</code></td>
+<td>double</td>
+<td>2.0</td>
+<td>Stop loss per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2Target</code></td>
+<td>double</td>
+<td>14.0</td>
+<td>Take profit per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2ExpiryH</code></td>
+<td>double</td>
+<td>20</td>
+<td>Order patience, hours (0 = no expiry)</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2CheckTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_M15</td>
+<td>Re-check the level at each close of</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2Lookback</code></td>
+<td>int</td>
+<td>48</td>
+<td>Swing search depth, bars</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2RiskWeight</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Risk weight (1 = as tested, 0 = min lot)</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2GateStopAtr</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own quiet gate, x ATR (0 = global)</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2GateActivity</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own activity gate (0 = off)</td>
+</tr>
+<tr>
+<td>10. Dive 2 - 4-hour level [Custom]</td>
+<td><code>InpD2Exit</code></td>
+<td>HunterExit</td>
+<td>HEXIT_GLOBAL</td>
+<td>Own exit mode</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3SwingTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_H4</td>
+<td>Swing timeframe</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3Width</code></td>
+<td>int</td>
+<td>5</td>
+<td>Swing width, bars each side</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3OffBuy</code></td>
+<td>double</td>
+<td>0.0228</td>
+<td>Buy stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3OffSell</code></td>
+<td>double</td>
+<td>0.0565</td>
+<td>Sell stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3Stop</code></td>
+<td>double</td>
+<td>2.0</td>
+<td>Stop loss per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3Target</code></td>
+<td>double</td>
+<td>15.0</td>
+<td>Take profit per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3ExpiryH</code></td>
+<td>double</td>
+<td>60</td>
+<td>Order patience, hours (0 = no expiry)</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3CheckTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_M15</td>
+<td>Re-check the level at each close of</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3Lookback</code></td>
+<td>int</td>
+<td>48</td>
+<td>Swing search depth, bars</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3RiskWeight</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Risk weight (1 = as tested, 0 = min lot)</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3GateStopAtr</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own quiet gate, x ATR (0 = global)</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3GateActivity</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own activity gate (0 = off)</td>
+</tr>
+<tr>
+<td>11. Dive 3 - 4-hour level [Custom]</td>
+<td><code>InpD3Exit</code></td>
+<td>HunterExit</td>
+<td>HEXIT_GLOBAL</td>
+<td>Own exit mode</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4SwingTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_H4</td>
+<td>Swing timeframe</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4Width</code></td>
+<td>int</td>
+<td>4</td>
+<td>Swing width, bars each side</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4OffBuy</code></td>
+<td>double</td>
+<td>0.0494</td>
+<td>Buy stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4OffSell</code></td>
+<td>double</td>
+<td>0.0619</td>
+<td>Sell stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4Stop</code></td>
+<td>double</td>
+<td>2.0</td>
+<td>Stop loss per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4Target</code></td>
+<td>double</td>
+<td>15.0</td>
+<td>Take profit per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4ExpiryH</code></td>
+<td>double</td>
+<td>55</td>
+<td>Order patience, hours (0 = no expiry)</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4CheckTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_M15</td>
+<td>Re-check the level at each close of</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4Lookback</code></td>
+<td>int</td>
+<td>48</td>
+<td>Swing search depth, bars</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4RiskWeight</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Risk weight (1 = as tested, 0 = min lot)</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4GateStopAtr</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own quiet gate, x ATR (0 = global)</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4GateActivity</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own activity gate (0 = off)</td>
+</tr>
+<tr>
+<td>12. Dive 4 - 4-hour level [Custom]</td>
+<td><code>InpD4Exit</code></td>
+<td>HunterExit</td>
+<td>HEXIT_GLOBAL</td>
+<td>Own exit mode</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1SwingTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_H1</td>
+<td>Swing timeframe</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1Width</code></td>
+<td>int</td>
+<td>5</td>
+<td>Swing width, bars each side</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1OffBuy</code></td>
+<td>double</td>
+<td>0.0783</td>
+<td>Buy stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1OffSell</code></td>
+<td>double</td>
+<td>0.0767</td>
+<td>Sell stop inside the level, % of price</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1Stop</code></td>
+<td>double</td>
+<td>2.0</td>
+<td>Stop loss per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1Target</code></td>
+<td>double</td>
+<td>15.0</td>
+<td>Take profit per 0.01 lot, account currency</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1ExpiryH</code></td>
+<td>double</td>
+<td>15</td>
+<td>Order patience, hours (0 = no expiry)</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1CheckTf</code></td>
+<td>ENUM_TIMEFRAMES</td>
+<td>PERIOD_M15</td>
+<td>Re-check the level at each close of</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1Lookback</code></td>
+<td>int</td>
+<td>100</td>
+<td>Swing search depth, bars</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1RiskWeight</code></td>
+<td>double</td>
+<td>0.25</td>
+<td>Risk weight (1 = as tested, 0 = min lot)</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1GateStopAtr</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own quiet gate, x ATR (0 = global)</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1GateActivity</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Own activity gate (0 = off)</td>
+</tr>
+<tr>
+<td>13. Skim - 1-hour level [Custom]</td>
+<td><code>InpS1Exit</code></td>
+<td>HunterExit</td>
+<td>HEXIT_GRIP_ALL</td>
+<td>Own exit mode</td>
+</tr>
+</tbody>
+</table>
+<p>Preset files with every key: <code>presets/KINGFISHER_low.set</code>, <code>_medium.set</code> (= the compiled defaults), <code>_high.set</code>, <code>_hot.set</code>, <code>_high_grip.set</code> (chapter 7.2). The presets were reissued on 2026-09-23 with every timeframe written as a number; a copy downloaded before that date ran a different, weaker configuration — replace it. A prop-firm account needs no preset: choose the Account type (chapter 3a).</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

@@ -1,0 +1,176 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Aegis Meridian manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="User manual for Aegis Meridian">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/rubberband/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Aegis Meridian manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="User manual for Aegis Meridian">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/rubberband/manual.html">
+<link rel="stylesheet" href="../../assets/style.css"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Aegis Meridian</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#aegis-meridian-user-manual">Aegis Meridian — User Manual</a><ul>
+<li><a href="#1-install">1. Install</a></li>
+<li><a href="#2-pick-your-risk-one-input-inpriskprofile">2. Pick your risk (one input: InpRiskProfile)</a></li>
+<li><a href="#2b-why-v139-ships-the-low-tier">2b. Why v1.39 ships the LOW tier</a></li>
+<li><a href="#3-confidence-lot-size-boosting-one-simple-switch-new-in-v137">3. Confidence lot-size boosting (one simple switch — NEW in v1.37)</a></li>
+<li><a href="#3b-optional-turbo-profiles-high-risk-high-return">3b. Optional +TURBO profiles (high-risk / high-return)</a></li>
+<li><a href="#4-understand-the-drawdown">4. Understand the drawdown</a></li>
+<li><a href="#5-safety-built-in">5. Safety built in</a></li>
+<li><a href="#6-requirements">6. Requirements</a></li>
+<li><a href="#risk-disclosure">Risk disclosure</a></li>
+<li><a href="#broker-differences-v137-note">Broker differences (v1.37 note)</a></li>
+<li><a href="#streak-sizing-v137-optional-and-broker-notes-v137">Streak sizing (v1.37, optional) and broker notes (v1.37)</a></li>
+<li><a href="#is-it-waiting-or-is-it-broken-the-regime-monitor">Is it waiting, or is it broken? — the regime monitor</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="aegis-meridian-user-manual">Aegis Meridian — User Manual</h1>
+<p>AUDCAD M15 adaptive mean-reversion grid. <em>Backtest figures only — past performance does not guarantee future results.</em></p>
+<h2 id="1-install">1. Install</h2>
+<ol>
+<li>Copy <code>AegisMeridian_market.ex5</code> to <code>MQL5/Experts/</code> (or attach from the Navigator after a Market install).</li>
+<li>Open <strong>one AUDCAD chart on the M15 timeframe</strong>.</li>
+<li>Attach the EA. Enable <strong>Algo Trading</strong>. A <strong>hedging</strong> account is required.</li>
+<li>Allow it to run 24/5 — a <strong>VPS is recommended</strong>.</li>
+</ol>
+<p>It is <strong>facade-complete</strong>: with no preset it runs the <strong>LOW</strong> profile out of the box (the default since v1.39; MEDIUM
+was the default up to v1.38 - see section 2b).</p>
+<h2 id="2-pick-your-risk-one-input-inpriskprofile">2. Pick your risk (one input: <code>InpRiskProfile</code>)</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06.</em></p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>Balance-risk</th>
+<th>Recommended account</th>
+<th>Backtest net (4.5 yr)</th>
+<th>Floating DD</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>LOW</strong> (default since 1.39)</td>
+<td>~1.5 %</td>
+<td>$500</td>
+<td>+41 %</td>
+<td>~10 %</td>
+</tr>
+<tr>
+<td>MEDIUM</td>
+<td>~3 %</td>
+<td>$1,000</td>
+<td>+71 %</td>
+<td>~18 %</td>
+</tr>
+<tr>
+<td>HIGH</td>
+<td>~4.5 %</td>
+<td>$2,000</td>
+<td>+131 %</td>
+<td>~24 %</td>
+</tr>
+<tr>
+<td>HOT</td>
+<td>~6 %</td>
+<td>$3,000</td>
+<td>+232 %</td>
+<td>~22 %</td>
+</tr>
+</tbody>
+</table>
+<h2 id="2b-why-v139-ships-the-low-tier">2b. Why v1.39 ships the LOW tier</h2>
+<p>On OANDA's AUDCAD real-tick backtest from January 2020 to September 2026 (per 0.01 lot, account equity marked at the worst M5
+price), the old MEDIUM default grew to +228 with one realised basket loss of -127 in May-July 2024, when its 35 % breaker
+closed a 10-leg basket; its deepest equity dip was 36.6 %. The LOW tier grew to <strong>+320</strong> over the same years, floated at most
+<strong>13.1 %</strong> and never realised a loss: the same 2024 basket stayed within its budget and closed in profit. Single-shot versions
+(no averaging, a hard 1/2/3 ATR stop) lost money at every stop width, because Rubberband's edge is the snap-back the
+averaging waits for. So v1.39 makes the survivable tier the default. MEDIUM, HIGH and HOT are still one click away, and on
+those tiers the 2024-type basket is a real risk, not a hypothetical one. <em>Backtest figures only.</em></p>
+<ul>
+<li><strong>Absolute minimum balance: $300</strong> (any profile). Below it the broker minimum lot (0.01) is too large a fraction of the account.</li>
+<li>Position size <strong>compounds automatically</strong> with the balance — a bigger account simply scales the lots.</li>
+<li><strong>CUSTOM</strong> profile: set your own fixed lot (<code>InpLot</code>) <strong>or</strong> your own balance-risk % (<code>InpCustomRiskPct</code>, where 1 % = 0.01 lot per $1,000).</li>
+<li><code>InpVirtualBalance = 0</code> (the default, and the value in all shipped presets) means the EA sizes on your <strong>real</strong> account balance. Setting a positive value makes the EA size as if the account held that amount — on a smaller real account this oversizes every position. Leave it at 0 unless you understand exactly why you need it.</li>
+</ul>
+<h2 id="3-confidence-lot-size-boosting-one-simple-switch-new-in-v137">3. Confidence lot-size boosting (one simple switch — NEW in v1.37)</h2>
+<p>Set <strong><code>InpConfidenceLots = true</code></strong> to turn on confidence-based lot boosting on <strong>any</strong> risk tier. It enlarges the
+lot only on the very-highest-confidence entries (calm-market extreme reversions, ~76 % revert in one leg) and
+leaves everything else flat. Real-tick backtest (OANDA AUDCAD.pro M15, 2022-26, LOW tier): <strong>OFF +78 % at 11.4 % DD →
+ON +92 % at 13.2 % DD</strong> — +17 % return for under 2 pp more drawdown, still inside the 20 % survival limit.
+- <code>InpConfidenceLots</code> — the switch (default <strong>false</strong> = drawdown-safest).
+- <code>InpConfidenceMult</code> — boost size (default 3.0; keep ≤ 3).
+- <code>InpConfidenceZThr</code> — how extreme a setup must be to count (default 2.0 fires regularly; 3.0 = only rare extremes).
+Preset: <code>presets/AegisMeridian_ConfidenceON.set</code>. The boost is RANGE-only by design — it never oversizes the
+trend/high-vol tail where deep-float baskets hide.</p>
+<h2 id="3b-optional-turbo-profiles-high-risk-high-return">3b. Optional +TURBO profiles (high-risk / high-return)</h2>
+<p>Alternatively pick a <strong>+TURBO</strong> profile in the Risk-Profile dropdown (LOW/MEDIUM/HIGH/HOT <strong>+TURBO</strong>) — same
+confidence boost, baked together with a hotter compounding tier. Backtest: <strong>MEDIUM+TURBO +89 %</strong> at ~15 % floating
+DD; <strong>HOT+TURBO +310 %</strong> at ~31 % floating DD. Use only with margin headroom. Presets: <code>*_TURBO.set</code>.</p>
+<h2 id="4-understand-the-drawdown">4. Understand the drawdown</h2>
+<p>This is a recovery-grid: it averages a small equal-lot basket against an over-extension and closes the basket when
+price reverts. Two drawdown numbers:
+- <strong>Realised</strong> (closed balance) is small (2–8 %) — baskets close in profit.
+- <strong>Floating</strong> is the real risk: how far an <em>open</em> basket goes underwater before reverting (10–24 % by tier, ~31 % HOT+TURBO).
+Choose your profile by the <strong>floating</strong> drawdown you can tolerate, and keep margin headroom for it.</p>
+<h2 id="5-safety-built-in">5. Safety built in</h2>
+<ul>
+<li>A tier-scaled account tail-guard flattens an open basket only in a genuine catastrophe (set far above normal float).</li>
+<li>Highly selective in high-volatility regimes (it widens grid spacing and demands a stronger stretch) — this is why the
+  floating drawdown stays contained while the return scales.</li>
+</ul>
+<h2 id="6-requirements">6. Requirements</h2>
+<ul>
+<li>Symbol <strong>AUDCAD</strong>, timeframe <strong>M15</strong>, one chart.</li>
+<li><strong>Hedging</strong> account, low spread, minimum <strong>$300</strong>.</li>
+<li>No DLLs, no external/web calls.</li>
+</ul>
+<h2 id="risk-disclosure">Risk disclosure</h2>
+<p>Grid / averaging strategies can hold an open basket significantly underwater before it reverts, and an extreme,
+non-reverting market move can cause large losses. Trade only risk capital, respect the minimum account, and keep margin
+headroom for the floating drawdown of your chosen profile. Backtest results do not guarantee future performance.</p>
+<h2 id="broker-differences-v137-note">Broker differences (v1.37 note)</h2>
+<p>Results differ across brokers for three reasons: (1) <strong>server timezone</strong> - v1.37 auto-detects the
+server-to-UTC offset on live/demo charts (<code>InpGmtAuto</code>), so the session window stays aligned;
+(2) <strong>swap</strong> - baskets can hold overnight and brokers charge different swap rates on AUDCAD;
+(3) <strong>spread/feed</strong> - entry timing shifts slightly with the tick stream. Backtest your own broker's
+real ticks before going live, and prefer brokers with low AUDCAD spread and moderate swaps.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06.</em></p>
+<h2 id="streak-sizing-v137-optional-and-broker-notes-v137">Streak sizing (v1.37, optional) and broker notes (v1.37)</h2>
+<p><code>InpStreakK</code> (default off) multiplies size while recent closed trades are net-positive - validated
+at K=2: +69% more net on the identical trade set, worst equity drawdown 18.3% (inside the 20%
+guideline). Load <code>presets/Meridian_SESS_streak2.set</code>.
+v1.37 auto-detects your broker's server-UTC offset live (<code>InpGmtAuto</code>) so the trading session
+stays aligned on any broker, and prints a risk warning when an aggressive profile is combined
+with a small balance.</p>
+<h2 id="is-it-waiting-or-is-it-broken-the-regime-monitor">Is it waiting, or is it broken? — the regime monitor</h2>
+<p>This product earns in a particular market state and goes quiet outside it. That is disclosed above,
+but a disclosure without a number is not usable: meeting a flat stretch, you cannot tell whether the
+machine is waiting for its conditions or whether its edge has changed. This section gives you the
+one measurement that separates those, taken from this product's own record.</p>
+<p><strong>The state to watch</strong> is the daily Average True Range of the traded instrument, expressed as a
+percentile of its own trailing 250 days — not a fixed number of dollars or pips, which goes stale as
+the instrument reprices. Most charting packages will plot ATR; the percentile is simply where today's
+ATR sits within the last year of its own values.</p>
+<p><strong>Measured on 53 months of real ticks (2022-01 to 2026-06).</strong> Good state: volatility percentile at or
+above 0.50, which is 57% of that record. In that state, every three-month window in this backtest
+record closed positive — its worst three-month stretch still finished at +$3,739.</p>
+<blockquote>
+<p><strong>Tripwire — while volatility is at or above 0.50, ANY losing three-month stretch is outside what
+this record contains.</strong></p>
+</blockquote>
+<p><strong>That tripwire is deliberately marked optimistic, and here is why.</strong> 100% of the months in this
+record are positive. A record where every month closed positive almost certainly does not span a regime this
+product struggles in — and independent testing of this strategy family on 2018–2021 data found it
+earned essentially nothing over that period. <strong>Treat the tripwire as a floor, not as a measured worst
+case</strong>, and treat a first losing quarter as new information rather than as a violation of an
+established bound.</p>
+<p><strong>What this cannot tell you.</strong> While the market is <em>outside</em> the good state, a temporary quiet
+period and a permanent change in behaviour look identical. The tripwire is the earliest point at
+which they separate, not an early warning. Nothing here is a guarantee; it is the historical extreme
+of a backtested record, and being beyond it is evidence rather than proof.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

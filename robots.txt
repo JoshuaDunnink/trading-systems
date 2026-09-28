@@ -1,0 +1,3 @@
+User-agent: *
+Allow: /
+Sitemap: https://joshuadunnink.github.io/trading-systems/sitemap.xml

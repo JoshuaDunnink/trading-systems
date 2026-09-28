@@ -1,0 +1,76 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>KingFisher EA - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Kingfisher trades the break of the nearest unbroken price level on XAUUSD. Five hunters run side by side on one chart: four watch the most recent unbroken swing high and swing low on the four-hour bars, one watches the one-hour bars. Each rests a buy stop...">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/kingfisher/"><meta property="og:type" content="website">
+<meta property="og:title" content="KingFisher EA - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Kingfisher trades the break of the nearest unbroken price level on XAUUSD. Five hunters run side by side on one chart: four watch the most recent unbroken swing high and swing low on the four-hour bars, one watches the one-hour bars. Each rests a buy stop...">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/kingfisher/">
+<link rel="stylesheet" href="../../assets/style.css"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<h1>KingFisher EA</h1><p class="lead">XAUUSD · M15 · MetaTrader 5 Expert Advisor</p><p><a class="btn" href="https://www.mql5.com/en/users/joshuadunnink">View on mql5</a><a class="btn ghost" href="manual.html">Read the manual</a></p><p class="note">Live signal 2392436 (real account): growth 0.50%, 6 trades, 1 week(s) live, as of 2026-09-28. <a href="../../signal.html">Details</a></p><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>Kingfisher trades the break of the nearest unbroken price level on XAUUSD. Five hunters run side by side on one
+chart: four watch the most recent unbroken swing high and swing low on the four-hour bars, one watches the
+one-hour bars. Each rests a buy stop just inside the high and a sell stop just inside the low, so it is filled at
+the moment the level gives way.</p>
+<p>How a trade is made:</p>
+<p>Level. A swing is a bar whose high or low is more extreme than the bars on both sides of it, and which price has
+not traded through since. The nearest such swing above and below price is the level.</p>
+<p>Entry. A stop order rests a small percentage of price inside the level. Orders that are not triggered expire after
+each hunter's patience (15 to 60 hours) and are renewed while the level is still current.</p>
+<p>Risk per trade. Every position opens with a fixed stop loss and take profit in account currency (2.00 and 15.00 per
+0.01 lot by default). Position size is computed from the chosen risk level and shared by the hunters that rest on
+the same level, so one break is one bet, never four.</p>
+<p>When it does not trade. Kingfisher places orders only while the stop loss is at most 20 % of the hourly range
+(ATR). In quiet markets it stands aside; in the four-year test it placed 18 trades across two quiet years. Orders
+are removed before the weekend.</p>
+<p>Exit. On the first tick after a fill the EA reads how fast price arrived. A fast fill rides to the take profit. A
+slow fill is managed by the Grip: once 1.00 ahead per 0.01 lot, the trade is closed if it gives back half of its
+best profit.</p>
+<p>What the EA does not do: no grid, no martingale, no averaging down, no position without a stop loss, no news
+trading logic, no files, no DLLs, no external resources.</p>
+<p>Settings. One short section, "Start here", is the whole setup: Account type (Personal, Prop firm 2-step, Prop firm
+1-step), Strategy settings (Recommended, Classic, Custom), Risk level (Low, Medium, High, Hot, Custom), an optional
+balance to size on, and a maximum spread in dollars. With Strategy settings on Recommended the tested configuration is
+used whatever the lower sections say, so a stray edit cannot change it; Custom opens every value that moves a trade -
+each hunter's level, offsets, stop, target and patience, the gates, the exits - for your own tests. The compiled
+defaults are the tested configuration; the EA needs no .set file. On a chart that is not gold it loads, says why, and
+stays flat. The Journal's second line states the lot size your risk level buys at your balance.</p>
+<p>Results below are Strategy Tester runs on real broker ticks (100 % history quality), 10,000 starting balance,
+compiled defaults, and are backtests, not live trading:</p>
+<ul>
+<li>Pepperstone, 2025-01 to 2026-09: growth ×20.6, worst drawdown 5.3 %, profit factor 3.57</li>
+<li>Vantage, 2025-06 to 2026-09: growth ×15.8, worst drawdown 5.9 %, profit factor 3.06</li>
+<li>Fusion, 2024-01 to 2026-09: growth ×11.2, worst drawdown 12.4 % (on this wide-fill feed the Classic setting did
+  better: ×17.3 at 10.2 %)</li>
+<li>BlackBull, 2025-04 to 2026-09: growth x18.8, worst drawdown 8.8 % (version 1.11)</li>
+</ul>
+<p>(Medium risk level, the 1.10 default settings; version 1.10 places exactly the same deals as these runs, proved deal for
+deal.) In 2023 and 2024 gold was quiet and the EA placed few trades: flat years, not losing ones.</p>
+<p>Results differ by broker. The stop is a fixed 2.00 per 0.01 lot, so the spread takes a fixed share of it: on the four
+raw-spread brokers the losers closed 2.07 to 2.34 away from the entry at the median, while on a broker whose gold
+spread was about 0.24, 8.5 % of the same entries were stopped out within one second of the fill (0.1 to 3.0 % on the
+raw-spread brokers) and they earned about half as much per trade. Use a raw-spread (ECN) account. The system earned its result in one kind
+of market — gold moving in large daily bursts — and stands aside in quiet markets rather than trading them. Past
+performance does not indicate future results. Test on a demo account with your broker before trading real funds.</p>
+<p>Prop-firm accounts. Choose the Account type and nothing else. Prop firm 2-step fixes the size at 0.5 % of balance per
+level (the Low level) for challenges with a 5 % daily and 10 % maximum loss; Prop firm 1-step fixes it at 0.25 % for
+3 %/6 % challenges and for any challenge on a standard-spread account. In a simulation that replays the backtest's own
+days (10,000 paths, challenge rules applied at every trade close), Prop firm 2-step on a raw-spread feed passed a
+10 % + 5 % two-step in 98.5 % of attempts (BlackBull, 2023–2026) and 100 % (Vantage, 2025–2026); on a standard-spread
+feed it passed 73 % and Prop firm 1-step 96 %. This is a statement about tested history, not a prediction. The EA does
+not read the firm's news calendar, and trades often last seconds to minutes: check the firm's news, weekend and
+minimum-duration rules. Details and the full table: user manual, chapter 3a.</p>
+<p>Prop-firm rules. A second input group takes your firm's own numbers: daily loss limit (a share of the account size
+or of the day-start value, counted from balance, equity or the higher of the two), maximum loss limit (fixed or
+trailing), profit target, best-day cap and a Friday close hour. When a limit is about to be reached the EA closes its
+own trades, deletes its orders and pauses until the firm's next day (daily rules) or stops for good (maximum loss,
+target); the Journal names the rule and the equity. The prop account types switch the daily and maximum loss on for you (5 and 10 percent, or 3 and 6); on Personal every rule is off. It is a rule guard, not a guarantee: a price gap can
+carry a loss past a limit, which is why the EA acts 0.5 percent early by default. User manual, chapter 3b.</p>
+<p>Reproducible. Every figure above comes with its exact Strategy Tester settings (user manual, chapter 14): expert,
+symbol, M15, dates, real ticks, 10,000 deposit, compiled defaults. Example: BlackBull, 2026-07-01 to 2026-09-19, Strategy
+settings Classic — 284 trades, net 6,576.13, profit factor 1.89, equity drawdown 15.6 %.</p>
+<p>Requirements: MetaTrader 5, XAUUSD, a raw-spread (ECN) account, leverage 1:100 or higher recommended, VPS or an
+always-on PC.</p><h2>Evidence</h2><figure><img src="img/00_structure.png" alt="structure (backtest chart)" loading="lazy"><figcaption>structure - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_five_feeds.png" alt="five feeds (backtest chart)" loading="lazy"><figcaption>five feeds - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/02_sizing.png" alt="sizing (backtest chart)" loading="lazy"><figcaption>sizing - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/03_gate.png" alt="gate (backtest chart)" loading="lazy"><figcaption>gate - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/04_quiet_years.png" alt="quiet years (backtest chart)" loading="lazy"><figcaption>quiet years - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/05_per_year.png" alt="per year (backtest chart)" loading="lazy"><figcaption>per year - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/06_costs.png" alt="costs (backtest chart)" loading="lazy"><figcaption>costs - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/07_latency.png" alt="latency (backtest chart)" loading="lazy"><figcaption>latency - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/08_hunter_weight.png" alt="hunter weight (backtest chart)" loading="lazy"><figcaption>hunter weight - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/09_exit_frontier.png" alt="exit frontier (backtest chart)" loading="lazy"><figcaption>exit frontier - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/10_hunter_exit.png" alt="hunter exit (backtest chart)" loading="lazy"><figcaption>hunter exit - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/11_ga_holdout.png" alt="ga holdout (backtest chart)" loading="lazy"><figcaption>ga holdout - Strategy Tester, real ticks, backtest</figcaption></figure>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
