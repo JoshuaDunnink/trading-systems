@@ -1,8 +1,8 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Kingfisher research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Research for Kingfisher">
+<title>Kingfisher research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="How Kingfisher was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/kingfisher/research.html"><meta property="og:type" content="website">
-<meta property="og:title" content="Kingfisher research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Research for Kingfisher">
+<meta property="og:title" content="Kingfisher research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="How Kingfisher was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/kingfisher/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/kingfisher_hero.jpg"><meta name="twitter:card" content="summary_large_image">
 <link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
 <body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
@@ -85,7 +85,7 @@
 <hr />
 <h2 id="2-the-base-mechanism-a-resting-order-inside-an-unbroken-level">2. The base mechanism: a resting order inside an unbroken level</h2>
 <p>Kingfisher is a level-break system. Before a burst, gold sits under a recent high or above a recent low that it has not managed to trade through, and a cluster of stop orders waits just beyond that level. Kingfisher rests its own stop order a hair <em>inside</em> the level, so it is already in the trade when the cluster goes off.</p>
-<p><img alt="Where the orders rest" src="evidence/00_structure.png" /></p>
+<p><img alt="Where the orders rest" src="img/00_structure.png" /></p>
 <p><em>Three weeks of 15-minute bars with the EA's own resting orders drawn: solid segments filled, dashed ones expired unfilled. Levels persist for days; most orders never fill; the ones that do fill at the moment the level gives way.</em></p>
 <p>Four hunters watch the four-hour level with slightly different distances and patience; a fifth watches the one-hour level. Every position carries a fixed stop loss and take profit in account currency per 0.01 lot from the second it opens, so the risk of a fill is known before it happens.</p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone, 2025-01 → 2026-09, fixed 0.01 lot, three random seeds against the level.</em></p>
@@ -117,12 +117,12 @@
 <p>A trending year pays <em>any</em> resting stop; the flat year separates the level from the drift. The level doubles the money per trade and flips the flat year's sign. That is the edge, and it is the only entry-side edge this note claims.</p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, 2022-11 → 2026-09 (per-feed windows as in section 0).</em></p>
 <p><strong>The win rate is a geometry, not a skill.</strong> With a 2.00 stop and a 15.00 target the fair-game win rate under zero drift is 2/17, about 12 %. The bracket-only machine wins 22–26 % of its fills on four feeds. The excess over 12 % is the level; the rest is the target being 7.5 times the stop. Readers who expect a 60 % win rate from a breakout system are expecting the wrong geometry (section 4 shows where a 71 % win rate comes from, and what it costs).</p>
-<p><img alt="Five feeds at a fixed lot" src="evidence/01_five_feeds.png" /></p>
+<p><img alt="Five feeds at a fixed lot" src="img/01_five_feeds.png" /></p>
 <hr />
 <h2 id="3-preventing-losses-the-quiet-market-gate">3. Preventing losses: the quiet-market gate</h2>
 <p>The raw machine bleeds in quiet markets. A fixed-dollar stop is a fixed <em>fraction of the hourly range</em> only while the range is large; when gold's hourly range shrinks, the same 2.00 stop sits inside the noise and is taken by it. Over eight years on a demo feed (OANDA, 2018 → 2026) the raw machine loses money in every year but 2019 and 2026.</p>
 <p>The fix is not a smaller stop and not a percentage stop — both were measured and both lose more (a stop scaled to price is 0.67 in 2018, and a 0.30 round-trip cost eats it). The fix is to <strong>refuse the trade when the stop is too large a share of the hourly range</strong>. Kingfisher calls this the quiet-market gate. It is self-calibrating — it compares the stop with the market's own current range, so it needs no calendar and no re-tuning.</p>
-<p><img alt="The gate" src="evidence/03_gate.png" /></p>
+<p><img alt="The gate" src="img/03_gate.png" /></p>
 <p><em>With and without the gate on three feeds, bracket exit, fixed 0.01 lot.</em></p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone, 2025-01 → 2026-09, fixed 0.01 lot.</em></p>
 <table>
@@ -153,9 +153,9 @@
 </tbody>
 </table>
 <p>Minus five percent of the net for minus seventy-two percent of the drawdown, with 2026 untouched. On the eight-year demo feed the gated machine stayed positive where the raw bracket did not — and it did so by trading about one percent of the time before 2025.</p>
-<p><img alt="Quiet years" src="evidence/04_quiet_years.png" /></p>
+<p><img alt="Quiet years" src="img/04_quiet_years.png" /></p>
 <p><em>Four years on BlackBull: 2023 and 2024 flat by refusal (1 and 17 trades), then the move.</em></p>
-<p><img alt="Per year" src="evidence/05_per_year.png" /></p>
+<p><img alt="Per year" src="img/05_per_year.png" /></p>
 <p><strong>The one failure the gate has, and its fix.</strong> In March 2020 the hourly range was inflated by a spread blow-out rather than by movement; the gate admitted 52 fills that lost 96 % of the time. High range from a wide spread is not a burst. A second admission, spread against the hour's range, closes that hole on the demo feed: the March-2020 dip shrinks to a fraction of its size, at the cost of a few trades. On the four live feeds it is noise of both signs around zero, so it ships as an input at zero — a documented defence for a broker whose spread blows out, not a default.</p>
 <p><strong>What did not help.</strong> A stricter "push" gate that refused fills whose approach had no momentum over-refused in the EA (an order cancelled on a quiet approach was not back in place when the push came) and was rebuilt into the exit instead (section 4). A minute-scale activity filter on the busy hunter looked like a clean +1–2 % offline and lost a fifth of the fills once the EA had to cancel and re-place orders to enforce it; it ships as an input at zero.</p>
 <hr />
@@ -206,14 +206,14 @@
 <p><strong>Why nothing cleverer is in the box.</strong> A hazard model over 42 features of the price path after the fill (out of sample, three feeds) ranked outcomes no better than the position's own current P&amp;L already does — and holding on current P&amp;L is what the bracket does for free. The exit line was closed on that result.</p>
 <h3 id="41-exit-and-risk-fraction-compared-at-the-same-drawdown">4.1 Exit and risk fraction, compared at the same drawdown</h3>
 <p>At a fixed lot the three exits are close. With sizing they are not, because compounding rewards the exit with the largest result <em>per unit of drawdown</em>, and that exit can then be run at a larger fraction.</p>
-<p><img alt="Exit × fraction frontier" src="evidence/09_exit_frontier.png" /></p>
+<p><img alt="Exit × fraction frontier" src="img/09_exit_frontier.png" /></p>
 <p><em>Each point is one full run; the label is the risk fraction per level. Read horizontally: at a given worst drawdown, which exit has grown more?</em></p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Vantage 2025-06 → 2026-09 and Pepperstone 2025-01 → 2026-09 (tight fills) vs Fusion 2024-01 → 2026-09 (wide fills).</em></p>
 <p>Where the stop fills are tight (Vantage, Pepperstone in these tests) the Grip at the High level is the fastest <strong>and</strong> smoothest path — Vantage ×27 in 15 months at a 5.7 % worst drawdown. Where the fills are wide (Fusion) the Grip's small wins are eaten by the fill cost and Smart at High is the fast path (×53 at 15.3 %). Smoothness compounds only if the broker does not tax the small wins.</p>
 <h3 id="42-one-exit-per-hunter-version-105">4.2 One exit per hunter (version 1.05)</h3>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone 2025-01 → 2026-09, Vantage 2025-06 → 2026-09, Fusion 2024-01 → 2026-09.</em></p>
 <p>The one-hour hunter's fills arrive with less push than the four-hour fills and lose at the stop 57–66 % of the time under Smart. Putting only that hunter on the Grip, with the four-hour hunters left on Smart, was pre-registered and run on three feeds:</p>
-<p><img alt="Per-hunter exit" src="evidence/10_hunter_exit.png" /></p>
+
 <table>
 <thead>
 <tr>
@@ -247,19 +247,19 @@
 <hr />
 <h2 id="5-sizing-one-bet-per-level-and-the-busy-hunters-budget">5. Sizing: one bet per level, and the busy hunter's budget</h2>
 <p><strong>Per level, not per order.</strong> When the four four-hour hunters fill on the same break they are one bet, not four. Sizing each order at 2 % of balance — the obvious setting — makes that one bet an 8 % bet. Even 2 % per <em>level</em> carries a 40–44 % worst drawdown for its climb (Fusion 2024-01 → 2026-09: ×100 at 40 %; Vantage ×114 at 25 %), and per order is worse still; on a netting account the tester refused most of the placements on margin before the drawdown could even be measured. Kingfisher sizes the <em>level</em>: the fraction is shared by the hunters that rest on it, and a five-lot cap brakes the tail.</p>
-<p><img alt="Medium on three feeds" src="evidence/02_sizing.png" /></p>
+<p><img alt="Medium on three feeds" src="img/02_sizing.png" /></p>
 <p><em>Medium (1 % per level) on three live feeds, log scale, with the drawdown track. The dashed line is the 20 % limit no run may cross.</em></p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, four live feeds (Pepperstone, Vantage, Fusion, BlackBull), Medium sizing (0.5 % per level), 2022-11 → 2026-09 (per-feed windows as in section 0).</em></p>
 <p><strong>The one-hour hunter's weight.</strong> Eighty percent of level events are the one-hour hunter alone, trading at a profit factor far below the four-hour events' (which win 39–47 % at profit factors of 2.3–5.0). Yet per-level sizing handed the one-hour hunter the full budget, because it is alone on its timeframe. Giving it a quarter of the budget was the single largest improvement in the programme:</p>
-<p><img alt="Hunter weight" src="evidence/08_hunter_weight.png" /></p>
+<p><img alt="Hunter weight" src="img/08_hunter_weight.png" /></p>
 <p><em>Four feeds, 0.5 % per level. The quarter weight keeps the machine and removes two thirds of the drawdown; growth per unit of drawdown rises on every feed. Raising the fraction back to 1 % then buys the growth back at the same or lower drawdown — which is the shipped Medium.</em></p>
 <p><strong>Small accounts.</strong> At the minimum lot a 100-unit account is a 2 %-per-fill account whatever the risk level says. Replayed on four brokers it never stopped out at 1:200 or higher and reached 1,000 in 98–100 % of resampled histories, but it dipped to 57–92 first and in a fair-game year one history in three fell below 50. At 1:30 a 100-unit account cannot open one 0.01 lot. The manual carries these numbers verbatim.</p>
 <hr />
 <h2 id="6-why-results-differ-by-broker">6. Why results differ by broker</h2>
 <p>Same entries, same hit rate: the brokers differ in how far past the 2.00 stop they fill the losers, and in how much that costs the small wins.</p>
-<p><img alt="Fill cost" src="evidence/06_costs.png" /></p>
+<p><img alt="Fill cost" src="img/06_costs.png" /></p>
 <p><em>Median and 90th-percentile distance from entry to the stop fill on the 2026 losers, four feeds. The widest feed earned about a quarter less per trade.</em></p>
-<p><img alt="Latency" src="evidence/07_latency.png" /></p>
+<p><img alt="Latency" src="img/07_latency.png" /></p>
 <p><em>Execution delay 0 / 100 / 500 ms: server-side stops are indifferent; the Grip (a market close) loses a little at 500 ms.</em></p>
 <p>The rule that follows: run four weeks on a demo account, read the median fill distance past the stop from the journal, and choose the exit accordingly (manual, chapters 4 and 7).</p>
 <hr />
@@ -274,7 +274,7 @@
 <li><strong>A per-fill machine-learning filter for the one-hour hunter</strong> and an imitation of a third-party model from our features: cross-feed nulls.</li>
 <li><strong>A per-hunter, per-regime parameter search</strong> (three criteria, forward-mode optimiser, then every selected genome on real ticks on an untouched 2026-Q3 window): the shipped constants beat every genome on 7 of 8 hunter-by-regime rows and on all 8 on drawdown. The genomes that won their own window did so by sitting on a range boundary (a far target, a loose gate) and lost forward. No per-regime parameter set exists in the product because none survived.</li>
 </ul>
-<p><img alt="GA holdout" src="evidence/11_ga_holdout.png" /></p>
+
 <p><em>Every forward-selected genome against the shipped defaults, one hunter at a time, real ticks, untouched holdout. Labels are the worst drawdown of each bar.</em></p>
 <hr />
 <h2 id="8-limits">8. Limits</h2>
