@@ -1,294 +1,100 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Rubberband - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="An adaptive mean-reversion grid for AUDCAD M15. It fades statistically over-extended price (a linear-regression channel z-score), averages a small equal-lot basket against the move, and closes the basket as price reverts to its mean. A live market-regime...">
+<title>Rubberband - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Rubberband trades AUDCAD on the M15 chart with a regime-aware mean-reversion grid. It reads how far price has stretched from its own recent average and fades the stretch with a small averaging basket, then closes the whole basket once price comes back.">
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/rubberband/"><meta property="og:type" content="website">
-<meta property="og:title" content="Rubberband - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="An adaptive mean-reversion grid for AUDCAD M15. It fades statistically over-extended price (a linear-regression channel z-score), averages a small equal-lot basket against the move, and closes the basket as price reverts to its mean. A live market-regime...">
+<meta property="og:title" content="Rubberband - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Rubberband trades AUDCAD on the M15 chart with a regime-aware mean-reversion grid. It reads how far price has stretched from its own recent average and fades the stretch with a small averaging basket, then closes the whole basket once price comes back.">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/rubberband/">
 <link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
 <body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
-<h1>Rubberband</h1><p class="lead">AUDCAD · M15 · MetaTrader 5 Expert Advisor · listed on mql5 as Aegis Meridian</p><p><a class="btn" href="https://www.mql5.com/en/users/joshuadunnink">View on mql5</a><a class="btn ghost" href="manual.html">Read the manual</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 2.95 · worst equity drawdown 2.37% · 103 trades · return +3.8% on 10,000</p><p class="stamp">Backtest, real ticks, Fusion Markets, 2026-03-01 to 2026-09-01, version 1.40. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/rubberband_headline.png" alt="Rubberband balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><blockquote>
-<p><strong>All figures below are BACKTEST results on real-tick history. Past performance is not indicative of future results.</strong></p>
-</blockquote>
-<h2 id="short-description-the-hook">Short description (the hook)</h2>
-<p><strong>An adaptive mean-reversion grid for AUDCAD M15.</strong> It fades statistically over-extended price (a linear-regression
-channel z-score), averages a small equal-lot basket against the move, and closes the basket as price reverts to its
-mean. A live market-regime detector (trend-efficiency + volatility) re-tunes selectivity, grid spacing and the
-profit target for <strong>range, high-volatility and trending</strong> conditions — trading less and spacing wider exactly when a
-trend would otherwise hurt a grid. One <strong>risk knob</strong> scales everything from a conservative grind to maximum
-compounding, each with a matched survival guard.</p>
-<hr />
-<h2 id="strategy-overview-mechanism-no-black-box">Strategy overview (mechanism — no black box)</h2>
+<h1>Rubberband</h1><p class="lead">AUDCAD · M15 · MetaTrader 5 Expert Advisor · listed on mql5 as Aegis Meridian</p><p><a class="btn" href="https://www.mql5.com/en/users/joshuadunnink">View on mql5</a><a class="btn ghost" href="manual.html">Read the manual</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 2.95 · worst equity drawdown 2.37% · 103 trades · return +3.8% on 10,000</p><p class="stamp">Backtest, real ticks, Fusion Markets, 2026-03-01 to 2026-09-01, version 1.40. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/rubberband_headline.png" alt="Rubberband balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>Rubberband trades AUDCAD on the M15 chart with a regime-aware mean-reversion grid. It reads how far price has
+stretched from its own recent average and fades the stretch with a small averaging basket, then closes the whole
+basket once price comes back.</p>
+<p>How a trade is made:</p>
+<p>Stretch. A linear regression channel is fit over the last 20 M15 bars. The distance from price to the channel, in
+standard deviations (the regression z-score), measures how far price has pulled away from its own trend line.</p>
+<p>Entry. A basket seeds only when the z-score is strongly extended and RSI(14) confirms the same extreme (oversold
+for a buy, overbought for a sell); a Kaufman efficiency-ratio filter skips the seed when the market is trending
+too cleanly for a fade to make sense.</p>
+<p>Regime. A live four-state detector (range, high volatility, trend, quiet) reads the daily trend efficiency and
+the daily ATR percentile and re-tunes the entry threshold, the grid spacing and the basket profit target to the
+state it finds - wider spacing and a stronger extension are demanded in a trending or high-volatility market,
+tighter and more frequent entries in a range.</p>
+<p>Basket. If price keeps moving against the first leg, the EA adds an equal-lot leg every fixed multiple of ATR, up
+to 15 legs. The basket closes as soon as its floating profit reaches the regime's target; an optional per-position
+time or ATR stop can close a single leg on its own, independent of the basket.</p>
+<p>Safety. A tier-scaled account guard flattens an open basket only if its floating loss reaches a level set well
+above the normal float for that risk tier. On a terminal restart with a basket still open, the grid rebuilds its
+own add-spacing from the account's live positions rather than from any saved state, and a basket's exit is not
+marked complete until every one of its legs is confirmed closed by the broker.</p>
+<p>Friday and weekend control (new in 1.41). <code>InpFriNoNewHour</code> (server hour, 0-23, default 0 = off) stops the EA
+from seeding a NEW basket from that hour on a Friday; a basket that is already open keeps adding and exiting
+exactly as before - only the seed is gated. It is independent of the existing <code>InpPropFridayCloseHour</code> (0 = off),
+which flattens every open basket at a chosen Friday hour and blocks new trading until Monday. Use it if you would
+rather not carry an open basket over the weekend gap; it trades some return for fewer weekend holds. This build
+ships with the control off.</p>
+<p>What the EA does not do: no martingale doubling, no news-calendar reading, no files, no DLLs, no external
+resources, no trading on any symbol other than the one you attach it to.</p>
+<h2 id="risk-profile">Risk profile</h2>
+<p>One input, <code>InpRiskProfile</code>, picks the position-sizing tier. <code>RP_LOW</code> is the compiled default since version 1.39
+and needs no <code>.set</code> file; <code>InpSizePolicy</code> (default Automatic) decides whether the EA scales the tier to your
+balance or trades the exact lot you set yourself.</p>
+<p>Backtest, MetaTrader 5 Strategy Tester, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06 (about 4.5 years):</p>
 <ul>
-<li><strong>Entry:</strong> fade only <em>strong</em> extensions — when price is far from its regression-channel mean (high |z|) and momentum
-  is stretched, in the London/New-York window. Strong selectivity is the core edge (it trades ~half as often as a naïve grid).</li>
-<li><strong>Recovery:</strong> equal-lot basket, adds a leg every <em>N×ATR</em> of adverse move (no martingale — every leg is the same size).</li>
-<li><strong>Exit:</strong> the whole basket closes once it floats back to a small net profit (a fraction of ATR × basket volume).</li>
-<li><strong>Regime adaptation (live, self-calibrating):</strong> a daily trend-efficiency + volatility-percentile classifier labels the
-  market RANGE / HIGH-VOL / TREND and applies the setting bank optimised for each — <strong>in a trend it widens grid spacing
-  and stops gating on efficiency</strong>, so the basket cannot over-stack; in range it tightens for frequent reversions.</li>
-<li><strong>Survival:</strong> a tier-scaled account guard sits <em>above</em> each risk tier's normal floating range — it does nothing in
-  normal operation and only acts as a catastrophe backstop.</li>
+<li>LOW (about 1.5% balance risk, 500 recommended account): net +41%, profit factor 2.4, floating drawdown about
+  10%.</li>
+<li>MEDIUM (about 3% balance risk, 1,000 recommended account): net +71%, profit factor 2.34, floating drawdown
+  about 18%.</li>
 </ul>
-<hr />
-<h2 id="backtest-performance-risk-tiers">Backtest performance — risk tiers</h2>
-<p><strong>Symbol</strong> AUDCAD · <strong>Timeframe</strong> M15 · <strong>Model</strong> every-tick (real ticks) · <strong>Period</strong> 2022-01 → 2026-06 (~4.5 years) ·
-<strong>Spread/commission</strong> broker-real. One strategy; the tier only scales position size + its matched survival guard.</p>
-<table>
-<thead>
-<tr>
-<th>Risk tier</th>
-<th>Balance-risk %</th>
-<th>Recommended account</th>
-<th>Net (period)</th>
-<th>≈ Annual</th>
-<th>Profit Factor</th>
-<th>Expected Payoff</th>
-<th>Recovery Factor</th>
-<th>Sharpe</th>
-<th>Trades</th>
-<th>Win %</th>
-<th>Realised DD</th>
-<th>Floating DD</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>LOW</strong> (conservative, <strong>default</strong>)</td>
-<td>~1.5 %</td>
-<td>$500</td>
-<td><strong>+41 %</strong></td>
-<td>~7.9 %/yr</td>
-<td>2.40</td>
-<td>0.18</td>
-<td>3.44</td>
-<td>3.89</td>
-<td>1,113</td>
-<td>81.1 %</td>
-<td><strong>2.4 %</strong></td>
-<td><strong>9.7 %</strong></td>
-</tr>
-<tr>
-<td><strong>MEDIUM</strong> (balanced)</td>
-<td>~3.0 %</td>
-<td>$1,000</td>
-<td><strong>+71 %</strong></td>
-<td>~12.7 %/yr</td>
-<td>2.34</td>
-<td>0.64</td>
-<td>2.99</td>
-<td>3.55</td>
-<td>1,113</td>
-<td>81.1 %</td>
-<td><strong>4.3 %</strong></td>
-<td><strong>17.8 %</strong></td>
-</tr>
-<tr>
-<td><strong>HIGH</strong> (aggressive)</td>
-<td>~4.5 %</td>
-<td>$2,000</td>
-<td><strong>+131 %</strong></td>
-<td>~20.3 %/yr</td>
-<td>2.33</td>
-<td>2.35</td>
-<td>3.39</td>
-<td>3.55</td>
-<td>1,113</td>
-<td>81.2 %</td>
-<td><strong>5.8 %</strong></td>
-<td><strong>24.4 %</strong></td>
-</tr>
-<tr>
-<td><strong>HOT</strong> (maximum)</td>
-<td>~6.0 %</td>
-<td>$3,000</td>
-<td><strong>+232 %</strong></td>
-<td>~30.4 %/yr</td>
-<td>2.31</td>
-<td>6.27</td>
-<td>3.25</td>
-<td>3.43</td>
-<td>1,113</td>
-<td>81.2 %</td>
-<td><strong>8.0 %</strong></td>
-<td><strong>21.7 %</strong></td>
-</tr>
-</tbody>
-</table>
-<p><em>Backtest, MetaTrader 5 Strategy Tester, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06.</em></p>
-<p><em>Every tier was profitable in </em><em>every calendar year</em><em> of the test (2022, 2023, 2024, 2025, 2026-YTD), including the 2024
-AUDCAD carry-shock and the 2026 trend.</em> ~250 trades/year, 81 % win rate. Equity curve is a near-linear grind
-(R² 0.98–0.997). The regime-aware engine is highly selective in high-volatility conditions — fewer, higher-quality
-baskets — which is why the floating drawdown stays low (Sharpe ~3.4–3.9) while the return scales.</p>
-<p><strong>Minimum account: $300</strong> (any tier — below this the broker minimum lot of 0.01 floats &gt;15 % of a tiny account).
-The figures above use each tier's <strong>recommended</strong> account, where its sizing runs as designed. The risk tier is a
-free choice at any account ≥ minimum; position size compounds automatically with the balance.</p>
-<h3 id="turbo-profiles-optional-high-risk-high-return-conviction-oversizing">+TURBO profiles (optional, high-risk / high-return) — conviction oversizing</h3>
-<p>Each tier also has a <strong>+TURBO</strong> variant in the Risk-Profile dropdown — the same confidence boost baked together with
-a hotter compounding tier. It keeps the tier's sizing but <strong>oversizes only the very-highest-confidence entries</strong>
-(a calm-market, extreme-stretch reversion that historically reverts in one leg ~76 % of the time). Same period:</p>
-<p><em>Backtest, MetaTrader 5 Strategy Tester, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06.</em></p>
-<table>
-<thead>
-<tr>
-<th>+TURBO profile</th>
-<th>Recommended account</th>
-<th>Net (period)</th>
-<th>≈ Annual</th>
-<th>Profit Factor</th>
-<th>Expected Payoff</th>
-<th>Recovery Factor</th>
-<th>Sharpe</th>
-<th>Win %</th>
-<th>Realised DD</th>
-<th>Floating DD</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><strong>MEDIUM + TURBO</strong></td>
-<td>$1,000</td>
-<td><strong>+89 %</strong></td>
-<td>~15.4 %/yr</td>
-<td>2.40</td>
-<td>0.79</td>
-<td>3.43</td>
-<td>3.39</td>
-<td>81.5 %</td>
-<td><strong>4.1 %</strong></td>
-<td><strong>15.0 %</strong></td>
-</tr>
-<tr>
-<td><strong>HOT + TURBO</strong></td>
-<td>$3,000</td>
-<td><strong>+310 %</strong></td>
-<td>~34.5 %/yr</td>
-<td>2.34</td>
-<td>8.27</td>
-<td>2.50</td>
-<td>3.16</td>
-<td>81.5 %</td>
-<td><strong>6.2 %</strong></td>
-<td><strong>30.8 %</strong></td>
-</tr>
-</tbody>
-</table>
-<p><em>(LOW+TURBO and HIGH+TURBO also exist in the dropdown.)</em> Note <strong>MEDIUM+TURBO returns more than plain MEDIUM
-(+89 % vs +71 %) at a <em>lower</em> floating drawdown (15.0 % vs 17.8 %)</strong> — it scales up only the safest trades. The
-oversize is <strong>baked into the +TURBO profiles</strong> (×3, capped — higher is unstable); plain tiers leave it off, and only
-<strong>CUSTOM</strong> lets you set it manually. High-risk/high-return mode — larger floating drawdown; use with margin headroom.</p>
-<p><em>Backtest, MetaTrader 5 Strategy Tester, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06.</em></p>
-<h3 id="how-to-read-the-two-drawdowns-important">How to read the two drawdowns (important)</h3>
+<p>HIGH and HOT tiers are available in the same dropdown for a larger account and a larger floating drawdown than
+shown here; a CUSTOM tier lets you set your own fixed lot or your own balance-risk percentage.</p>
+<h2 id="results">Results</h2>
+<p>Results below are Strategy Tester, real-tick backtest runs (100% history quality), AUDCAD M15, compiled RP_LOW
+defaults, and are not live trading:</p>
 <ul>
-<li><strong>Realised drawdown</strong> (closed-trade balance dip) is tiny (2–8 %) because baskets revert and close in profit.</li>
-<li><strong>Floating drawdown</strong> is the real risk dial — the deepest the <em>open</em> basket goes underwater before reverting
-  (~10 % LOW → ~22–24 % HIGH/HOT, ~31 % HOT+TURBO). <strong>Choose your tier by the floating DD you can stomach</strong>, and keep
-  margin headroom for it. Higher tiers compound faster but float deeper; this is the honest trade-off, not hidden.</li>
+<li>Backtest, real ticks, Fusion AUDCAD, 2026.03.01 to 2026.09.01, 10,000 starting balance: net 382.75 (+3.8%),
+  profit factor 2.95, 103 trades, equity drawdown 2.37%, leverage 1:500.</li>
+<li>Backtest, real ticks, Pepperstone AUDCAD, 2026.03.01 to 2026.09.01, 10,000 starting balance: net 472.63
+  (+4.7%), profit factor 1.56, 156 trades, equity drawdown 8.35%, leverage 1:400.</li>
+<li>Backtest, real ticks, Vantage AUDCAD, 2026.03.01 to 2026.09.01, 10,000 starting balance: net 414.08 (+4.1%),
+  profit factor 1.69, 119 trades, equity drawdown 8.76%, leverage 1:500.</li>
+<li>Backtest, real ticks, OANDA AUDCAD (demo account, shown only as the spread-survival check), 2026.03.01 to
+  2026.09.01, 10,000 starting balance: net 638.74 (+6.4%), profit factor 2.11, 146 trades, equity drawdown
+  10.36%, leverage 1:100.</li>
 </ul>
-<hr />
-<h2 id="detailed-tester-statistics-backtest-oanda-audcadpro-real-ticks-2022-01-to-2026-06-medium-tier-the-default-up-to-v138">Detailed tester statistics — backtest, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06 (MEDIUM tier - the default up to v1.38)</h2>
-<table>
-<thead>
-<tr>
-<th>Metric</th>
-<th>Value</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td>Total net profit</td>
-<td>+$713 on $1,000 (+71 %)</td>
-</tr>
-<tr>
-<td>Gross profit / Gross loss</td>
-<td>$1,246 / −$534</td>
-</tr>
-<tr>
-<td>Profit factor</td>
-<td>2.34</td>
-</tr>
-<tr>
-<td>Expected payoff</td>
-<td>0.64</td>
-</tr>
-<tr>
-<td>Recovery factor</td>
-<td>2.99</td>
-</tr>
-<tr>
-<td>Sharpe ratio</td>
-<td>3.55</td>
-</tr>
-<tr>
-<td>Total trades</td>
-<td>1,113 (~250/yr)</td>
-</tr>
-<tr>
-<td><strong>Source</strong></td>
-<td>Backtest, OANDA AUDCAD.pro real ticks, 2022-01 to 2026-06</td>
-</tr>
-<tr>
-<td>Win rate</td>
-<td>81.1 %</td>
-</tr>
-<tr>
-<td>Average win / average loss</td>
-<td>$1.38 / −$2.54</td>
-</tr>
-<tr>
-<td>Largest win / largest loss</td>
-<td>$15.92 / −$18.66</td>
-</tr>
-<tr>
-<td>Balance (realised) max DD</td>
-<td>4.3 %</td>
-</tr>
-<tr>
-<td>Equity (floating) max DD</td>
-<td>17.8 %</td>
-</tr>
-<tr>
-<td>Profitable months</td>
-<td>100 %</td>
-</tr>
-</tbody>
-</table>
-<hr />
-<h2 id="risk-tiers-minimum-accounts">Risk tiers &amp; minimum accounts</h2>
-<p>One input — <strong>Risk Profile</strong> — sets the balance-risk %, position scaling and the matched survival guard:
-<strong>LOW ~1.5 % · MEDIUM ~3 % · HIGH ~4.5 % · HOT ~6 %</strong>. LOW is the default (v1.39) and the tier to start on. <strong>Absolute minimum $300</strong>
-(any tier); the recommended account per tier (table above) is where that tier's sizing runs as designed. The
-position size compounds automatically with the balance, so a larger account simply scales the lots up.</p>
-<p><strong>CUSTOM</strong> hands sizing fully to you: set your own <strong>lot size</strong> (fixed lot) <em>or</em> your own <strong>balance-risk %</strong>
-(compounding, 1 % = 0.01 lot per $1,000) — your choice, no preset applied.</p>
+<p>The headline is the Fusion run (backtest, real ticks, 2026.03.01 to 2026.09.01): the smallest result of the three
+live-account brokers, not the largest and not an average. The same rules take near-identical trades on every
+broker; where the money differs, the smaller number is the one to plan with.</p>
+<h2 id="how-rubberband-differs-from-boomerang">How Rubberband differs from Boomerang</h2>
+<p>Rubberband and Boomerang are both AUDCAD reversion systems. They are separate builds, and the mechanism differs in
+four places:</p>
+<ul>
+<li>Entry: Rubberband fades a linear regression channel z-score confirmed by RSI(14). Boomerang instead requires
+  five simultaneous conditions - position in the rolling eight-hour range, a Bollinger z-score, the sign of the
+  previous bar, a four-bar move threshold and RSI(3).</li>
+<li>Adaptation: Rubberband runs a live four-state regime detector (range, high volatility, trend, quiet) that
+  re-tunes its entry threshold, its grid spacing and its profit target. Boomerang has no regime detector and uses
+  fixed thresholds.</li>
+<li>Exit: Rubberband closes the basket at a regime-set profit target and can cap how long a single position is
+  held. Boomerang's target decays with both basket depth and basket age, and it separately retires its best
+  winner against its worst loser.</li>
+<li>Depth and data: Rubberband holds up to 15 legs and reads five timeframes (M1, M5, M15, H1, D1). Boomerang caps
+  at 5 legs and reads only its M5 chart.</li>
+</ul>
 <h2 id="requirements">Requirements</h2>
 <ul>
-<li><strong>Symbol:</strong> AUDCAD · <strong>Timeframe:</strong> M15 · one chart.</li>
-<li><strong>Account:</strong> hedging mode, low spread; VPS recommended (24/5 operation). Minimum balance $300.</li>
-<li>Default settings are baked in — runs out of the box at LOW (v1.39); the Risk Profile knob is the only input most users touch.</li>
-<li><strong>Why LOW is the default (v1.39):</strong> on OANDA's 2020-2026 real ticks the MEDIUM tier once realised a basket loss at its 35 %
-  breaker (May-July 2024); LOW carried the same basket inside a 13 % float and closed it without a loss. Higher tiers keep that
-  risk.</li>
+<li>Symbol AUDCAD, timeframe M15, one chart.</li>
+<li>Hedging account, minimum 300 in account currency, low AUDCAD spread.</li>
+<li>No DLLs, no external or web calls.</li>
+<li>Continuous operation recommended (a VPS or an always-on PC); the EA manages open baskets across sessions and
+  across a restart.</li>
 </ul>
 <h2 id="risk-disclosure">Risk disclosure</h2>
-<p>Grid / averaging strategies carry recovery-basket risk: an open basket can float significantly underwater
-(see <em>Floating DD</em> per tier) before it reverts, and an extreme, non-reverting market move can cause large losses.
-Use only risk capital, respect the minimum account per tier, and keep margin headroom for the floating drawdown.
-<strong>Backtest results do not guarantee future performance.</strong> No result here is a live-account claim.</p>
-<hr />
-<p><em>Backtest source: real-tick AUDCAD M15, 2022-01 → 2026-06, per-tier minimum-account deposit, broker-real spread.</em></p>
-<h2 id="how-this-differs-from-boomerang">How this differs from Boomerang</h2>
-<p>Both trade AUDCAD reversion, and they are different machines rather than one machine tuned twice.</p>
-<ul>
-<li><strong>Entry.</strong> Rubberband fades a linear-regression channel z-score confirmed by RSI(14). Boomerang needs five
-  conditions at once: position in the rolling eight-hour range, a Bollinger z-score, the direction of the previous
-  bar, a four-bar return threshold and RSI(3).</li>
-<li><strong>Adaptation.</strong> Rubberband runs a live four-state regime detector that re-tunes its entry threshold, its grid
-  spacing and its profit target. Boomerang has no regime detector and uses fixed thresholds.</li>
-<li><strong>Exit.</strong> Rubberband closes the basket on a regime-set target and can cap how long any one position is held.
-  Boomerang's target decays with depth and age, and it retires its best winner against its worst loser.</li>
-<li><strong>Depth and data.</strong> Fifteen legs reading M1, M5, M15, H1 and D1 here; five legs on one M5 chart there.</li>
-</ul><h2>Evidence</h2><figure><img src="img/01_equity_FUSION.png" alt="equity FUSION (backtest chart)" loading="lazy"><figcaption>equity FUSION - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_OANDA.png" alt="equity OANDA (backtest chart)" loading="lazy"><figcaption>equity OANDA - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_OANDA_FULL.png" alt="equity OANDA FULL (backtest chart)" loading="lazy"><figcaption>equity OANDA FULL - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_PEPPERSTONE.png" alt="equity PEPPERSTONE (backtest chart)" loading="lazy"><figcaption>equity PEPPERSTONE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_VANTAGE.png" alt="equity VANTAGE (backtest chart)" loading="lazy"><figcaption>equity VANTAGE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/02_per_year.png" alt="per year (backtest chart)" loading="lazy"><figcaption>per year - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/03_feed_comparison.png" alt="feed comparison (backtest chart)" loading="lazy"><figcaption>feed comparison - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/04_trade_distribution.png" alt="trade distribution (backtest chart)" loading="lazy"><figcaption>trade distribution - Strategy Tester, real ticks, backtest</figcaption></figure>
+<p>This is an averaging grid: it holds a small basket of same-direction positions open until price reverts, and an
+open basket can go significantly underwater before it does. An extreme, non-reverting move can produce a large
+loss. Trade only risk capital, respect the minimum account, and keep margin headroom for the floating drawdown of
+the tier you choose. Backtest results do not guarantee future performance. Past results do not predict future
+results.</p><h2>Evidence</h2><figure><img src="img/01_equity_FUSION.png" alt="equity FUSION (backtest chart)" loading="lazy"><figcaption>equity FUSION - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_PEPPERSTONE.png" alt="equity PEPPERSTONE (backtest chart)" loading="lazy"><figcaption>equity PEPPERSTONE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_VANTAGE.png" alt="equity VANTAGE (backtest chart)" loading="lazy"><figcaption>equity VANTAGE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_OANDA.png" alt="equity OANDA (backtest chart)" loading="lazy"><figcaption>equity OANDA - Strategy Tester, real ticks, backtest</figcaption></figure>
 </main>
 <footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
 <a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
