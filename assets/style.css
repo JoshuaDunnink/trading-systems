@@ -38,4 +38,6 @@ border-radius:999px;border:1px solid var(--line);color:var(--muted);margin-left:
 .card img.thumb{width:100%;height:auto;border:1px solid var(--line);border-radius:6px;margin-top:6px}
 .stats-line{font-weight:600;margin:.6em 0 .1em}.stamp{color:var(--muted);font-size:.82rem;margin:.1em 0 0}
 .card.headline h2{margin-top:0}
+.card img.cover{width:100%;height:auto;aspect-ratio:1/1;object-fit:cover;border-radius:8px;margin-bottom:8px;display:block}
+img.hero{width:100%;max-width:420px;height:auto;border-radius:12px;display:block;margin:0 0 12px}
 footer{border-top:1px solid var(--line);padding-top:16px;padding-bottom:32px;color:var(--muted);font-size:.88rem}
