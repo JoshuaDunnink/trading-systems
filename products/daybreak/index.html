@@ -1,0 +1,126 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daybreak - Gold prior-day breakout Expert Advisor for MT5 (XAUUSD M15)</title><meta name="description" content="Up before the market, Daybreak chalks yesterday&#x27;s high and low on the wall and waits at the line. When price crosses it, he goes with the first burst and is...">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "Daybreak", "applicationCategory": "FinanceApplication", "operatingSystem": "MetaTrader 5 (Windows)", "description": "Up before the market, Daybreak chalks yesterday's high and low on the wall and waits at the line. When price crosses it, he goes with the first burst and is...", "url": "https://joshuadunnink.github.io/trading-systems/products/daybreak/", "author": {"@type": "Person", "name": "Joshua Dunnink", "url": "https://www.mql5.com/en/users/joshuadunnink"}, "image": "https://joshuadunnink.github.io/trading-systems/img/daybreak_hero.jpg"}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://joshuadunnink.github.io/trading-systems/"}, {"@type": "ListItem", "position": 2, "name": "Products", "item": "https://joshuadunnink.github.io/trading-systems/products.html"}, {"@type": "ListItem", "position": 3, "name": "Daybreak", "item": "https://joshuadunnink.github.io/trading-systems/products/daybreak/"}]}</script>
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/daybreak/"><meta property="og:type" content="website">
+<meta property="og:title" content="Daybreak - Gold prior-day breakout Expert Advisor for MT5 (XAUUSD M15)"><meta property="og:description" content="Up before the market, Daybreak chalks yesterday&#x27;s high and low on the wall and waits at the line. When price crosses it, he goes with the first burst and is...">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/daybreak/"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/daybreak_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<a href="../../img/daybreak_hero.jpg"><img class="hero" src="../../img/daybreak_hero.jpg" width="800" height="800" alt="Daybreak artwork"></a><h1>Daybreak</h1><p class="lead">XAUUSD · M15 · MetaTrader 5 Expert Advisor</p><p class="note"><strong>Coming soon.</strong> This Expert Advisor is in final testing and is not for sale yet. Its description, manual and research are published so you can follow it before release.</p><p><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 2.49 · worst equity drawdown 4.2% · 140 trades · return x1.53 on 10,000</p><p class="stamp">Backtest, real ticks, BlackBull Markets, 2025-01-02 to 2026-09-25, Medium risk, current defaults. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/daybreak_headline.png" alt="Daybreak balance curve (backtest)" loading="lazy"><figcaption>Chart: BlackBull, Medium risk, the full validated window.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>Up before the market, Daybreak chalks yesterday's high and low on the wall and waits at the line.
+When price crosses it, he goes with the first burst and is out again in seconds - one level, one trade,
+and a quiet day if nothing breaks.</p>
+<p>Daybreak Gold is a breakout system for gold. Every trading day it sets two prices from the
+previous day's high and low. A break through either level opens one position - never more than one
+at a time - with a stop loss and a take profit measured from the level itself, so every trade
+carries the same risk distance regardless of the fill. Once a position is far enough in profit, a
+trailing stop takes over and gives back only a fixed amount from the best price reached.</p>
+<p>The strategy skips new entries on the day of a US employment report, a Federal Reserve rate
+decision, and the thinly-traded days around the year-end close. It also holds new entries on a day
+whose prior 24 hours moved too little, unless the break reaches into price the market has not
+traded in five days.</p>
+<p>The results below come from gold in 2025 and 2026, a high-volatility period; the same rules run on gold from
+2018 to 2024 were flat to slightly negative. This is a system for a moving gold market, not an all-weather one.</p>
+<p>No grid. No martingale. No averaging into a losing position. One risk setting (Risk level: Low,
+Medium or High) controls position size as a percent of balance per stop; every other input is open
+for review.</p>
+<p><strong>Backtest, MetaTrader 5 Strategy Tester, real ticks, 100% history quality, $10,000 deposit,
+2025-01-02 to 2026-09-25, fixed 250 ms execution delay, compounding:</strong></p>
+<table>
+<thead>
+<tr>
+<th>Risk level</th>
+<th>Feed</th>
+<th>Net growth</th>
+<th>Profit factor</th>
+<th>Max equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Medium (default)</td>
+<td>BlackBull</td>
+<td>+52.9%</td>
+<td>2.49</td>
+<td>4.23%</td>
+</tr>
+<tr>
+<td>Medium (default)</td>
+<td>Fusion</td>
+<td>+70.2%</td>
+<td>2.77</td>
+<td>6.21%</td>
+</tr>
+<tr>
+<td>Medium (default)</td>
+<td>Pepperstone</td>
+<td>+285.3%</td>
+<td>5.96</td>
+<td>6.76%</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>BlackBull</td>
+<td>+23.4%</td>
+<td>2.50</td>
+<td>2.11%</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>Fusion</td>
+<td>+30.5%</td>
+<td>2.84</td>
+<td>3.08%</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>Pepperstone</td>
+<td>+95.5%</td>
+<td>6.34</td>
+<td>3.38%</td>
+</tr>
+<tr>
+<td>High</td>
+<td>BlackBull</td>
+<td>+132.8%</td>
+<td>2.47</td>
+<td>8.41%</td>
+</tr>
+<tr>
+<td>High</td>
+<td>Fusion</td>
+<td>+185.3%</td>
+<td>2.65</td>
+<td>12.23%</td>
+</tr>
+<tr>
+<td>High</td>
+<td>Pepperstone</td>
+<td>+560.7%</td>
+<td>5.38</td>
+<td>9.69%</td>
+</tr>
+</tbody>
+</table>
+<p>High risk is margin-fit adjusted for a 1:20 (ESMA retail) gold account - the shrink is what keeps
+these trades executable at all on such an account. Losses come in runs: in the same backtests, five to seven consecutive stop-outs occurred about once a
+year, costing roughly 3% at Low, 7-11% at Medium and 12-20% at High, depending on the broker's tick
+stream. These figures are backtests on historical data; they are not a promise, guarantee or
+projection of future results.</p>
+<h2 id="frequently-asked-questions">Frequently asked questions</h2>
+<p><strong>Does it hedge, martingale or grid?</strong> No. One position at a time, always with a stop loss.</p>
+<p><strong>What symbol and timeframe?</strong> Gold only. Any chart timeframe works - the strategy reads the daily
+bar and a fixed M15 clock internally regardless of the chart it is attached to.</p>
+<p><strong>What controls risk?</strong> The Risk level input (Low / Medium / High), or a custom risk percent / fixed
+lot under Risk level = Custom.</p>
+<p><strong>Does it work on a prop-firm account?</strong> Account type includes Prop firm 2-step and Prop firm 1-step
+presets that add a daily-loss and maximum-loss guard sized to typical challenge rules; a Prop-firm
+rules section lets you enter your own firm's exact numbers.</p>
+<p><strong>Why doesn't it trade every day?</strong> Two levels a day, at most one trade per level, and several days
+are held entirely (thin prior-day range, a scheduled calendar event). This is by design.</p><h2>Evidence</h2><figure><img src="img/01_blackbull_medium.png" alt="blackbull medium (backtest chart)" loading="lazy"><figcaption>blackbull medium - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/02_fusion_medium.png" alt="fusion medium (backtest chart)" loading="lazy"><figcaption>fusion medium - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/03_pepperstone_medium.png" alt="pepperstone medium (backtest chart)" loading="lazy"><figcaption>pepperstone medium - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/04_structure_levels.png" alt="structure levels (backtest chart)" loading="lazy"><figcaption>structure levels - Strategy Tester, real ticks, backtest</figcaption></figure>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

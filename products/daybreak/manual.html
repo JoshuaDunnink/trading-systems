@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daybreak manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Daybreak user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/daybreak/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Daybreak manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Daybreak user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/daybreak/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/daybreak_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Daybreak</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#daybreak-user-manual">DAYBREAK — user manual</a><ul>
+<li><a href="#1-what-it-does-in-plain-words">1. What it does, in plain words</a></li>
+<li><a href="#2-installation-five-minutes">2. Installation (five minutes)</a></li>
+<li><a href="#2a-the-inputs-at-a-glance">2a. The inputs at a glance</a></li>
+<li><a href="#3-the-only-setting-that-matters-risk-level">3. The only setting that matters: risk level</a><ul>
+<li><a href="#custom-sizing">Custom sizing</a></li>
+</ul>
+</li>
+<li><a href="#3a-prop-firm-accounts-one-choice">3a. Prop-firm accounts: one choice</a></li>
+<li><a href="#3b-prop-firm-rules-your-firms-own-numbers">3b. Prop-firm rules: your firm's own numbers</a></li>
+<li><a href="#3c-losing-runs-what-to-expect">3c. Losing runs: what to expect</a></li>
+<li><a href="#4-your-first-week">4. Your first week</a></li>
+<li><a href="#5-reading-the-chart-and-the-journal">5. Reading the chart and the journal</a></li>
+<li><a href="#6-when-it-does-not-trade-and-why-that-is-usually-right">6. When it does not trade — and why that is usually right</a></li>
+<li><a href="#7-exit-mechanics">7. Exit mechanics</a></li>
+<li><a href="#8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</a></li>
+<li><a href="#9-sizing-and-margin">9. Sizing and margin</a></li>
+<li><a href="#10-optimising-for-advanced-users">10. Optimising (for advanced users)</a></li>
+<li><a href="#11-what-is-saved-and-what-is-not">11. What is saved and what is not</a></li>
+<li><a href="#12-troubleshooting">12. Troubleshooting</a></li>
+<li><a href="#13-final-checklist-and-disclaimer">13. Final checklist and disclaimer</a></li>
+<li><a href="#14-reproduce-the-tests-yourself">14. Reproduce the tests yourself</a></li>
+<li><a href="#complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="daybreak-user-manual">DAYBREAK — user manual</h1>
+<h2 id="1-what-it-does-in-plain-words">1. What it does, in plain words</h2>
+<p>DAYBREAK watches two prices every trading day: the high and the low of the <strong>previous</strong> day. If
+price breaks up through yesterday's high, it buys; if price breaks down through yesterday's low, it
+sells. Only one of those can happen per day per side, and only after the day's first M15 bar has
+closed — a level the market already passed before that bar closed is skipped for the day, because a
+break that already happened before the EA could see it is not a signal.</p>
+<p>Every position carries a stop loss and a take profit measured from the <strong>level</strong>, not from the price
+you actually got filled at, so the risk on the trade is the same distance whatever the slippage was.
+Once the trade is far enough ahead, a trailing stop takes over and gives back only a fixed amount
+from the best price seen.</p>
+<p>DAYBREAK holds <strong>at most one position at a time</strong>. There is no grid, no martingale, no averaging
+into a loser — every position stands on its own stop loss.</p>
+<p>It skips new entries (not existing positions) on the day of a US jobs report, a Federal Reserve rate
+decision, and the few thinly-traded days around the year-end close. It also skips new entries on a
+day whose prior 24 hours moved too little — unless the break reaches into price nobody has traded in
+five days, which is let through on its own.</p>
+<h2 id="2-installation-five-minutes">2. Installation (five minutes)</h2>
+<ol>
+<li>Attach DAYBREAK to a gold chart (<code>XAUUSD</code>, <code>XAUUSDp</code>, <code>GOLD.pro</code> or your broker's spelling — any
+   timeframe; the strategy reads the daily and M15 bars itself).</li>
+<li>Leave every input at its default. That default <strong>is</strong> the validated configuration.</li>
+<li>Set <strong>Risk level</strong> (section "1. Start here") to match your comfort: Low, Medium (default) or High.</li>
+<li>Allow algo trading, drag it onto the chart, done.</li>
+</ol>
+<h2 id="2a-the-inputs-at-a-glance">2a. The inputs at a glance</h2>
+<table>
+<thead>
+<tr>
+<th>Section</th>
+<th>What you touch</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Start here</td>
+<td>Account type, Settings profile, Risk level, virtual balance, max spread</td>
+</tr>
+<tr>
+<td>2. Sides</td>
+<td>Allow buy / Allow sell</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules</td>
+<td>Only if you trade a funded/prop account with its own daily/max-loss numbers</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td>NFP / FOMC / year-end skips (leave on)</td>
+</tr>
+<tr>
+<td>5. Safety</td>
+<td>Margin fit, jump-skip, account breaker, hard floor</td>
+</tr>
+<tr>
+<td>[Custom] groups</td>
+<td>Only read when Settings profile = Custom</td>
+</tr>
+</tbody>
+</table>
+<h2 id="3-the-only-setting-that-matters-risk-level">3. The only setting that matters: risk level</h2>
+<p><code>InpRisk</code> sizes every trade as a percent of your account balance, per the trade's own stop distance.
+Figures: backtest, MetaTrader 5 Strategy Tester, real ticks, Low / Medium / High risk arms, BlackBull,
+2025.01.02 → 2026.09.25, $10,000 deposit, fixed 250 ms execution delay, compounding.</p>
+<table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Risk per trade</th>
+<th>BlackBull (real ticks, 2025.01.02→2026.09.25, $10,000)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td>0.75%</td>
+<td>+23.4% net, max equity DD 2.11%</td>
+</tr>
+<tr>
+<td><strong>Medium (default)</strong></td>
+<td><strong>1.5%</strong></td>
+<td><strong>+52.9% net, PF 2.49, max equity DD 4.23%</strong></td>
+</tr>
+<tr>
+<td>High</td>
+<td>3.0%</td>
+<td>+132.8% net, max equity DD 8.41% (margin-fit shrinks the lot on a 1:20 gold account)</td>
+</tr>
+<tr>
+<td>Custom</td>
+<td>your choice, or a fixed lot</td>
+<td>—</td>
+</tr>
+</tbody>
+</table>
+<p>Higher risk grows the account faster and draws down harder. <strong>Medium is the validated default</strong> —
+raise it only if you have sat through the Low/Medium curves and are comfortable with the shape.</p>
+<h3 id="custom-sizing">Custom sizing</h3>
+<p>Set Risk level = Custom, then either:
+- <strong>Risk percent</strong> — your own % of balance per stop, in "Custom risk %, per stop", or
+- <strong>Fixed lot</strong> — set "Custom sizing method" to Fixed lot and give the lot size in "Custom fixed lot".</p>
+<h2 id="3a-prop-firm-accounts-one-choice">3a. Prop-firm accounts: one choice</h2>
+<p>"Account type" (section 1) has three settings:</p>
+<ul>
+<li><strong>Personal</strong> — sizing follows Risk level exactly as above.</li>
+<li><strong>Prop firm 2-step</strong> / <strong>Prop firm 1-step</strong> — fills in a daily-loss and maximum-loss guard (5%/10%
+  for a 2-step challenge, 3%/6% for a 1-step one) <em>if you leave the prop-rule percentages at 0</em>. Set
+  your own firm's numbers in section 3 to override them.</li>
+</ul>
+<h2 id="3b-prop-firm-rules-your-firms-own-numbers">3b. Prop-firm rules: your firm's own numbers</h2>
+<p>All zero by default (off). Fill in only the ones your firm actually enforces:</p>
+<ul>
+<li><strong>Daily loss limit %</strong> — closes everything and pauses until the firm's next day.</li>
+<li><strong>Maximum loss limit %</strong> — closes everything and stops trading on this login for good.</li>
+<li><strong>Profit target %</strong> — closes everything and stops (celebrate).</li>
+<li><strong>Best-day cap %</strong> — closes everything and pauses until the next day (a firm that caps a single
+  day's gain).</li>
+<li><strong>Safety %</strong> — the EA acts this many percent <strong>before</strong> each limit, so a fast candle can't jump
+  straight through a hard limit unmanaged.</li>
+</ul>
+<h2 id="3c-losing-runs-what-to-expect">3c. Losing runs: what to expect</h2>
+<p>Losses come in runs. In the backtests behind the risk table, five to seven consecutive stop-outs occurred about once a year (October 2025 and September 2026 in the 2025-2026 window). Each stop-out costs about one risk unit, so such a run costs roughly 3% at Low, 7-11% at Medium and 12-20% at High, depending on the broker's tick stream. No filter tested could tell these days from the profitable ones in advance; the risk level is the control. Pick the level whose run you can sit through.</p>
+<h2 id="4-your-first-week">4. Your first week</h2>
+<p>Watch the Experts log. On load you will see one banner line naming the account type, profile, risk
+level, sides, calendar skips, the range-gate floor and its status, margin-fit and jump-skip, and a
+second line with every bracket distance. A broker-profile line follows with your computed lot and
+its risk in account currency and percent.</p>
+<h2 id="5-reading-the-chart-and-the-journal">5. Reading the chart and the journal</h2>
+<p>DAYBREAK does not draw objects on the chart. The journal prints:
+- <code>DAYBREAK: entries held for &lt;reason&gt;</code> — a calendar-day skip or a closed range gate.
+- <code>DAYBREAK: lot reduced X -&gt; Y to fit N% of free margin</code> — the margin-fit sizer at work.
+- <code>DAYBREAK: the buy/sell level was skipped - price had already jumped past the trigger</code> — the
+  jump-skip rule.
+- <code>DAYBREAK: order admitted under the 5-day-zone rule</code> — a trade the range gate would otherwise have
+  held, let through because it broke into fresh five-day territory.</p>
+<h2 id="6-when-it-does-not-trade-and-why-that-is-usually-right">6. When it does not trade — and why that is usually right</h2>
+<p>Two levels a day, at most one trade each, only after the day's first M15 bar closes. Most days do
+not qualify: the level may already be behind price at the open (gapped over), the day's range may sit
+below the floor, or a calendar skip may be active. This is normal — the strategy trades roughly two
+handfuls of times a month, not every day.</p>
+<h2 id="7-exit-mechanics">7. Exit mechanics</h2>
+<ul>
+<li><strong>Stop loss / take profit</strong> are set the moment the trade opens, both measured from the level.</li>
+<li><strong>Trailing stop</strong> arms once profit clears the arm distance, then either locks a fraction of the
+  excursion (Proportional mode) or trails a fixed distance behind the best price (Fixed mode, the
+  validated default). "Never below entry" (off by default) floors the trail at exact breakeven once
+  either mode has armed.</li>
+</ul>
+<h2 id="8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</h2>
+<p>DAYBREAK sends a market order the instant a level breaks — not a resting pending order — so your
+broker's fill speed and slippage matter. A tight-spread, fast-fill broker gets you a fill closer to
+the level; a wide-spread broker gives back part of the edge to the spread itself, same as any
+breakout system.</p>
+<h2 id="9-sizing-and-margin">9. Sizing and margin</h2>
+<p>Every risk level is capped by "Margin fit %" (default 95, always on): if the risk-sized lot would
+need more margin than that share of your free margin, the lot is shrunk to what fits, never refused
+outright. Gold on many brokers margins at 1:20 for a retail account whatever your account leverage —
+this is why High risk's real-world return is well below twice Medium's return.</p>
+<h2 id="10-optimising-for-advanced-users">10. Optimising (for advanced users)</h2>
+<p>Every input is exposed for research and GA use, but the compiled defaults ARE the validated
+configuration. Changing a [Custom] input without setting Settings profile = Custom does nothing —
+that is the point of the facade (see <code>_proofs/PROOFS.md</code>).</p>
+<h2 id="11-what-is-saved-and-what-is-not">11. What is saved and what is not</h2>
+<p>Prop-firm rule state (daily/maximum-loss anchors) persists across a restart on a live or demo account
+via terminal global variables; the Strategy Tester always starts fresh. Nothing else is saved.</p>
+<h2 id="12-troubleshooting">12. Troubleshooting</h2>
+<ul>
+<li><strong>No trades for weeks</strong> — normal; check the journal for "entries held" lines before assuming a
+  problem.</li>
+<li><strong>Lot smaller than expected</strong> — the margin-fit sizer shrank it; the journal names the reason.</li>
+<li><strong>"the broker's minimum stop distance... the bracket will be rejected"</strong> — printed once at start if
+  your broker's <code>STOPS_LEVEL</code> is wider than the $ stop; contact your broker about a tighter minimum
+  or use a wider custom stop.</li>
+</ul>
+<h2 id="13-final-checklist-and-disclaimer">13. Final checklist and disclaimer</h2>
+<p>Backtest figures throughout this manual are MetaTrader 5 Strategy Tester runs on real broker ticks,
+labelled with their feed and window. They are not a promise of future results. Past performance,
+including in a backtest, does not guarantee future performance.</p>
+<h2 id="14-reproduce-the-tests-yourself">14. Reproduce the tests yourself</h2>
+<p>Every figure in this manual comes with the settings that produced it. Reproducing one takes a few
+minutes in MetaTrader 5 and needs no .set file.</p>
+<p><strong>By hand, in MetaTrader 5</strong> (the BlackBull Medium row; open the Strategy Tester with Ctrl+R):</p>
+<table>
+<thead>
+<tr>
+<th>Step</th>
+<th>Setting</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td>Expert: <code>DAYBREAK</code> - the Journal's first line must read <code>DAYBREAK 1.00</code></td>
+</tr>
+<tr>
+<td>2</td>
+<td>Symbol: gold on your terminal (the row was measured on BlackBull, symbol <code>XAUUSDp</code>)</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Timeframe: M15</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Date: Custom period, 2025.01.02 to 2026.09.25</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Modelling: Every tick based on real ticks</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Deposit: 10,000 USD, leverage as your account</td>
+</tr>
+<tr>
+<td>7</td>
+<td>Execution delay: 250 ms (the Settings tab's delay field)</td>
+</tr>
+<tr>
+<td>8</td>
+<td>Inputs: leave every input at its default (Settings profile = Recommended, Risk level = Medium)</td>
+</tr>
+</tbody>
+</table>
+<p>Expect 140 trades, net about +52.9 %, profit factor 2.49 and a maximum equity drawdown of 4.23 %
+(backtest, Medium risk, BlackBull, 2025.01.02 to 2026.09.25). On another broker the trade list is the
+same to the second and the profit differs: the trailing stop lives longer on some tick streams than on
+others, which is why this manual quotes three brokers, never one.</p>
+<h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</h2>
+<p>See <code>presets/DAYBREAK_MEDIUM.set</code> for the complete, validated input list (42 inputs, UTF-16 LE with
+BOM, every enum written as its integer). <code>presets/DAYBREAK_{LOW,HIGH,FIXED001}.set</code> differ only in
+the Risk-level / custom-sizing inputs.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

@@ -1,0 +1,255 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Daybreak research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="How Daybreak was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/daybreak/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Daybreak research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="How Daybreak was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/daybreak/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/daybreak_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Daybreak</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#daybreak-research-note">Daybreak — Research Note</a><ul>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
+<li><a href="#2-the-mechanism-two-prices-a-day">2. The mechanism: two prices a day</a></li>
+<li><a href="#3-risk-levels-low-medium-high">3. Risk levels: Low, Medium, High</a></li>
+<li><a href="#4-execution-why-results-differ-by-broker">4. Execution: why results differ by broker</a></li>
+<li><a href="#5-regime-honesty-a-system-for-a-moving-market">5. Regime honesty: a system for a moving market</a></li>
+<li><a href="#6-losing-runs-what-the-tests-show">6. Losing runs: what the tests show</a></li>
+<li><a href="#7-what-was-tried-and-left-out">7. What was tried and left out</a></li>
+<li><a href="#8-where-the-engine-came-from">8. Where the engine came from</a></li>
+<li><a href="#9-limits">9. Limits</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="daybreak-research-note">Daybreak — Research Note</h1>
+<p><em>What the machine does, what was left out on the way to the shipped version, and what the tests behind
+each figure showed.</em></p>
+<p>Version 1.00 · September 2026</p>
+<p>All figures in this note are Strategy Tester runs on real broker ticks at 100% history quality. They
+are backtests, not a record of live trading. Every number names the broker feed and the window it
+came from; a number that cannot be traced that way does not appear here.</p>
+<hr />
+<h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p>Daybreak runs out of the box on its <strong>Medium</strong> setting (1.5% of balance risked per trade, against the
+trade's own $5 level-anchored stop). Three live broker feeds, $10,000 starting balance, compiled
+defaults:</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull / Fusion / Pepperstone, 2025-01-02 to
+2026-09-25, fixed 250 ms execution delay, compounding, Medium risk (1.5% of balance per stop).</em></p>
+<table>
+<thead>
+<tr>
+<th>Feed</th>
+<th>Growth</th>
+<th>Profit factor</th>
+<th>Max equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull</td>
+<td>+52.9%</td>
+<td>2.49</td>
+<td>4.23%</td>
+</tr>
+<tr>
+<td>Fusion</td>
+<td>+70.2%</td>
+<td>2.77</td>
+<td>6.21%</td>
+</tr>
+<tr>
+<td>Pepperstone</td>
+<td>+285.3%</td>
+<td>5.96</td>
+<td>6.76%</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="BlackBull, Medium risk, full window" src="img/01_blackbull_medium.png" /></p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2025-01-02 to 2026-09-25, Medium risk.</em></p>
+<p>The headline figure above is BlackBull's — the weakest of the three live brokers in this window, not
+the strongest. Fusion and Pepperstone are shown alongside it rather than in its place:</p>
+<p><img alt="Fusion, Medium risk, full window" src="img/02_fusion_medium.png" /></p>
+<p><img alt="Pepperstone, Medium risk, full window" src="img/03_pepperstone_medium.png" /></p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Fusion / Pepperstone, 2025-01-02 to 2026-09-25,
+Medium risk.</em></p>
+<p>How the machine got to that table, what it leaves out on a quiet day, what a losing run costs, and
+which market this result belongs to, is the rest of this note.</p>
+<hr />
+<h2 id="1-how-it-was-tested">1. How it was tested</h2>
+<ul>
+<li><strong>Real ticks only.</strong> Every figure in this note is a Strategy Tester run on a broker's own tick
+  archive at 100% history quality, not a one-minute-bar approximation.</li>
+<li><strong>A fixed execution delay.</strong> Every run charges a 250 ms delay between the signal and the fill, so
+  the figures already carry a cost for order latency rather than assuming an instant fill.</li>
+<li><strong>Three feeds are one gold market, not three samples.</strong> BlackBull, Fusion and Pepperstone price the
+  same market through three different spreads and fill behaviours. Agreement across them shows the
+  mechanism survives the broker; it does not multiply the evidence by three (section 4 shows how much
+  the three still differ).</li>
+<li><strong>The shipped defaults are the tested configuration.</strong> Daybreak's compiled defaults (Settings =
+  Recommended, Risk = Medium) reproduce the exact setup this note's figures were measured on. Nothing
+  needs to be changed to get the tested behaviour.</li>
+</ul>
+<hr />
+<h2 id="2-the-mechanism-two-prices-a-day">2. The mechanism: two prices a day</h2>
+<p>Every trading day, Daybreak marks two prices: the previous day's high and the previous day's low. A
+break through either level — after the day's first M15 bar has closed, so a break that already
+happened before the EA could see it is not a signal — opens one position, never more than one at a
+time. No grid, no martingale, no averaging into a losing position.</p>
+<p><img alt="Chart structure: entries landing on the prior-day levels this strategy trades" src="img/04_structure_levels.png" /></p>
+<p>The stop loss and the take profit are measured from the <strong>level itself</strong>, not from the price the
+order actually filled at, so the risk on the trade is the same distance whatever the slippage was at
+the moment of the break: a $5 stop, a $50 target. Once the trade is far enough ahead, a trailing stop
+takes over, following the best price on every tick and giving back only a fixed $0.50 from it. Held
+positions typically last seconds to minutes, not hours.</p>
+<p><strong>Skipping quiet days.</strong> A day whose prior 24 hours moved too little is held entirely — no new
+entries — unless the break reaches into price the market has not traded in five days, in which case
+it is let through on its own. A level the price has already jumped more than half a stop past by the
+time it is seen is dropped for that day rather than chased.</p>
+<p><strong>Skipping the calendar.</strong> New entries are held on the day of a US employment report, a Federal
+Reserve rate decision, and the thinly-traded days around the year-end close. Existing positions are
+not affected — only new entries are.</p>
+<hr />
+<h2 id="3-risk-levels-low-medium-high">3. Risk levels: Low, Medium, High</h2>
+<p>One input controls position size: a percent of balance risked per trade against the trade's own $5
+stop. Higher risk grows the account faster in these backtests and draws down harder; there is no
+level that avoids that trade-off.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull / Fusion / Pepperstone, 2025-01-02 to
+2026-09-25, fixed 250 ms execution delay, compounding.</em></p>
+<table>
+<thead>
+<tr>
+<th>Risk level</th>
+<th>Risk per stop</th>
+<th>Feed</th>
+<th>Growth</th>
+<th>Profit factor</th>
+<th>Max equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td>0.75%</td>
+<td>BlackBull</td>
+<td>+23.4%</td>
+<td>2.50</td>
+<td>2.11%</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>0.75%</td>
+<td>Fusion</td>
+<td>+30.5%</td>
+<td>2.84</td>
+<td>3.08%</td>
+</tr>
+<tr>
+<td>Low</td>
+<td>0.75%</td>
+<td>Pepperstone</td>
+<td>+95.5%</td>
+<td>6.34</td>
+<td>3.38%</td>
+</tr>
+<tr>
+<td>High</td>
+<td>3.0%</td>
+<td>BlackBull</td>
+<td>+132.8%</td>
+<td>2.47</td>
+<td>8.41%</td>
+</tr>
+<tr>
+<td>High</td>
+<td>3.0%</td>
+<td>Fusion</td>
+<td>+185.3%</td>
+<td>2.65</td>
+<td>12.23%</td>
+</tr>
+<tr>
+<td>High</td>
+<td>3.0%</td>
+<td>Pepperstone</td>
+<td>+560.7%</td>
+<td>5.38</td>
+<td>9.69%</td>
+</tr>
+</tbody>
+</table>
+<p>(Medium sits between the two — see the table in section 0.)</p>
+<p><strong>High risk on a leveraged gold account is size-limited by margin, not just by the risk setting.</strong> A
+1:20 gold-margin account (the standard ESMA retail limit) runs out of free margin for the full
+risk-sized lot well before 3% of balance is actually at stake; a margin-fit sizer shrinks the lot to
+fit rather than let the broker refuse the order. The High figures above already include that shrink —
+without it, this window would have produced long stretches with no trade at all rather than a larger
+one.</p>
+<hr />
+<h2 id="4-execution-why-results-differ-by-broker">4. Execution: why results differ by broker</h2>
+<p>The entries are identical across the three brokers — same levels, same day, same side. What differs
+is how far each broker's tick stream carries the trailing stop before it is taken out, which is why
+the same mechanism produces three different growth figures above.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull / Fusion / Pepperstone, 2025-01-02 to
+2026-09-25.</em></p>
+<p>In these tests the average win per 0.01 lot ranged from about $1.7 to $4.4 broker to broker, purely
+from how each broker's own tick stream lets the trailing stop run: on one feed the same $0.50 trail
+survived about twenty seconds on a typical winner, on the others two to three seconds, from the same
+entries. Which feed does what is a property of that feed, measured, not predicted.</p>
+<p><strong>Random execution delay.</strong> The 250 ms figure above is fixed; a further test replaced it with a
+randomly varying delay, five runs on each of the three brokers. Every run stayed profitable, profit
+factor ranging from 1.52 to 4.57, and the middle run on each broker kept 60% to 76% of that broker's
+zero-delay result. A VPS close to the broker's server is recommended, since delay is part of what
+these figures measure, not something the strategy is indifferent to.</p>
+<hr />
+<h2 id="5-regime-honesty-a-system-for-a-moving-market">5. Regime honesty: a system for a moving market</h2>
+<p>Every figure in this note comes from gold in 2025 and 2026 — a period of large, frequent daily moves.
+The same rules, unchanged, run on gold from 2018 to 2024 were flat to slightly negative. Daybreak is
+built for a gold market that moves; it is not offered as an all-weather system, and a return to a
+quieter gold market would be expected to bring these figures back down with it.</p>
+<hr />
+<h2 id="6-losing-runs-what-the-tests-show">6. Losing runs: what the tests show</h2>
+<p>Losses come in runs, not evenly spread. In these backtests, five to seven consecutive stop-outs
+happened about once a year — October 2025 and September 2026 in the window above — each one costing
+roughly one risk unit. Across a run like that, the cost was roughly 3% of balance at Low, 7-11% at
+Medium, and 12-20% at High, depending on the broker's tick stream. No filter that was tested could
+tell one of those days from a normal one in advance; the risk level is what actually controls how much
+a run like that costs. Choose the level whose run size is one you would sit through.</p>
+<hr />
+<h2 id="7-what-was-tried-and-left-out">7. What was tried and left out</h2>
+<p>So the reader knows what is not in the box: a stop capped from the fill price instead of the level, a
+fixed take-profit distance in place of the trailing exit, a stepped (rather than continuous) trailing
+stop, session and calendar filters beyond the ones shipped, a machine-learned entry filter, a
+market-regime filter, and a rule that stands the strategy down after a losing streak were all tested.
+Each one either cost return on the live broker feeds or failed once it was checked on data it had not
+been built on. None of them is in the shipped product.</p>
+<hr />
+<h2 id="8-where-the-engine-came-from">8. Where the engine came from</h2>
+<p>Daybreak's break-and-trail engine began as a measured decode of a commercial gold breakout EA. That
+decode contained two separate trading engines; only the prior-day-level engine described in this note
+was kept. The second engine was left out because, once execution delay was modelled honestly, its
+edge disappeared in testing. The vendor is not named here or anywhere in this product's materials —
+what is published is the mechanism and the tests that decided it, in our own words.</p>
+<hr />
+<h2 id="9-limits">9. Limits</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull / Fusion / Pepperstone, 2025-01-02 to 2026-09-25.</em></p>
+<ul>
+<li>These are backtests on tick archives, not a record of live trading. A live account adds real
+  spread, slippage and a broker's own fill behaviour on top of what the archive can show; section 4's
+  broker-to-broker spread is the size of that kind of difference on three feeds, not a guarantee of
+  it.</li>
+<li>The result belongs to a moving gold market (section 5). A quiet gold market means few trades and a
+  flatter, possibly negative, result — that is the design, not a malfunction.</li>
+<li>Growth figures compound a single $10,000 start across one 2025-01-02 to 2026-09-25 window. A
+  different start date inside the same window moves the growth number; the drawdown figures move
+  less, which is why they are quoted alongside every growth figure in this note.</li>
+<li>Past results, backtested or live, do not predict future results. Test on a demo account with your
+  own broker before trading real funds.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
