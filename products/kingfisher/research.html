@@ -22,7 +22,8 @@
 <li><a href="#5-sizing-one-bet-per-level-and-the-busy-hunters-budget">5. Sizing: one bet per level, and the busy hunter's budget</a></li>
 <li><a href="#6-why-results-differ-by-broker">6. Why results differ by broker</a></li>
 <li><a href="#7-what-was-tested-and-rejected">7. What was tested and rejected</a></li>
-<li><a href="#8-limits">8. Limits</a></li>
+<li><a href="#8-september-2026-the-second-research-round">8. September 2026: the second research round</a></li>
+<li><a href="#9-limits">9. Limits</a></li>
 <li><a href="#appendix-traceability">Appendix — traceability</a></li>
 </ul>
 </li>
@@ -30,7 +31,7 @@
 </div>
 </nav><h1 id="kingfisher-research-note">Kingfisher — Research Note</h1>
 <p><em>What the machine does, what was changed on the way to the shipped version, and what each change did — with the tests that decided it.</em></p>
-<p>Version 1.05 · September 2026</p>
+<p>Versions 1.05 – 1.14 · September 2026</p>
 <p>All figures in this note are Strategy Tester runs on real broker ticks at 100 % history quality. They are backtests, not a record of live trading. Every number names the build, the broker feed and the window it came from; a number that cannot be traced that way does not appear here.</p>
 <hr />
 <h2 id="0-the-result-in-one-table">0. The result in one table</h2>
@@ -277,7 +278,24 @@
 
 <p><em>Every forward-selected genome against the shipped defaults, one hunter at a time, real ticks, untouched holdout. Labels are the worst drawdown of each bar.</em></p>
 <hr />
-<h2 id="8-limits">8. Limits</h2>
+<h2 id="8-september-2026-the-second-research-round">8. September 2026: the second research round</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull / Fusion / Pepperstone / IC Markets, 2025-04 → 2026-09; Dukascopy ticks 2013-05 → 2015-11 replayed at today's gold price level.</em></p>
+<p>After 1.05 the machine went through a second, larger round of research. Its goal was not more profit. It was a steadier path: flat stretches instead of slow bleeds when gold is quiet, and no change to how Kingfisher trades an active market. The effort, in numbers that describe the work rather than the result:</p>
+<ul>
+<li><strong>More than thirty separate studies and over 130 tested variants</strong>, each written down with its expected result and its pass bar <em>before</em> any number was read. With that many tries a few variants look good by chance, so a single good number never decides anything.</li>
+<li><strong>Close to 5,000 trades replayed tick by tick</strong> on four brokers, from the fill to the exit, so that every alternative could be judged on exactly the same trades.</li>
+<li><strong>Older markets replayed at today's price level.</strong> A fixed-dollar system behaves differently when gold is half its current price, so older years were replayed with every price scaled to today's level before any comparison.</li>
+<li><strong>Controls on every question.</strong> Random timing, placebo levels at a similar distance, shuffled outcomes, and a matched random version of every filter. A rule that does no better than its random twin is not a rule.</li>
+<li><strong>Two views of every result:</strong> a fixed lot per trade (so position size cannot flatter a variant) and the result per unit of risk.</li>
+</ul>
+<p>What the round established:</p>
+<p><strong>The exit held its ground.</strong> Around sixty alternative ways to leave a trade were tested against the shipped exit: taking profit just short of the target, reacting to fading momentum, to older levels on the chart and to classic indicator signals and their rate of change, wider or trailing stops, break-even moves, a shared stop for stacked positions, and machine-learning confidence models. None beat the shipped exit at equal drawdown across brokers. Two candidates survived the offline stage and are in their final tester proof; everything else stays out.</p>
+<p><strong>One system on every account.</strong> Since 1.13 the stops, targets and exit levels are the same distance in the gold price whatever currency the account is held in. An account in euros now trades exactly the system that was tested, proven trade for trade against a dollar account.</p>
+<p><strong>Restart-proof, and visible on the chart (1.14).</strong> A restart or a version update no longer changes how a running trade will exit: 480 simulated restarts in one test month produced exactly the same trades as an uninterrupted run. A panel on the chart shows why Kingfisher trades or waits, where each open trade's exit sits, and its closed result; the level behind every resting order and every exit are drawn on the chart. Pause, refresh, lock and close are sent by the EA itself and written to its log. 1.14 places exactly the same trades as 1.13; that was proven on the shipped file.</p>
+<p><strong>Market structure matters for the one-hour hunter.</strong> The largest finding of the round: the chart structure around a level changes how the one-hour hunter's breaks behave. In some structures they carry markedly further; in others they tend to fizzle, and those are the stretches where a quiet market slowly bleeds. A structure-aware admission rule is in its final tests.</p>
+<p><strong>How a change gets in.</strong> A candidate must improve the current market in <em>both</em> of its halves, 2025 and 2026 separately, and must do no harm on older years replayed at today's price. What fails stays out, and this note will say so.</p>
+<hr />
+<h2 id="9-limits">9. Limits</h2>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, windows as in section 0.</em></p>
 <ul>
 <li>Kingfisher earned its result in a market of large daily gold bursts (2025-10 onward on every feed) and stands aside in quiet markets. A quiet year means few trades and little income. That is the design, and the four-year feed shows it.</li>
@@ -326,6 +344,46 @@
 <td>1.05</td>
 <td>one exit mode per hunter</td>
 <td>pure four-hour events equal 1.04 to the cent; pure one-hour events under the Grip equal the research lock to the cent</td>
+</tr>
+<tr>
+<td>1.06 – 1.07</td>
+<td>research switches, off in the product</td>
+<td>trade-for-trade identical to 1.05</td>
+</tr>
+<tr>
+<td>1.08</td>
+<td>no order calls while the market is closed</td>
+<td>identical trades, cleaner journal</td>
+</tr>
+<tr>
+<td>1.09</td>
+<td>prop-firm rules, all off by default</td>
+<td>defaults unchanged</td>
+</tr>
+<tr>
+<td>1.10</td>
+<td>simpler input layout: account type, strategy settings, risk level first</td>
+<td>defaults unchanged</td>
+</tr>
+<tr>
+<td>1.11</td>
+<td>on high-volatility days the one-hour hunter rides instead of locking</td>
+<td>chosen on two feeds, validated on a third</td>
+</tr>
+<tr>
+<td>1.12</td>
+<td>optional counter-trade after a one-hour stop-out, off by default</td>
+<td>switched off it equals 1.11 to the cent</td>
+</tr>
+<tr>
+<td>1.13</td>
+<td>the same stops, targets and exit levels on every account currency</td>
+<td>euro deposit equals dollar deposit trade for trade</td>
+</tr>
+<tr>
+<td>1.14</td>
+<td>restart-proof exits, chart panel and drawings</td>
+<td>same trades as 1.13 on the shipped file; 480 simulated restarts identical</td>
 </tr>
 </tbody>
 </table>

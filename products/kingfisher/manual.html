@@ -22,13 +22,20 @@
 </ul>
 </li>
 <li><a href="#4-your-first-week">4. Your first week</a></li>
-<li><a href="#5-reading-the-chart-and-the-journal">5. Reading the chart and the journal</a></li>
+<li><a href="#5-reading-the-chart-the-panel-and-the-journal">5. Reading the chart, the panel and the journal</a><ul>
+<li><a href="#51-what-kingfisher-draws-since-114-inpdrawtrades-on-by-default">5.1 What KINGFISHER draws (since 1.14; InpDrawTrades, on by default)</a></li>
+<li><a href="#52-the-panel-since-114-inppanel-on-by-default">5.2 The panel (since 1.14; InpPanel, on by default)</a></li>
+<li><a href="#53-journal-lines">5.3 Journal lines</a></li>
+</ul>
+</li>
 <li><a href="#6-when-it-does-not-trade-and-why-that-is-usually-right">6. When it does not trade — and why that is usually right</a></li>
 <li><a href="#7-exit-modes">7. Exit modes</a><ul>
 <li><a href="#70-since-111-on-a-high-volatility-day-the-skim-hunter-rides">7.0 Since 1.11: on a high-volatility day the Skim hunter rides</a></li>
 <li><a href="#71-one-exit-per-hunter-inpd1exit-inps1exit-since-105">7.1 One exit per hunter (InpD1Exit … InpS1Exit, since 1.05)</a></li>
 <li><a href="#72-the-smoothest-path-on-a-tight-fill-broker-presetskingfisher_high_gripset">7.2 The smoothest path on a tight-fill broker: presets/KINGFISHER_high_grip.set</a></li>
 <li><a href="#73-since-112-rebound-reverse-after-a-skim-stop-out-opt-in-inprebound-off-by-default">7.3 Since 1.12: Rebound - reverse after a Skim stop-out (opt-in, InpRebound, off by default)</a></li>
+<li><a href="#74-since-113-the-same-stops-and-targets-on-every-account-currency">7.4 Since 1.13: the same stops and targets on every account currency</a></li>
+<li><a href="#75-since-114-the-grip-can-also-move-the-brokers-stop-opt-in-inpgripserverstop-off-by-default">7.5 Since 1.14: the Grip can also move the broker's stop (opt-in, InpGripServerStop, off by default)</a></li>
 </ul>
 </li>
 <li><a href="#8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</a></li>
@@ -44,7 +51,7 @@
 </ul>
 </div>
 </nav><h1 id="kingfisher-user-manual">KINGFISHER — user manual</h1>
-<p><em>Version 1.11 · XAUUSD · MetaTrader 5</em></p>
+<p><em>Version 1.14 · XAUUSD · MetaTrader 5</em></p>
 <p>KINGFISHER sits still above the water and dives once, when the fish breaks the surface. On a gold chart it waits at the nearest price level that has not been broken yet, rests a small order just inside it, and is filled at the moment the level gives way. Every trade has a fixed stop loss and take profit from the second it opens. When the market is too quiet for that stop loss to make sense, KINGFISHER does not trade at all.</p>
 <p>This manual is written for someone who has never run an expert advisor before. If you only read one chapter, read chapter 3.</p>
 <hr />
@@ -90,7 +97,7 @@
 <p>The four Dives rest on the <em>same</em> level and usually fill on the <em>same</em> break — that is deliberate, and it is why KINGFISHER sizes risk per <strong>level</strong>, not per order (chapter 3).</p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, 2022 to 2026.</em></p>
 <p><strong>What each hunter contributes.</strong> In four years of live-tick testing on four brokers, Skim placed about 60 % of all trades and won 17–20 % of them; the four Dives won 32–40 % of theirs (profit factor 2.5–4.3) and earned three-quarters of the money. Skim is the busy one; the Dives are the profitable ones. Two per-hunter inputs let you tune this without touching anything else: <code>Inp&lt;Hunter&gt;RiskWeight</code> scales that hunter's position size (1.0 = as tested; 0.25 = a quarter), and <code>Inp&lt;Hunter&gt;GateStopAtr</code> gives that hunter its own quiet-market threshold (0 = use the global 0.20), and <code>Inp&lt;Hunter&gt;GateActivity</code> makes that hunter stand aside while the market is calm at the minute scale (average one-minute range of the last 15 minutes divided by the last four hours; 1.0 = only trade when the last quarter hour is at least as active as the afternoon behind it; 0 = off). In four years of testing, Skim's fills that arrived on a calm quarter hour won 12–14 % — below breakeven — and its fills on an active one won 20–25 %. The tested configuration keeps all five at weight 1.0 and the activity gates off.</p>
-<p>Every position opens with a stop loss of 2.00 and a take profit of 15.00 (14.00 for Dive 2) in account currency per 0.01 lot. Nothing is averaged, nothing is added to a loser, no grid, no martingale.</p>
+<p>Every position opens with a stop loss of 2.00 and a take profit of 15.00 (14.00 for Dive 2) US dollars per 0.01 lot - a 2.00 and a 15.00 move in the gold price - whatever currency your account is in (since 1.13, chapter 7.4). Nothing is averaged, nothing is added to a loser, no grid, no martingale.</p>
 <p><strong>Two things make it different from a plain breakout robot:</strong></p>
 <ol>
 <li><strong>It knows when to stay out.</strong> The stop loss is a fixed amount of money. When gold is quiet and the hourly range is small, a 2.00 stop is inside the noise and gets hit before the move starts — that is where breakout robots bleed. KINGFISHER trades only while the stop is at most 20 % of the hourly range. In a quiet month it may place a handful of orders; in a quiet year, almost none.</li>
@@ -105,7 +112,7 @@
 <li>Make sure the <strong>Algo Trading</strong> button in the toolbar is green. A smiling face in the chart's top-right corner means the EA is running.</li>
 </ol>
 <p>The journal (<strong>Toolbox → Experts</strong>) shows one line on start, for example:</p>
-<pre><code>KINGFISHER v1.11 | account Personal | settings Recommended | XAUUSD | 5 of 5 hunters | risk Medium (1.00% per level) | exit Smart, Skim Grip | trade while stop &lt;= 0.20 x hourly ATR | max lot 5.00
+<pre><code>KINGFISHER v1.13 | account Personal | settings Recommended | XAUUSD | 5 of 5 hunters | risk Medium (1.00% per level) | exit Smart, Skim Grip | trade while stop &lt;= 0.20 x hourly ATR | max lot 5.00
 KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker minimum 0.01)
 </code></pre>
 <p>If your account is a <strong>netting</strong> account (one position per symbol) the EA prints a note; see chapter 6.</p>
@@ -509,14 +516,98 @@ the middle of the day does not give it a fresh daily allowance.</p>
 <li>When you go live, <strong>start at Low</strong> for the first eight trading weeks, or set Custom with <code>InpRiskPct = 0.25</code>.</li>
 <li>Move to Medium only after at least 60 closed trades with a profit factor above 1.5 and no single day losing more than 3 % of balance.</li>
 </ol>
-<h2 id="5-reading-the-chart-and-the-journal">5. Reading the chart and the journal</h2>
-<p>KINGFISHER draws nothing on the chart. You will see:</p>
+<h2 id="5-reading-the-chart-the-panel-and-the-journal">5. Reading the chart, the panel and the journal</h2>
+<h3 id="51-what-kingfisher-draws-since-114-inpdrawtrades-on-by-default">5.1 What KINGFISHER draws (since 1.14; <code>InpDrawTrades</code>, on by default)</h3>
 <ul>
-<li><strong>Pending orders</strong> (dotted lines): buy stops above price, sell stops below, comment <code>KF D1</code> … <code>KF D4</code> (the Dives) and <code>KF S1</code> (Skim). Up to three per hunter and side.</li>
-<li><strong>Open positions</strong> with a stop loss and take profit line each.</li>
-<li>Orders <strong>disappearing</strong> — normal: they expire after each hunter's patience, they are removed on Friday evening, and they are cancelled when the hourly range shrinks below the gate.</li>
+<li><strong>The level behind every resting order</strong>: a dotted line at the swing high or low the order rests on, labelled with the hunter and
+  the timeframe, for example <code>Skim - 1-hour swing high 4187.61 -&gt; buy stop 4184.35</code>. The order itself sits a small percentage inside
+  the level, so it fills the moment the level gives way.</li>
+<li><strong>Where the Grip starts</strong>: a dashed gold line at the entry + 1.00, labelled <code>Grip starts at ...</code>, until the trade reaches it.</li>
+<li><strong>The Grip exit, as it trails</strong>: once the Grip is on, a solid gold staircase at the price where the trade would close (it keeps
+  50 % of the best profit). It only ever steps in the trade's favour; <code>Grip exit ...</code> labels its current level.</li>
+<li><strong>Riding trades</strong>: a fast fill rides to its target instead; the chart says <code>riding to its target (a fast fill)</code>.</li>
+<li><strong>Every exit</strong>: where and why each trade closed - <code>Target +13.20 EUR</code>, <code>Grip exit +7.39 EUR</code>, <code>Stop</code> with its result, <code>Stop (locked)</code>
+  (a stop that had been moved into profit) or <code>Panel close</code> - in your account currency, costs included.</li>
 </ul>
-<p>Journal lines you may see:</p>
+<p>KINGFISHER also hides the chart grid while it runs (<code>InpCleanChart</code>; the grid comes back when you remove the EA), and one input,
+<code>InpTextSize</code> (default 10), sets the size of every label and of the panel.</p>
+<p>The order and position lines with their stop loss and take profit are MetaTrader's own (switch on <em>Show trade levels</em> in the chart
+properties if you do not see them). Turning <code>InpDrawTrades</code> off changes nothing in the trading.</p>
+<h3 id="52-the-panel-since-114-inppanel-on-by-default">5.2 The panel (since 1.14; <code>InpPanel</code>, on by default)</h3>
+<p>A small panel in the top-left corner shows, live:</p>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>KINGFISHER 1.14  XAUUSD  risk Medium  magic 89830</code></td>
+<td>what runs on this chart</td>
+</tr>
+<tr>
+<td><code>Stop 2.00  target 15.00 USD per 0.01 lot  Grip from +1.00, keeps 50% of the best</code></td>
+<td>the geometry every new order uses</td>
+</tr>
+<tr>
+<td><code>Trading - stop is 0.14 x the 1-hour range (limit 0.20)</code></td>
+<td>why it trades now - or <code>Quiet market ...</code>, <code>Weekend shield ...</code>, <code>Market closed</code>, <code>Entries PAUSED ...</code></td>
+</tr>
+<tr>
+<td><code>Resting orders 3:  S1 buy 4184.35,  D2 sell 4096.95 ...</code></td>
+<td>the orders waiting at levels</td>
+</tr>
+<tr>
+<td><code>Skim    BUY  0.01 @ 4184.52   +7.12 EUR   Grip on: best +16.80, exits at 4192.92</code></td>
+<td>each open trade and exactly where its exit is</td>
+</tr>
+<tr>
+<td><code>Closed today: 3 trades +12.40 EUR     last 7 days: 9 trades +31.20 EUR</code></td>
+<td>Kingfisher's own closed result (this magic number only, costs included)</td>
+</tr>
+</tbody>
+</table>
+<p>And four buttons:</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What the EA does</th>
+<th>Clicks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pause entries / Resume entries</strong></td>
+<td>Pause: removes Kingfisher's resting orders and places no new ones; open trades keep their Grip, stop and target. The pause survives a restart. Resume: each hunter places orders at its next check.</td>
+<td>one</td>
+</tr>
+<tr>
+<td><strong>Refresh orders</strong></td>
+<td>removes Kingfisher's resting orders; each hunter places fresh ones at its next check with the current settings. No trade opens or closes.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Lock profit</strong></td>
+<td>moves the broker stop of each winning trade: to its Grip exit (Grip on), to half the open profit (a riding trade) or to the entry (in profit, Grip not started). A losing trade is left alone; a stop is never loosened.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Close all</strong></td>
+<td>closes every Kingfisher trade at market, removes its orders and pauses entries (press Resume to trade again).</td>
+<td>two</td>
+</tr>
+</tbody>
+</table>
+<p>"Two clicks": the first click turns the button red (<code>Confirm ...?</code>); a second click within 5 seconds acts.</p>
+<p><strong>Why panel actions stay "automated".</strong> MetaTrader records who sent every deal: <em>Expert</em> for an EA, <em>Client</em>, <em>Mobile</em> or <em>Web</em> for a
+person. The panel does not trade by itself - a button asks KINGFISHER and KINGFISHER sends the request, so the account history shows
+<em>Expert</em>. Every panel action is also written to the Experts tab (<code>KINGFISHER panel: ...</code>) and a panel close carries the comment
+<code>KF panel close</code>, so your own history always shows which exits were your decision. Algo Trading must be on for the buttons to work;
+if it is off, the panel says so and does nothing.</p>
+<h3 id="53-journal-lines">5.3 Journal lines</h3>
 <table>
 <thead>
 <tr>
@@ -526,19 +617,31 @@ the middle of the day does not give it a fresh daily allowance.</p>
 </thead>
 <tbody>
 <tr>
-<td><code>KINGFISHER v1.04 …</code></td>
+<td><code>KINGFISHER v1.14 ...</code></td>
 <td>started; the banner repeats the risk level and exit mode</td>
 </tr>
 <tr>
-<td><code>Note: this account is in netting mode …</code></td>
+<td><code>KINGFISHER panel on ... Grip state saved per position ...</code></td>
+<td>the 1.14 features that are on</td>
+</tr>
+<tr>
+<td><code>KINGFISHER: N resting orders had another stop / target distance ...</code></td>
+<td>at start, orders left by an older version or other settings were replaced (chapter 11)</td>
+</tr>
+<tr>
+<td><code>KINGFISHER panel: ...</code></td>
+<td>a panel action and its result</td>
+</tr>
+<tr>
+<td><code>Note: this account is in netting mode ...</code></td>
 <td>see chapter 6</td>
 </tr>
 <tr>
-<td><code>Note: Hot risk level …</code></td>
+<td><code>Note: Hot risk level ...</code></td>
 <td>you chose Hot; the warning is deliberate</td>
 </tr>
 <tr>
-<td><code>KINGFISHER: orders placed N \| skipped - quiet hour …</code></td>
+<td><code>KINGFISHER: orders placed N \| skipped - quiet hour ...</code></td>
 <td>printed when the EA is removed; a summary of why orders were or were not placed</td>
 </tr>
 </tbody>
@@ -776,6 +879,24 @@ belongs to the volatile gold market of 2025 - 2026. It is a choice for traders w
 is why it ships off.</p>
 <p>Proved before release: with Rebound off, 1.12 places exactly the same deals as 1.11. With it on, 1.12 places exactly the
 same deals as the research build the table above was measured on, including under the Prop 2-step account type.</p>
+<h3 id="74-since-113-the-same-stops-and-targets-on-every-account-currency">7.4 Since 1.13: the same stops and targets on every account currency</h3>
+<p>Up to 1.12, KINGFISHER read its stop (2.00), target (15.00), Grip start (1.00) and quiet-market gate in your ACCOUNT currency per
+0.01 lot. On a euro account that made every distance about 14 % wider in the gold price (with EURUSD near 1.14): the stop sat 2.28
+away instead of 2.00, the target 17.07 instead of 15.00, and the quiet-market gate admitted fewer hours. A euro account therefore
+traded a slightly different system from the one every test in this manual measured - one live week on a euro account showed exactly
+that, trade for trade.</p>
+<p>From 1.13 all of these are US dollars of gold price per 0.01 lot on any account. Your risk level still works in your own currency:
+Medium risks 1 % of YOUR balance per level, and the prop-firm limits are your firm's amounts, as before. On a US-dollar account
+nothing changes at all.</p>
+<p>Proved before release: on a US-dollar account 1.13 places exactly the same deals as 1.12 (534 trades, +21,371.96 on BlackBull real ticks,
+April - September 2026), also with Rebound on and under the Prop 2-step account type; on a euro deposit it places the same deals as on a
+dollar deposit (IC Markets, September 2026: 186 of 186), where 1.12 on a euro deposit traded a different book.</p>
+<h3 id="75-since-114-the-grip-can-also-move-the-brokers-stop-opt-in-inpgripserverstop-off-by-default">7.5 Since 1.14: the Grip can also move the broker's stop (opt-in, <code>InpGripServerStop</code>, off by default)</h3>
+<p>The Grip closes a trade itself, from the EA, at the tick where profit falls to 50 % of the best. That needs the terminal running. With
+<code>InpGripServerStop = true</code> KINGFISHER also moves the trade's broker stop to the Grip exit as the best profit grows (in steps of 0.20,
+never loosened), so if your terminal or VPS goes offline the broker still closes the trade near the same level. While the EA runs, its
+own close still comes first. It is off by default because a broker stop fills slightly differently from a market close; chapter 14
+shows the measured difference.</p>
 <h2 id="8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</h2>
 <p>Same entries, same hit rate on every broker tested; what differs is how far past the 2.00 stop you are filled on a fast move. Measured medians (2026, losers): 2.06, 2.11, 2.17, 2.30 on the four live feeds; the widest feed earned about 25 % less per trade than the tightest. Execution delay of 100–500 ms was tested and changed the result by at most 1 %; it is the broker's quote path, not latency, that costs.</p>
 <p><strong>Spread is the bigger cost, and it is visible before you trade.</strong> KINGFISHER's stop is a fixed 2.00 per 0.01 lot, so
@@ -802,7 +923,16 @@ and 0.50 on a three-decimal one — look at your symbol's digits before relying 
 <li>Optimise on <strong>real ticks</strong> ("Every tick based on real ticks"), never on OHLC — the entries depend on the tick path.</li>
 </ul>
 <h2 id="11-what-is-saved-and-what-is-not">11. What is saved and what is not</h2>
-<p>KINGFISHER keeps no files. After a restart it re-adopts its own orders and positions by magic number and comment. The Grip's "best profit so far" for an open trade is <em>not</em> saved: after a restart it starts tracking again from the moment the trade is next seen, and the Smart read of "fast or slow fill" is taken again on that first tick.</p>
+<p>KINGFISHER keeps no files. After a restart it re-adopts its own orders and positions by magic number and comment.</p>
+<p><strong>Since 1.14 each open trade's Grip state is saved</strong> (in the terminal's global variables, F3): whether it rides or is gripped, whether
+the Grip has started, and its best profit so far. A restart, a new version dropped on the chart or a closed terminal therefore leaves
+every exit exactly where it was. Up to 1.13 that state lived only in memory: after a restart the best profit started again from the
+current price and the "fast or slow fill" read was taken again at that moment, so a riding trade could come back gripped. The saved
+values are removed when the trade closes. The panel's pause is saved the same way.</p>
+<p><strong>Orders from an older version are replaced at start</strong> (<code>InpRefreshOldOrders</code>, on). When KINGFISHER starts, any of its resting orders
+whose stop or target distance is not the current one - placed by an older version, under other settings, or on a euro account before
+1.13 (2.28 / 17.07 instead of 2.00 / 15.00) - is removed, and the hunter places it again at once with the current distances. Open
+trades are never changed.</p>
 <h2 id="12-troubleshooting">12. Troubleshooting</h2>
 <table>
 <thead>
@@ -862,6 +992,21 @@ and 0.50 on a three-decimal one — look at your symbol's digits before relying 
 <td>Prop mode seems to ignore the risk level</td>
 <td>expected</td>
 <td>the account type overrides the risk level; set Personal to use chapter 3</td>
+</tr>
+<tr>
+<td>Panel buttons do nothing</td>
+<td>Algo Trading is off</td>
+<td>switch on Algo Trading in the toolbar; the panel's last line says so</td>
+</tr>
+<tr>
+<td>No new orders, panel says PAUSED</td>
+<td>the panel's pause is saved across restarts</td>
+<td>press Resume entries</td>
+</tr>
+<tr>
+<td>Panel covers the one-click trading buttons</td>
+<td>both use the top-left corner</td>
+<td>hide one-click trading (right-click the chart) or set <code>InpPanel = false</code></td>
 </tr>
 </tbody>
 </table>
@@ -1044,7 +1189,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpGripStart</code></td>
 <td>double</td>
 <td>1.00</td>
-<td>Grip starts at this profit per 0.01 lot</td>
+<td>Grip starts at this profit per 0.01 lot, USD on gold</td>
 </tr>
 <tr>
 <td>3. Exit [Custom]</td>
@@ -1366,14 +1511,14 @@ ticks produces a different, invalid result.</p>
 <td><code>InpD1Stop</code></td>
 <td>double</td>
 <td>2.0</td>
-<td>Stop loss per 0.01 lot, account currency</td>
+<td>Stop loss per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>9. Dive 1 - 4-hour level [Custom]</td>
 <td><code>InpD1Target</code></td>
 <td>double</td>
 <td>15.0</td>
-<td>Take profit per 0.01 lot, account currency</td>
+<td>Take profit per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>9. Dive 1 - 4-hour level [Custom]</td>
@@ -1457,14 +1602,14 @@ ticks produces a different, invalid result.</p>
 <td><code>InpD2Stop</code></td>
 <td>double</td>
 <td>2.0</td>
-<td>Stop loss per 0.01 lot, account currency</td>
+<td>Stop loss per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>10. Dive 2 - 4-hour level [Custom]</td>
 <td><code>InpD2Target</code></td>
 <td>double</td>
 <td>14.0</td>
-<td>Take profit per 0.01 lot, account currency</td>
+<td>Take profit per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>10. Dive 2 - 4-hour level [Custom]</td>
@@ -1548,14 +1693,14 @@ ticks produces a different, invalid result.</p>
 <td><code>InpD3Stop</code></td>
 <td>double</td>
 <td>2.0</td>
-<td>Stop loss per 0.01 lot, account currency</td>
+<td>Stop loss per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>11. Dive 3 - 4-hour level [Custom]</td>
 <td><code>InpD3Target</code></td>
 <td>double</td>
 <td>15.0</td>
-<td>Take profit per 0.01 lot, account currency</td>
+<td>Take profit per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>11. Dive 3 - 4-hour level [Custom]</td>
@@ -1639,14 +1784,14 @@ ticks produces a different, invalid result.</p>
 <td><code>InpD4Stop</code></td>
 <td>double</td>
 <td>2.0</td>
-<td>Stop loss per 0.01 lot, account currency</td>
+<td>Stop loss per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>12. Dive 4 - 4-hour level [Custom]</td>
 <td><code>InpD4Target</code></td>
 <td>double</td>
 <td>15.0</td>
-<td>Take profit per 0.01 lot, account currency</td>
+<td>Take profit per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>12. Dive 4 - 4-hour level [Custom]</td>
@@ -1730,14 +1875,14 @@ ticks produces a different, invalid result.</p>
 <td><code>InpS1Stop</code></td>
 <td>double</td>
 <td>2.0</td>
-<td>Stop loss per 0.01 lot, account currency</td>
+<td>Stop loss per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>13. Skim - 1-hour level [Custom]</td>
 <td><code>InpS1Target</code></td>
 <td>double</td>
 <td>15.0</td>
-<td>Take profit per 0.01 lot, account currency</td>
+<td>Take profit per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
 <td>13. Skim - 1-hour level [Custom]</td>
@@ -1788,9 +1933,50 @@ ticks produces a different, invalid result.</p>
 <td>HEXIT_GRIP_ALL</td>
 <td>Own exit mode</td>
 </tr>
+<tr>
+<td>14. Panel and chart</td>
+<td><code>InpPanel</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Show the control panel (Pause, Refresh orders, Lock profit, Close all)</td>
+</tr>
+<tr>
+<td>14. Panel and chart</td>
+<td><code>InpDrawTrades</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Draw the Grip line, the levels and every exit on the chart</td>
+</tr>
+<tr>
+<td>14. Panel and chart</td>
+<td><code>InpRefreshOldOrders</code></td>
+<td>bool</td>
+<td>true</td>
+<td>On start, replace resting orders placed with other stop / target distances</td>
+</tr>
+<tr>
+<td>14. Panel and chart</td>
+<td><code>InpGripServerStop</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Grip: also move the broker stop to the Grip exit (protects a trade while offline)</td>
+</tr>
+<tr>
+<td>14. Panel and chart</td>
+<td><code>InpCleanChart</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Clean chart: hide the grid (put back when the EA is removed)</td>
+</tr>
+<tr>
+<td>14. Panel and chart</td>
+<td><code>InpTextSize</code></td>
+<td>int</td>
+<td>10</td>
+<td>Text size of the panel and the chart labels (8-16)</td>
+</tr>
 </tbody>
 </table>
-<p>Preset files with every key: <code>presets/KINGFISHER_low.set</code>, <code>_medium.set</code> (= the compiled defaults), <code>_high.set</code>, <code>_hot.set</code>, <code>_high_grip.set</code> (chapter 7.2). The presets were reissued on 2026-09-23 with every timeframe written as a number; a copy downloaded before that date ran a different, weaker configuration — replace it. A prop-firm account needs no preset: choose the Account type (chapter 3a).</p>
 </main>
 <footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
 <a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
