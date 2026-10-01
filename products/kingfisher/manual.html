@@ -51,7 +51,7 @@
 </ul>
 </div>
 </nav><h1 id="kingfisher-user-manual">KINGFISHER — user manual</h1>
-<p><em>Version 1.14 · XAUUSD · MetaTrader 5</em></p>
+<p><em>Version 1.16 · XAUUSD · MetaTrader 5</em></p>
 <p>KINGFISHER sits still above the water and dives once, when the fish breaks the surface. On a gold chart it waits at the nearest price level that has not been broken yet, rests a small order just inside it, and is filled at the moment the level gives way. Every trade has a fixed stop loss and take profit from the second it opens. When the market is too quiet for that stop loss to make sense, KINGFISHER does not trade at all.</p>
 <p>This manual is written for someone who has never run an expert advisor before. If you only read one chapter, read chapter 3.</p>
 <hr />
@@ -187,6 +187,10 @@ other symbols; in the Strategy Tester it always runs, so the Market validator ca
 <p><strong>The second Journal line</strong> says what your risk level buys at your balance, for example
 <code>a Dive order is 0.01 lot (broker minimum 0.01) - the minimum lot sets the risk here</code>. On a small account every risk
 level trades the same minimum lot until the balance grows (about 1,200 at Medium, 2,400 at Low).</p>
+<p><strong>The third Journal line</strong> (since 1.16) says what the smallest order costs in margin at your broker, for example
+<code>the smallest order (0.01 lot) needs 7.95 USD at this broker; free margin 100.00 covers 12 at once</code>. If the free margin covers
+none, the line says so: nothing can be placed until it does. Kingfisher has no minimum balance of its own - this is the broker's
+margin (chapter 9).</p>
 <h2 id="3-the-only-setting-that-matters-risk-level">3. The only setting that matters: risk level</h2>
 <p><code>InpRisk</code> — one choice, four levels plus Custom.</p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion, 2024 to 2026 (Low, Medium, High rows). Hot is not separately tested; its drawdown figure is extrapolated from the same three feeds.</em></p>
@@ -569,6 +573,10 @@ properties if you do not see them). Turning <code>InpDrawTrades</code> off chang
 <td><code>Closed today: 3 trades +12.40 EUR     last 7 days: 9 trades +31.20 EUR</code></td>
 <td>Kingfisher's own closed result (this magic number only, costs included)</td>
 </tr>
+<tr>
+<td><code>Waiting for margin: next order needs 152.40</code> (red, since 1.16)</td>
+<td>your broker's margin holds orders back - shown only while the free margin is short (chapter 9)</td>
+</tr>
 </tbody>
 </table>
 <p>And four buttons:</p>
@@ -916,7 +924,8 @@ and 0.50 on a three-decimal one — look at your symbol's digits before relying 
 <li>The size of each order is computed from the risk level, the balance, the 2.00 stop and the broker's tick value, then shared among the hunters on that level (<code>LOT_RISK_PER_LEVEL</code>).</li>
 <li><code>InpMaxLot</code> (5.0) caps every order. In the tests it only came into play after the balance had grown twenty-fold.</li>
 <li>Custom mode also offers fixed lots (<code>LOT_FIXED</code> + <code>InpFixedLot</code>), lots per 1,000 of balance, and risk per order (each fill risks the full percentage — in the same tests this took the drawdown past 40 %; not recommended).</li>
-<li><strong>No minimum balance of its own; the broker's margin sets it.</strong> KINGFISHER skips an order only when the broker would refuse it for margin (counted as <code>margin</code> in the summary line). One 0.01 lot of gold needs about the gold price divided by your leverage: 5-9 at 1:500, 25-45 at 1:100, 120-225 on EU-regulated accounts, where retail gold leverage is capped at 1:20 whatever the account leverage says. Below that no order is placed: the account waits, and that is the broker's limit, not a setting of the EA.</li>
+<li><strong>No minimum balance of its own; the broker's margin sets it.</strong> KINGFISHER skips an order only when the broker would refuse it for margin (counted as <code>margin</code> in the summary line). One 0.01 lot of gold needs about the gold price divided by your leverage: 5-9 at 1:500, 25-45 at 1:100, 120-225 on EU-regulated accounts, where retail gold leverage is capped at 1:20 whatever the account leverage says. Below that no order is placed: the account waits, and that is the broker's limit, not a setting of the EA. Since 1.16 the EA says so: a Journal note once a day while orders are held back, and the
+panel line <code>Waiting for margin</code> while the free margin is short.</li>
 <li>Leverage: up to seven positions can be open at once, so on a small account 1:500 lets them fit. At 1:30 and Medium the resting orders can exhaust free margin on small accounts; use Low or set <code>InpMaxRestingMarginPct</code>.</li>
 </ul>
 <h2 id="10-optimising-for-advanced-users">10. Optimising (for advanced users)</h2>
@@ -965,7 +974,7 @@ trades are never changed.</p>
 <tr>
 <td>No orders at all on a small account; a large <code>margin</code> count in the summary line</td>
 <td>the broker's margin for one 0.01 lot is more than your free margin (EU-regulated gold accounts: leverage 1:20, about 120-225 per 0.01 lot)</td>
-<td>add funds, or use an account with higher gold leverage; orders resume as soon as one fits (chapter 9)</td>
+<td>add funds, or use an account with higher gold leverage; orders resume as soon as one fits (chapter 9). Since 1.16 the Journal and the panel say so</td>
 </tr>
 <tr>
 <td>Fills much worse than 2.00 on losers</td>
