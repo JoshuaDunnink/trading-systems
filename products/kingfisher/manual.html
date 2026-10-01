@@ -237,6 +237,7 @@ level trades the same minimum lot until the balance grows (about 1,200 at Medium
 <li>1,000: one 0.01 lot already risks 2.00 per hunter; the EA never trades below the broker minimum, so the real risk per level is about 0.8 % — the drawdown will be proportionally larger (up to ~16 %).</li>
 <li>500: about 1.6 % per level; a 2025-type stretch can produce a 20 % drawdown. Start on Low.</li>
 <li>100: the minimum lot rules everything — each fill risks $2.10 (2.1 %), a four-Dive burst 8.4 %. Replayed on four brokers' real ticks a $100 account never hit a stop-out at 1:200 or higher, reached $1,000 in 98–100 % of resampled histories, and grew to $2,600–13,000 in 1.2–3.5 years — but it fell to $57–92 first, and in a fair-game year (2025-type) one history in three dips below $50. Leverage matters here: at 1:100 the broker refuses part of each burst for margin and the stop-out sits at ~$44; at 1:30 a $100 account cannot open a single 0.01 lot (about $300 is the floor). Above ~$400 the percentage sizing takes over and the drawdown falls back to the 10–15 % of the table.</li>
+<li>Below 100: KINGFISHER still trades whenever your broker's margin allows one 0.01 lot (from about 10 at 1:500), but a few early losses can leave the balance below the margin for the next order, and then it stops for good. Accounts started on every day of the window and followed for twelve months at 1:500: from 50, 13-23 % of start days got stuck; from 25, 47-71 %; from 10, 59-98 %; from 100, none (also none at 1:100). From the same start day, a 10 account on one broker kept trading and on another stopped after its first losses. <em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Kingfisher 1.15 at the minimum lot, BlackBull / Fusion, 2024 to 2026 (every start day, 12 months, with the broker's margin).</em></li>
 </ul>
 <p><strong>The honest sentence.</strong> These are backtests on real broker ticks, not results from live trading. KINGFISHER made its money in one kind of market — gold moving in large daily bursts, the way it has since late 2025. In quiet years (2023, 2024 on the four-year feed) it placed 18 trades in two years and finished flat. It should not lose much in a quiet year; it will not earn much either. Do not run it for income you need next month.</p>
 <h2 id="3a-prop-firm-accounts-one-choice-since-108">3a. Prop-firm accounts: one choice (since 1.08)</h2>
@@ -915,7 +916,8 @@ and 0.50 on a three-decimal one — look at your symbol's digits before relying 
 <li>The size of each order is computed from the risk level, the balance, the 2.00 stop and the broker's tick value, then shared among the hunters on that level (<code>LOT_RISK_PER_LEVEL</code>).</li>
 <li><code>InpMaxLot</code> (5.0) caps every order. In the tests it only came into play after the balance had grown twenty-fold.</li>
 <li>Custom mode also offers fixed lots (<code>LOT_FIXED</code> + <code>InpFixedLot</code>), lots per 1,000 of balance, and risk per order (each fill risks the full percentage — in the same tests this took the drawdown past 40 %; not recommended).</li>
-<li>Leverage: 1:100 or higher is comfortable. At 1:30 and Medium the resting orders can exhaust free margin on small accounts; use Low or set <code>InpMaxRestingMarginPct</code>.</li>
+<li><strong>No minimum balance of its own; the broker's margin sets it.</strong> KINGFISHER skips an order only when the broker would refuse it for margin (counted as <code>margin</code> in the summary line). One 0.01 lot of gold needs about the gold price divided by your leverage: 5-9 at 1:500, 25-45 at 1:100, 120-225 on EU-regulated accounts, where retail gold leverage is capped at 1:20 whatever the account leverage says. Below that no order is placed: the account waits, and that is the broker's limit, not a setting of the EA.</li>
+<li>Leverage: up to seven positions can be open at once, so on a small account 1:500 lets them fit. At 1:30 and Medium the resting orders can exhaust free margin on small accounts; use Low or set <code>InpMaxRestingMarginPct</code>.</li>
 </ul>
 <h2 id="10-optimising-for-advanced-users">10. Optimising (for advanced users)</h2>
 <p>Every value that moves a trade is an input, so the Strategy Tester's genetic optimiser can search any of them: the five hunters' offsets, stops, targets, patience, swing width and timeframe; the gate; the exit thresholds; the weekend times. Two warnings from the people who built it:</p>
@@ -959,6 +961,11 @@ trades are never changed.</p>
 <td><code>not enough money</code> in the journal</td>
 <td>netting account or low leverage</td>
 <td><code>InpMaxRestingMarginPct = 60</code>, or Low risk</td>
+</tr>
+<tr>
+<td>No orders at all on a small account; a large <code>margin</code> count in the summary line</td>
+<td>the broker's margin for one 0.01 lot is more than your free margin (EU-regulated gold accounts: leverage 1:20, about 120-225 per 0.01 lot)</td>
+<td>add funds, or use an account with higher gold leverage; orders resume as soon as one fits (chapter 9)</td>
 </tr>
 <tr>
 <td>Fills much worse than 2.00 on losers</td>
