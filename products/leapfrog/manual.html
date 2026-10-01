@@ -11,6 +11,11 @@
 <ul>
 <li><a href="#leapfrog-user-manual">Leapfrog — User Manual</a><ul>
 <li><a href="#what-it-does">What it does</a></li>
+<li><a href="#what-changed-in-version-130">What changed in version 1.30</a></li>
+<li><a href="#what-changed-in-version-129-panel-chart-labels-restart-safe">What changed in version 1.29 - panel, chart labels, restart-safe</a><ul>
+<li><a href="#the-panel-and-the-chart-since-129">The panel and the chart (since 1.29)</a></li>
+</ul>
+</li>
 <li><a href="#what-is-new-in-version-121-two-volatility-regime-controls">What is new in version 1.21 — two volatility-regime controls</a></li>
 <li><a href="#getting-started">Getting started</a></li>
 <li><a href="#settings-start-at-the-top-since-128">Settings: start at the top (since 1.28)</a></li>
@@ -37,7 +42,7 @@
 </div>
 </nav><h1 id="leapfrog-user-manual">Leapfrog — User Manual</h1>
 <p><strong>Instrument:</strong> XAUUSD (gold) · <strong>Timeframe:</strong> any (it works from hourly and daily series internally; M15 is used for validation)
-<strong>Magic:</strong> 89770 (the five ladders use 89770–89774) · <strong>Version:</strong> 1.28
+<strong>Magic:</strong> 89770 (the five ladders use 89770–89774) · <strong>Version:</strong> 1.30
 <strong>Account type:</strong> Hedging</p>
 <h2 id="what-it-does">What it does</h2>
 <p>Five independent "ladders" each watch a different rolling range of gold: the last day (ladder D), about
@@ -51,6 +56,96 @@ martingale: each ladder holds at most one position per side, and a losing positi
 <p>The ranges often end at the same high or low, so on a clean break several ladders fill at once: most
 breaks are traded by two to four ladders together. Treat the five ladders as one strategy traded at up to
 five times the lot per ladder, not as five unrelated systems (chapter "Deposit and position sizing").</p>
+<h2 id="what-changed-in-version-130">What changed in version 1.30</h2>
+<ul>
+<li><strong>Trades identical to the previous version</strong> (proved deal for deal). It no longer sends a new stop order into a closed market (the broker's daily break, a holiday): the request the broker would have refused is skipped, so the trades are unchanged and the journal no longer fills with 'Market closed' errors.</li>
+</ul>
+<h2 id="what-changed-in-version-129-panel-chart-labels-restart-safe">What changed in version 1.29 - panel, chart labels, restart-safe</h2>
+<ul>
+<li><strong>Trades identical to 1.28</strong> (proved deal for deal; see the MANIFEST).</li>
+<li><strong>Faster backtests and less VPS load.</strong> Unchanged in practice - Leapfrog was already fast (about 2 minutes for 269 M BlackBull ticks); its per-tick work fell further (the daily ATR read once a day).</li>
+<li><strong>A restart no longer re-places an order on a level that already traded.</strong> Each ladder's last levels, its side, its cooldown after a stop, and the hour of its last order check are saved on the account and re-read.</li>
+<li><strong>No refused fills on a small account.</strong> A new stop order is placed only when the free margin covers it; when it does not, the panel and a daily journal line say so. At the tested sizes this never binds.</li>
+<li><strong>Clearer journal.</strong> The start lines say when the account type's size overrides your lot inputs, and when edited [Custom] inputs are not in force under Settings = Recommended.</li>
+<li><strong>A control panel and chart labels</strong> (below).</li>
+</ul>
+<h3 id="the-panel-and-the-chart-since-129">The panel and the chart (since 1.29)</h3>
+<p>A small panel in the top-left corner shows what the EA is doing, and the chart labels every level it waits at, every open trade's exit and every closed trade's result. Nothing is drawn in a plain Strategy Tester run; on a live chart and in the visual tester it refreshes every second. Inputs: <code>InpPanel</code>, <code>InpDrawTrades</code>, <code>InpCleanChart</code> (hides the grid while the EA runs and puts it back when it is removed), <code>InpTextSize</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>LEAPFROG 1.29  XAUUSD  lot 0.04 per ladder</code></td>
+<td>what runs on this chart</td>
+</tr>
+<tr>
+<td><code>Ladders on: A B C D E - stop orders at their range high and low</code></td>
+<td>which ladders trade</td>
+</tr>
+<tr>
+<td><code>Exits: half off at 0.71 / 0.89 / 1.01 R, trail 0.71 R</code></td>
+<td>the exit rules in one line</td>
+</tr>
+<tr>
+<td><code>Trading - orders checked every hour</code></td>
+<td>why it trades now - or <code>Weekend ...</code>, <code>Volatility extreme ...</code>, <code>Very quiet market ...</code></td>
+</tr>
+<tr>
+<td><code>Resting orders: 6 (nearest first)</code> / <code>D buy 4210.50, ...</code></td>
+<td>the orders waiting at the ladders' range edges</td>
+</tr>
+<tr>
+<td><code>A BUY 0.04 @ 4185.20   +12.40 USD</code> / <code>next half off at 4198.30, stop 4176.00</code></td>
+<td>each open trade, its next part-close mark and its stop</td>
+</tr>
+<tr>
+<td><code>Waiting for margin: next order needs 152.40</code> (red)</td>
+<td>your broker's margin holds orders back - shown only while the free margin is short</td>
+</tr>
+<tr>
+<td><code>Closed today: 3 trades +12.40 USD</code> / <code>Last 7 days: ...</code></td>
+<td>this EA's own closed result (its magic number only, costs included)</td>
+</tr>
+</tbody>
+</table>
+<p>4 buttons. Every action is sent by the EA itself and written to the Experts tab; a panel close carries the comment "... panel close". The second-click buttons need the same button again within 5 seconds.</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What the EA does</th>
+<th>Clicks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pause entries / Resume entries</strong></td>
+<td>Pause: removes the resting orders and places no new ones; open trades keep their exits. The pause is saved on the account and survives a restart. Resume: orders return at the next check.</td>
+<td>one</td>
+</tr>
+<tr>
+<td><strong>Refresh orders</strong></td>
+<td>removes the resting orders; fresh ones are placed at the next check with the current settings. No trade is opened or closed.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Lock profit</strong></td>
+<td>moves each winning trade's broker stop to the trail's own price (current price minus the trail giveback in R) when that is above the entry, else to the entry. A losing trade is left alone and a stop is never loosened.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Close all</strong></td>
+<td>closes every trade of this EA at market, removes its orders and pauses entries (press Resume to trade again).</td>
+<td>two</td>
+</tr>
+</tbody>
+</table>
+<p>On the chart: each resting order as a dotted line at its ladder's range edge, labelled at the right edge with the ladders on it (buys above their line, sells below); each open trade's next part-close mark. A closed trade shows as a dotted line from its entry to its exit, labelled with why it closed and its net result.</p>
 <h2 id="what-is-new-in-version-121-two-volatility-regime-controls">What is new in version 1.21 — two volatility-regime controls</h2>
 <p>Version 1.21 had one weakness, and it was documented honestly: the engine earns when gold's daily
 ranges expand and pays a slow cost while they do not. Version 1.21 addresses that directly, with two
@@ -1248,6 +1343,34 @@ of a backtested record, and being beyond it is evidence rather than proof.</p>
 <td>int</td>
 <td>15</td>
 <td>Pause after a stop, minutes</td>
+</tr>
+<tr>
+<td>12. Panel and chart</td>
+<td><code>InpPanel</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Show the control panel (Pause, Refresh orders, Lock profit, Close all)</td>
+</tr>
+<tr>
+<td>12. Panel and chart</td>
+<td><code>InpDrawTrades</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Describe the levels, orders and trades on the chart</td>
+</tr>
+<tr>
+<td>12. Panel and chart</td>
+<td><code>InpCleanChart</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Clean chart: hide the grid (put back when the EA is removed)</td>
+</tr>
+<tr>
+<td>12. Panel and chart</td>
+<td><code>InpTextSize</code></td>
+<td>int</td>
+<td>10</td>
+<td>Text size of the panel and the chart labels (8-16)</td>
 </tr>
 </tbody>
 </table>

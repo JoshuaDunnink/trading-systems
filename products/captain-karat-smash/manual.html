@@ -13,6 +13,11 @@
 <li><a href="#1-what-it-does">1. What it does</a></li>
 <li><a href="#2-installation">2. Installation</a></li>
 <li><a href="#3-the-only-setting-that-matters">3. The only setting that matters</a></li>
+<li><a href="#3f-what-changed-in-version-111">3f. What changed in version 1.11</a></li>
+<li><a href="#3e-what-changed-in-version-110-panel-chart-labels-restart-safe">3e. What changed in version 1.10 - panel, chart labels, restart-safe</a><ul>
+<li><a href="#the-panel-and-the-chart-since-110">The panel and the chart (since 1.10)</a></li>
+</ul>
+</li>
 <li><a href="#3d-what-changed-in-version-109">3d. What changed in version 1.09</a></li>
 <li><a href="#3c-what-changed-in-version-108">3c. What changed in version 1.08</a></li>
 <li><a href="#3b-what-changed-in-version-107">3b. What changed in version 1.07</a></li>
@@ -34,7 +39,7 @@
 </nav><h1 id="captain-karat-smash-user-manual">Captain Karat-Smash — user manual</h1>
 <p><em>He waits patiently for the walls of consolidation to close in, and then BAM! Punches right through the
 resistance line to grab the gold. The rest of this manual explains exactly how he does it.</em></p>
-<p>Version 1.09 · XAUUSD · attach to one H1 chart · hedging account</p>
+<p>Version 1.11 · XAUUSD · attach to one H1 chart · hedging account</p>
 <hr />
 <h2 id="1-what-it-does">1. What it does</h2>
 <p>Captain Karat-Smash trades breakouts of intraday support and resistance on gold. It is not one strategy but
@@ -120,6 +125,95 @@ double, and to stop and review a system if drawdown in practice reaches one and 
 <p><strong>Suggested minimum balance:</strong> 3,000 at Medium. The EA never refuses to trade on a small balance — it
 falls back to the broker's minimum lot — but below that figure a single minimum lot is a large share of the
 account and the drawdown percentages above no longer apply.</p>
+<h2 id="3f-what-changed-in-version-111">3f. What changed in version 1.11</h2>
+<ul>
+<li><strong>Trades identical to the previous version</strong> (proved deal for deal). It no longer sends an order or a stop change into a closed market (the broker's daily break, a holiday): the request the broker would have refused is skipped at the same point, so nothing about the trades changes and the journal no longer fills with 'Market closed' errors.</li>
+</ul>
+<h2 id="3e-what-changed-in-version-110-panel-chart-labels-restart-safe">3e. What changed in version 1.10 - panel, chart labels, restart-safe</h2>
+<ul>
+<li><strong>Trades identical to 1.09</strong> (proved deal for deal; see the MANIFEST). Nothing about when it enters or exits has changed.</li>
+<li><strong>Faster backtests and less VPS load.</strong> A BlackBull backtest of 21 months (269 M real ticks) takes about 3 minutes instead of 17 (5.7x; Vantage 4.4x).</li>
+<li><strong>A restart no longer changes a trade.</strong> Each position's furthest move for and against it, its lock stage and trend side, and each strategy's last swing are saved on the account and re-read after a restart. Before, a restart reset the London Grip and the bounce exit, and re-placed orders on swings whose orders had already filled - with a restart every hour, 1.09 traded 3,875 times instead of 1,148 at a 25 % instead of 5 % equity drawdown (backtest, restart arm, BlackBull, 2025-01 to 2026-09).</li>
+<li><strong>Clearer journal.</strong> The start lines say CAPTAIN KARAT-SMASH, what the risk level buys at your balance (and when the broker's minimum lot sets the risk), what the smallest order needs in margin, and which of your inputs a prop account type overrides. When the broker's margin holds an order back, one line a day says so.</li>
+<li><strong>A control panel and chart labels</strong> (below).</li>
+</ul>
+<h3 id="the-panel-and-the-chart-since-110">The panel and the chart (since 1.10)</h3>
+<p>A small panel in the top-left corner shows what the EA is doing, and the chart labels every level it waits at, every open trade's exit and every closed trade's result. Nothing is drawn in a plain Strategy Tester run; on a live chart and in the visual tester it refreshes every second. Inputs: <code>InpPanel</code>, <code>InpDrawTrades</code>, <code>InpCleanChart</code> (hides the grid while the EA runs and puts it back when it is removed), <code>InpTextSize</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>CAPTAIN KARAT-SMASH 1.10  XAUUSD  risk Medium</code></td>
+<td>what runs on this chart</td>
+</tr>
+<tr>
+<td><code>Strategies on: 1 2 3 4 5 6 7   order 0.02 lot</code></td>
+<td>which strategies trade and the lot each order uses now</td>
+</tr>
+<tr>
+<td><code>Exits: stop locks, then trails; London Grip keeps 50%</code></td>
+<td>the exit rules in one line</td>
+</tr>
+<tr>
+<td><code>Trading - 7 strategies watch their levels</code></td>
+<td>why it trades now - or <code>Market closed</code>, <code>Spread ... above the limit</code>, <code>Entries PAUSED ...</code>, a prop-firm rule</td>
+</tr>
+<tr>
+<td><code>Resting orders: 14 (nearest first)</code> / <code>S3 buy 4210.50, ...</code></td>
+<td>the orders waiting at levels, the four nearest to price</td>
+</tr>
+<tr>
+<td><code>S3 BUY 0.02 @ 4185.20   +12.40 USD</code> / <code>stop locks at 4199.00</code></td>
+<td>each open trade and what its exit does now: where the stop locks, where the Grip starts or exits, or the trailing stop</td>
+</tr>
+<tr>
+<td><code>Waiting for margin: next order needs 152.40</code> (red)</td>
+<td>your broker's margin holds orders back - shown only while the free margin is short</td>
+</tr>
+<tr>
+<td><code>Closed today: 3 trades +12.40 USD</code> / <code>Last 7 days: ...</code></td>
+<td>this EA's own closed result (its magic number only, costs included)</td>
+</tr>
+</tbody>
+</table>
+<p>4 buttons. Every action is sent by the EA itself and written to the Experts tab; a panel close carries the comment "... panel close". The second-click buttons need the same button again within 5 seconds.</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What the EA does</th>
+<th>Clicks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pause entries / Resume entries</strong></td>
+<td>Pause: removes the resting orders and places no new ones; open trades keep their exits. The pause is saved on the account and survives a restart. Resume: orders return at the next check.</td>
+<td>one</td>
+</tr>
+<tr>
+<td><strong>Refresh orders</strong></td>
+<td>removes the resting orders; fresh ones are placed at the next check with the current settings. No trade is opened or closed.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Lock profit</strong></td>
+<td>moves each winning trade's broker stop to its Grip exit (London Grip on), else to its strategy's own lock price once the trade is past it, else to the entry. A losing trade is left alone and a stop is never loosened.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Close all</strong></td>
+<td>closes every trade of this EA at market, removes its orders and pauses entries (press Resume to trade again).</td>
+<td>two</td>
+</tr>
+</tbody>
+</table>
+<p>On the chart: each resting order as a dotted line at the swing level it rests on, labelled at the right edge with the strategies on it and their stop prices (buys above their line, sells below); each open trade's lock price, Grip start or Grip exit, or trailing stop as a line with its label. A closed trade shows as a dotted line from its entry to its exit, labelled with why it closed and its net result.</p>
 <h2 id="3d-what-changed-in-version-109">3d. What changed in version 1.09</h2>
 <p><strong>London-session breaks are locked in; with-trend runners get more room.</strong> The London morning's first push is often the
 false move of the day: it runs, then fades once New York opens. From 1.09 a position opened in the London session (from
@@ -913,6 +1007,34 @@ swing before it places anything, and the daily strategies can wait days.</p>
 <td>double</td>
 <td>10.0</td>
 <td>Maximum lot size per order (every risk level)</td>
+</tr>
+<tr>
+<td>6. Panel and chart</td>
+<td><code>InpPanel</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Show the control panel (Pause, Refresh orders, Lock profit, Close all)</td>
+</tr>
+<tr>
+<td>6. Panel and chart</td>
+<td><code>InpDrawTrades</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Describe the levels, orders and trades on the chart</td>
+</tr>
+<tr>
+<td>6. Panel and chart</td>
+<td><code>InpCleanChart</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Clean chart: hide the grid (put back when the EA is removed)</td>
+</tr>
+<tr>
+<td>6. Panel and chart</td>
+<td><code>InpTextSize</code></td>
+<td>int</td>
+<td>10</td>
+<td>Text size of the panel and the chart labels (8-16)</td>
 </tr>
 </tbody>
 </table>

@@ -10,7 +10,10 @@
 <p><a href="index.html">&larr; Daybreak</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
 <ul>
 <li><a href="#daybreak-research-note">Daybreak — Research Note</a><ul>
-<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a><ul>
+<li><a href="#earlier-measurement">Earlier measurement</a></li>
+</ul>
+</li>
 <li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
 <li><a href="#2-the-mechanism-two-prices-a-day">2. The mechanism: two prices a day</a></li>
 <li><a href="#3-risk-levels-low-medium-high">3. Risk levels: Low, Medium, High</a></li>
@@ -27,12 +30,54 @@
 </nav><h1 id="daybreak-research-note">Daybreak — Research Note</h1>
 <p><em>What the machine does, what was left out on the way to the shipped version, and what the tests behind
 each figure showed.</em></p>
-<p>Version 1.00 · September 2026</p>
+<p>Version 1.01 · October 2026</p>
 <p>All figures in this note are Strategy Tester runs on real broker ticks at 100% history quality. They
 are backtests, not a record of live trading. Every number names the broker feed and the window it
 came from; a number that cannot be traced that way does not appear here.</p>
 <hr />
 <h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p><strong>Version 1.01, compiled defaults.</strong> Backtest, MetaTrader 5 Strategy Tester, real ticks at 100 % history quality, 10,000 starting deposit, 2 January 2024 to 26 September 2026, three live broker feeds (Vantage's real-tick history starts in July 2025, so its row covers July 2025 on):</p>
+<table>
+<thead>
+<tr>
+<th>feed</th>
+<th style="text-align: right;">net</th>
+<th style="text-align: right;">% of deposit</th>
+<th style="text-align: right;">profit factor</th>
+<th style="text-align: right;">trades</th>
+<th style="text-align: right;">relative equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fusion - the published figure, the weaker of the two feeds that cover the whole window</td>
+<td style="text-align: right;">6,176.63</td>
+<td style="text-align: right;">+61.8 %</td>
+<td style="text-align: right;">2.37</td>
+<td style="text-align: right;">159</td>
+<td style="text-align: right;">6.43 %</td>
+</tr>
+<tr>
+<td>BlackBull</td>
+<td style="text-align: right;">7,511.23</td>
+<td style="text-align: right;">+75.1 %</td>
+<td style="text-align: right;">3.09</td>
+<td style="text-align: right;">159</td>
+<td style="text-align: right;">3.50 %</td>
+</tr>
+<tr>
+<td>Vantage (from July 2025)</td>
+<td style="text-align: right;">8,109.57</td>
+<td style="text-align: right;">+81.1 %</td>
+<td style="text-align: right;">4.12</td>
+<td style="text-align: right;">122</td>
+<td style="text-align: right;">3.97 %</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Daybreak 1.01 at its default settings on three live brokers" src="img/02_medium.png" /></p>
+<p>Pepperstone, used in earlier measurements, is left out of the current figures: its real-tick archive on our test terminal has gaps in 2026, and a figure built on filled-in ticks is not published.</p>
+<h3 id="earlier-measurement">Earlier measurement</h3>
 <p>Daybreak runs out of the box on its <strong>Medium</strong> setting (1.5% of balance risked per trade, against the
 trade's own $5 level-anchored stop). Three live broker feeds, $10,000 starting balance, compiled
 defaults:</p>
@@ -68,12 +113,12 @@ defaults:</p>
 </tr>
 </tbody>
 </table>
-<p><img alt="BlackBull, Medium risk, full window" src="img/01_blackbull_medium.png" /></p>
+
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2025-01-02 to 2026-09-25, Medium risk.</em></p>
 <p>The headline figure above is BlackBull's — the weakest of the three live brokers in this window, not
 the strongest. Fusion and Pepperstone are shown alongside it rather than in its place:</p>
-<p><img alt="Fusion, Medium risk, full window" src="img/02_fusion_medium.png" /></p>
-<p><img alt="Pepperstone, Medium risk, full window" src="img/03_pepperstone_medium.png" /></p>
+
+
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Fusion / Pepperstone, 2025-01-02 to 2026-09-25,
 Medium risk.</em></p>
 <p>How the machine got to that table, what it leaves out on a quiet day, what a losing run costs, and

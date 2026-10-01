@@ -11,6 +11,11 @@
 <ul>
 <li><a href="#jab-user-manual">Jab — User Manual</a><ul>
 <li><a href="#what-it-does">What it does</a></li>
+<li><a href="#what-changed-in-version-150">What changed in version 1.50</a></li>
+<li><a href="#what-changed-in-version-149-panel-chart-labels-restart-safe">What changed in version 1.49 - panel, chart labels, restart-safe</a><ul>
+<li><a href="#the-panel-and-the-chart-since-149">The panel and the chart (since 1.49)</a></li>
+</ul>
+</li>
 <li><a href="#getting-started">Getting started</a></li>
 <li><a href="#settings-that-matter">Settings that matter</a></li>
 <li><a href="#optional-preset-cadence">Optional preset: Cadence</a></li>
@@ -33,7 +38,7 @@
 </nav><h1 id="jab-user-manual">Jab — User Manual</h1>
 <p><strong>Instrument:</strong> XAUUSD (gold) · <strong>Timeframe:</strong> M15 · <strong>Magic:</strong> 89721
 <strong>Account type:</strong> Hedging, <strong>raw-spread / ECN required</strong>
-<strong>Version:</strong> 1.48</p>
+<strong>Version:</strong> 1.50</p>
 <h2 id="what-it-does">What it does</h2>
 <p>Rests a stop order beyond a confirmed M15 swing level, in the direction of the last closed
 candle. On a fill, the position is managed by a two-stage trailing stop: a first stop move
@@ -41,6 +46,90 @@ once the trade is 6 $/oz ahead, then a 2 $/oz trail once it is 4 $/oz ahead. Eve
 carries a hard stop 5 $/oz from entry the moment it is placed. Version 1.43 widened this exit:
 the earlier 0.37 $/oz trail sat inside the spread of most live feeds and gave back the edge.
 At most one position per side. No averaging, no grid, no martingale.</p>
+<h2 id="what-changed-in-version-150">What changed in version 1.50</h2>
+<ul>
+<li><strong>Trades identical to the previous version</strong> (proved deal for deal). It no longer sends an order into a closed market (the broker's daily break, a holiday): the request the broker would have refused is skipped, so the trades are unchanged and the journal no longer fills with 'Market closed' errors.</li>
+</ul>
+<h2 id="what-changed-in-version-149-panel-chart-labels-restart-safe">What changed in version 1.49 - panel, chart labels, restart-safe</h2>
+<ul>
+<li><strong>Trades identical to 1.48</strong> (proved deal for deal; see the MANIFEST).</li>
+<li><strong>A restart no longer places a new order in the middle of a bar.</strong> The bar it last acted on is saved on the account and re-read.</li>
+<li><strong>Clearer journal.</strong> Every line says JAB. With Sizing = Automatic, when the free margin cannot carry your lot the order goes out at the broker minimum - now one line a day says so (Sizing = Exact sends your lot as given).</li>
+<li><strong>A control panel and chart labels</strong> (below).</li>
+</ul>
+<h3 id="the-panel-and-the-chart-since-149">The panel and the chart (since 1.49)</h3>
+<p>A small panel in the top-left corner shows what the EA is doing, and the chart labels every level it waits at, every open trade's exit and every closed trade's result. Nothing is drawn in a plain Strategy Tester run; on a live chart and in the visual tester it refreshes every second. Inputs: <code>InpPanel</code>, <code>InpDrawTrades</code>, <code>InpCleanChart</code> (hides the grid while the EA runs and puts it back when it is removed), <code>InpTextSize</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>JAB 1.49  XAUUSD  lot 0.01</code></td>
+<td>what runs on this chart</td>
+</tr>
+<tr>
+<td><code>A stop order at a 15-minute swing level, with the candle</code></td>
+<td>the rule in one line, then the stop and the two-stage trail</td>
+</tr>
+<tr>
+<td><code>Trading - checks every 15-minute bar</code></td>
+<td>why it trades now - or <code>In a trade - one at a time</code>, <code>Weekend ...</code></td>
+</tr>
+<tr>
+<td><code>Resting: buy stop 4210.50</code></td>
+<td>the order waiting at a level</td>
+</tr>
+<tr>
+<td><code>BUY 0.01 @ 4211.20   +1.40 USD</code> / <code>trail 6.00; tightens at 4215.20</code></td>
+<td>the open trade and its trail stage</td>
+</tr>
+<tr>
+<td><code>Waiting for margin: next order needs 152.40</code> (red)</td>
+<td>your broker's margin holds orders back - shown only while the free margin is short</td>
+</tr>
+<tr>
+<td><code>Closed today: 3 trades +12.40 USD</code> / <code>Last 7 days: ...</code></td>
+<td>this EA's own closed result (its magic number only, costs included)</td>
+</tr>
+</tbody>
+</table>
+<p>4 buttons. Every action is sent by the EA itself and written to the Experts tab; a panel close carries the comment "... panel close". The second-click buttons need the same button again within 5 seconds.</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What the EA does</th>
+<th>Clicks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pause entries / Resume entries</strong></td>
+<td>Pause: removes the resting orders and places no new ones; open trades keep their exits. The pause is saved on the account and survives a restart. Resume: orders return at the next check.</td>
+<td>one</td>
+</tr>
+<tr>
+<td><strong>Refresh orders</strong></td>
+<td>removes the resting orders; fresh ones are placed at the next check with the current settings. No trade is opened or closed.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Lock profit</strong></td>
+<td>moves the winning trade's broker stop to the tight trail's price when that is above the entry, else to the entry. A losing trade is left alone and a stop is never loosened.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Close all</strong></td>
+<td>closes every trade of this EA at market, removes its orders and pauses entries (press Resume to trade again).</td>
+<td>two</td>
+</tr>
+</tbody>
+</table>
+<p>On the chart: the resting order as a dotted line at its swing level; the open trade's price where the trail tightens. A closed trade shows as a dotted line from its entry to its exit, labelled with why it closed and its net result.</p>
 <h2 id="getting-started">Getting started</h2>
 <ol>
 <li>Attach to an XAUUSD (gold) M15 chart. No set file is needed; the defaults are the validated ones.</li>
@@ -411,95 +500,95 @@ the order.</p>
 </thead>
 <tbody>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropAccountSize</code></td>
 <td>double</td>
 <td>0</td>
 <td>Account size (0 = balance when the EA first starts)</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropDailyLossPct</code></td>
 <td>double</td>
 <td>0</td>
-<td>Daily loss limit % (0 = off; a prop account type fills it in)</td>
+<td>Daily loss limit % (0 = off)</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropDailyPctOf</code></td>
 <td>PropPctOf</td>
 <td>PROP_PCT_OF_SIZE</td>
 <td>Daily loss limit is a % of</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropDailyFrom</code></td>
 <td>PropDayFrom</td>
 <td>PROP_DAY_HIGHER</td>
 <td>Daily loss is counted from</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropMaxLossPct</code></td>
 <td>double</td>
 <td>0</td>
-<td>Maximum loss limit % of account size (0 = off; a prop account type fills it in)</td>
+<td>Maximum loss limit % (0 = off)</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropMaxRule</code></td>
 <td>PropMaxRule</td>
 <td>PROP_MAX_FIXED</td>
 <td>Maximum loss limit type</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropTrailLock</code></td>
 <td>bool</td>
 <td>true</td>
 <td>A trailing limit stops rising at the account size</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropSafetyPct</code></td>
 <td>double</td>
 <td>0.5</td>
 <td>Act this many % of account size BEFORE each loss limit</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropTargetPct</code></td>
 <td>double</td>
 <td>0</td>
 <td>Profit target %: close all and stop for good (0 = off)</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropDayGainPct</code></td>
 <td>double</td>
 <td>0</td>
 <td>Best-day cap %: close all and pause for the day (0 = off)</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropDayStartHour</code></td>
 <td>int</td>
 <td>0</td>
 <td>Hour the firm's day starts, broker server time (0-23)</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropFridayCloseHour</code></td>
 <td>int</td>
 <td>0</td>
-<td>Friday: close all at this server hour, resume Monday (0 = off)</td>
+<td>Friday: close all at this hour (0 = off)</td>
 </tr>
 <tr>
-<td>Prop-firm rules - your firm's numbers (0 = rule off)</td>
+<td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropResetState</code></td>
 <td>bool</td>
 <td>false</td>
-<td>New challenge on the same login: true for ONE start, then false</td>
+<td>New challenge, same login: true once</td>
 </tr>
 <tr>
 <td>MONEY</td>
@@ -983,6 +1072,34 @@ the order.</p>
 <td>bool</td>
 <td>false</td>
 <td>Print detailed order and trail decisions to the journal</td>
+</tr>
+<tr>
+<td>PANEL AND CHART</td>
+<td><code>InpPanel</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Show the control panel (Pause, Refresh orders, Lock profit, Close all)</td>
+</tr>
+<tr>
+<td>PANEL AND CHART</td>
+<td><code>InpDrawTrades</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Describe the levels, orders and trades on the chart</td>
+</tr>
+<tr>
+<td>PANEL AND CHART</td>
+<td><code>InpCleanChart</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Clean chart: hide the grid (put back when the EA is removed)</td>
+</tr>
+<tr>
+<td>PANEL AND CHART</td>
+<td><code>InpTextSize</code></td>
+<td>int</td>
+<td>10</td>
+<td>Text size of the panel and the chart labels (8-16)</td>
 </tr>
 </tbody>
 </table>

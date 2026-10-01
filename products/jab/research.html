@@ -10,7 +10,10 @@
 <p><a href="index.html">&larr; Jab</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
 <ul>
 <li><a href="#jab-research-note">Jab — Research Note</a><ul>
-<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a><ul>
+<li><a href="#earlier-measurement">Earlier measurement</a></li>
+</ul>
+</li>
 <li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
 <li><a href="#2-the-base-mechanism-a-stop-order-at-the-freshest-unbroken-pivot">2. The base mechanism: a stop order at the freshest unbroken pivot</a></li>
 <li><a href="#3-choosing-the-level-eight-definitions-were-screened-one-survived">3. Choosing the level: eight definitions were screened, one survived</a></li>
@@ -28,10 +31,52 @@
 </div>
 </nav><h1 id="jab-research-note">Jab — Research Note</h1>
 <p><em>What the machine does, what was changed on the way to the shipped version, and what each change did — with the tests that decided it.</em></p>
-<p>Version 1.48 · XAUUSD, M15</p>
+<p>Version 1.50 · XAUUSD, M15</p>
 <p>All figures in this note are Strategy Tester runs on real broker ticks at 100% history quality. They are backtest figures, not a record of live trading. Every number names the broker feed and the window it came from. Where a design decision is described without a number, it is because the underlying test produced a small or negative reading that this note does not repeat — the decision it led to is stated instead, in words.</p>
 <hr />
 <h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p><strong>Version 1.50, compiled defaults.</strong> Backtest, MetaTrader 5 Strategy Tester, real ticks at 100 % history quality, 10,000 starting deposit, 2 January 2024 to 26 September 2026, three live broker feeds (Vantage's real-tick history starts in July 2025, so its row covers July 2025 on):</p>
+<table>
+<thead>
+<tr>
+<th>feed</th>
+<th style="text-align: right;">net</th>
+<th style="text-align: right;">% of deposit</th>
+<th style="text-align: right;">profit factor</th>
+<th style="text-align: right;">trades</th>
+<th style="text-align: right;">relative equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fusion - the published figure, the weaker of the two feeds that cover the whole window</td>
+<td style="text-align: right;">469.77</td>
+<td style="text-align: right;">+4.7 %</td>
+<td style="text-align: right;">1.58</td>
+<td style="text-align: right;">467</td>
+<td style="text-align: right;">0.36 %</td>
+</tr>
+<tr>
+<td>BlackBull</td>
+<td style="text-align: right;">628.13</td>
+<td style="text-align: right;">+6.3 %</td>
+<td style="text-align: right;">1.86</td>
+<td style="text-align: right;">469</td>
+<td style="text-align: right;">0.47 %</td>
+</tr>
+<tr>
+<td>Vantage (from July 2025)</td>
+<td style="text-align: right;">460.05</td>
+<td style="text-align: right;">+4.6 %</td>
+<td style="text-align: right;">2.19</td>
+<td style="text-align: right;">272</td>
+<td style="text-align: right;">0.29 %</td>
+</tr>
+</tbody>
+</table>
+<p><img alt="Jab 1.50 at its default settings on three live brokers" src="img/02_medium.png" /></p>
+<p>Pepperstone, used in earlier measurements, is left out of the current figures: its real-tick archive on our test terminal has gaps in 2026, and a figure built on filled-in ticks is not published.</p>
+<h3 id="earlier-measurement">Earlier measurement</h3>
 <p>Jab runs out of the box on its compiled defaults — no set file needed. Strategy Tester, real broker ticks, 100% history quality, a 10,000 starting balance, matched window 2025-07-01 to 2026-09-07, measured on build 1.42; every default through the current 1.48 build reproduces the same trades:</p>
 <table>
 <thead>

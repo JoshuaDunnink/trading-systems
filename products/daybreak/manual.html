@@ -10,6 +10,10 @@
 <p><a href="index.html">&larr; Daybreak</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
 <ul>
 <li><a href="#daybreak-user-manual">DAYBREAK — user manual</a><ul>
+<li><a href="#what-changed-in-version-101-panel-chart-labels-restart-safe">What changed in version 1.01 - panel, chart labels, restart-safe</a><ul>
+<li><a href="#the-panel-and-the-chart-since-101">The panel and the chart (since 1.01)</a></li>
+</ul>
+</li>
 <li><a href="#1-what-it-does-in-plain-words">1. What it does, in plain words</a></li>
 <li><a href="#2-installation-five-minutes">2. Installation (five minutes)</a></li>
 <li><a href="#2a-the-inputs-at-a-glance">2a. The inputs at a glance</a></li>
@@ -37,6 +41,82 @@
 </ul>
 </div>
 </nav><h1 id="daybreak-user-manual">DAYBREAK — user manual</h1>
+<p><em>Version 1.01 · XAUUSD · MetaTrader 5</em></p>
+<h2 id="what-changed-in-version-101-panel-chart-labels-restart-safe">What changed in version 1.01 - panel, chart labels, restart-safe</h2>
+<ul>
+<li><strong>Trades identical to 1.00</strong> (proved deal for deal; see the MANIFEST).</li>
+<li><strong>A restart no longer re-arms a level that already traded today.</strong> The day's levels and their state, the range gate of the day and the highest (lowest) price the trail has followed are saved on the account and re-read. With a restart every hour of a backtest, 1.00 traded 281 times instead of 155.</li>
+<li><strong>Clearer journal.</strong> When you edit a section 6 or 7 input but run the Recommended profile, or a Custom sizing input under a named risk level, the start lines say those inputs are not in force. The smallest order's margin is printed at the start; when even the minimum lot does not fit, the panel says so.</li>
+<li><strong>A control panel and chart labels</strong> (below). Three buttons: the levels are set once a day, so there are no resting orders to refresh.</li>
+</ul>
+<h3 id="the-panel-and-the-chart-since-101">The panel and the chart (since 1.01)</h3>
+<p>A small panel in the top-left corner shows what the EA is doing, and the chart labels every level it waits at, every open trade's exit and every closed trade's result. Nothing is drawn in a plain Strategy Tester run; on a live chart and in the visual tester it refreshes every second. Inputs: <code>InpPanel</code>, <code>InpDrawTrades</code>, <code>InpCleanChart</code> (hides the grid while the EA runs and puts it back when it is removed), <code>InpTextSize</code>.</p>
+<table>
+<thead>
+<tr>
+<th>Line</th>
+<th>What it tells you</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><code>DAYBREAK 1.01  XAUUSD  risk Medium</code></td>
+<td>what runs on this chart</td>
+</tr>
+<tr>
+<td><code>Trades a break of yesterday's high or low</code></td>
+<td>the rule in one line, then the stop, target and trail</td>
+</tr>
+<tr>
+<td><code>Trading - watching yesterday's high and low</code></td>
+<td>why it trades now - or <code>Levels arm when the day's first 15-minute bar closes</code>, <code>Quiet yesterday ...</code>, <code>No new entries today: a US jobs-report day</code>, <code>Both levels are done for today</code></td>
+</tr>
+<tr>
+<td><code>High 4210.50: live</code> / <code>Low 4100.20: traded today</code></td>
+<td>the state of each of today's levels: live, traded today, or not armed today</td>
+</tr>
+<tr>
+<td><code>BUY 0.05 @ 4211.20   +12.40 USD</code> / <code>trails at 4215.10, best 4215.60</code></td>
+<td>the open trade and where its trail sits (or where it starts)</td>
+</tr>
+<tr>
+<td><code>Waiting for margin: next order needs 152.40</code> (red)</td>
+<td>your broker's margin holds orders back - shown only while the free margin is short</td>
+</tr>
+<tr>
+<td><code>Closed today: 3 trades +12.40 USD</code> / <code>Last 7 days: ...</code></td>
+<td>this EA's own closed result (its magic number only, costs included)</td>
+</tr>
+</tbody>
+</table>
+<p>3 buttons. Every action is sent by the EA itself and written to the Experts tab; a panel close carries the comment "... panel close". The second-click buttons need the same button again within 5 seconds.</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What the EA does</th>
+<th>Clicks</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pause entries / Resume entries</strong></td>
+<td>Pause: removes the resting orders and places no new ones; open trades keep their exits. The pause is saved on the account and survives a restart. Resume: orders return at the next check.</td>
+<td>one</td>
+</tr>
+<tr>
+<td><strong>Lock profit</strong></td>
+<td>moves the winning trade's broker stop to the trail's current lock once the trail has armed, else to the entry. A losing trade is left alone and a stop is never loosened.</td>
+<td>two</td>
+</tr>
+<tr>
+<td><strong>Close all</strong></td>
+<td>closes every trade of this EA at market, removes its orders and pauses entries (press Resume to trade again).</td>
+<td>two</td>
+</tr>
+</tbody>
+</table>
+<p>On the chart: yesterday's high and low while they are live, as dotted lines labelled with the trigger price a break fires at; the open trade's trail start or current trail price. A closed trade shows as a dotted line from its entry to its exit, labelled with why it closed and its net result.</p>
 <h2 id="1-what-it-does-in-plain-words">1. What it does, in plain words</h2>
 <p>DAYBREAK watches two prices every trading day: the high and the low of the <strong>previous</strong> day. If
 price breaks up through yesterday's high, it buys; if price breaks down through yesterday's low, it
@@ -265,9 +345,342 @@ minutes in MetaTrader 5 and needs no .set file.</p>
 same to the second and the profit differs: the trailing stop lives longer on some tick streams than on
 others, which is why this manual quotes three brokers, never one.</p>
 <h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</h2>
-<p>See <code>presets/DAYBREAK_MEDIUM.set</code> for the complete, validated input list (42 inputs, UTF-16 LE with
-BOM, every enum written as its integer). <code>presets/DAYBREAK_{LOW,HIGH,FIXED001}.set</code> differ only in
-the Risk-level / custom-sizing inputs.</p>
+<p>Generated from the compiled source; enum defaults are the source names - the Inputs tab shows their plain labels. The presets in <code>presets/</code> are complete sets of these inputs (UTF-16 LE with BOM, every enum as its integer).</p>
+<table>
+<thead>
+<tr>
+<th>Group</th>
+<th>Input</th>
+<th>Type</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1. Start here</td>
+<td><code>InpAccountMode</code></td>
+<td>AccountMode</td>
+<td>ACCOUNT_PERSONAL</td>
+<td>Account type</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpProfile</code></td>
+<td>StrategyProfile</td>
+<td>PROFILE_RECOMMENDED</td>
+<td>Settings profile</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpRisk</code></td>
+<td>RiskLevel</td>
+<td>RISK_MEDIUM</td>
+<td>Risk level</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpCustomLotMode</code></td>
+<td>CustomLotMode</td>
+<td>LOT_RISK_PCT</td>
+<td>Custom sizing method (Risk level = Custom)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpRiskPctCustom</code></td>
+<td>double</td>
+<td>1.5</td>
+<td>Custom risk %, per stop (Risk level = Custom)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpFixedLotCustom</code></td>
+<td>double</td>
+<td>0.01</td>
+<td>Custom fixed lot (Risk level = Custom)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpVirtualBalance</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Size as if the balance were this (0 = real)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpMaxSpreadUsd</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Max spread for a new order, USD (0 = off)</td>
+</tr>
+<tr>
+<td>2. Sides</td>
+<td><code>InpAllowBuy</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Allow buy trades (prior-day high breakout)</td>
+</tr>
+<tr>
+<td>2. Sides</td>
+<td><code>InpAllowSell</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Allow sell trades</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropAccountSize</code></td>
+<td>double</td>
+<td>0</td>
+<td>Account size (0 = balance when the EA first starts)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Daily loss limit % (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyPctOf</code></td>
+<td>PropPctOf</td>
+<td>PROP_PCT_OF_SIZE</td>
+<td>Daily loss limit is a % of</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDailyFrom</code></td>
+<td>PropDayFrom</td>
+<td>PROP_DAY_HIGHER</td>
+<td>Daily loss is counted from</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropMaxLossPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Maximum loss limit % (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropMaxRule</code></td>
+<td>PropMaxRule</td>
+<td>PROP_MAX_FIXED</td>
+<td>Maximum loss limit type</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropTrailLock</code></td>
+<td>bool</td>
+<td>true</td>
+<td>A trailing limit stops rising at the account size</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropSafetyPct</code></td>
+<td>double</td>
+<td>0.5</td>
+<td>Act this many % of account size BEFORE each loss limit</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropTargetPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Profit target %: close all and stop for good (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDayGainPct</code></td>
+<td>double</td>
+<td>0</td>
+<td>Best-day cap %: close all and pause for the day (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropDayStartHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Hour the firm's day starts, broker server time (0-23)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropFridayCloseHour</code></td>
+<td>int</td>
+<td>0</td>
+<td>Friday: close all at this hour (0 = off)</td>
+</tr>
+<tr>
+<td>3. Prop-firm rules (0 = rule off)</td>
+<td><code>InpPropResetState</code></td>
+<td>bool</td>
+<td>false</td>
+<td>New challenge, same login: true once</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpAvoidNFPDays</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Skip new entries on a US jobs-report day</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpAvoidFOMCDays</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Skip new entries on a Fed rate-decision day</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpAvoidYearEnd</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Skip new entries on the thin year-end days</td>
+</tr>
+<tr>
+<td>5. Safety</td>
+<td><code>InpMarginFitPct</code></td>
+<td>double</td>
+<td>95.0</td>
+<td>Shrink the lot to fit this % of free margin (0=off)</td>
+</tr>
+<tr>
+<td>5. Safety</td>
+<td><code>InpMaxJumpFrac</code></td>
+<td>double</td>
+<td>0.5</td>
+<td>Skip a level price already jumped past (0=off)</td>
+</tr>
+<tr>
+<td>5. Safety</td>
+<td><code>InpMaxAccountDD</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Pause new entries after this % equity drawdown (0=off)</td>
+</tr>
+<tr>
+<td>5. Safety</td>
+<td><code>InpHardFloorPct</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Stop for good after this % loss from the start (0=off)</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpTrigOffsetUsd</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Fire this many $ before (+) or after (-) the level</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpSLUsd</code></td>
+<td>double</td>
+<td>5.0</td>
+<td>Stop loss, $ from the level</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpTPUsd</code></td>
+<td>double</td>
+<td>50.0</td>
+<td>Take profit, $ from the level (0 = none)</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpTrailMode</code></td>
+<td>ENUM_TRAIL_MODE</td>
+<td>TRAIL_FIXED</td>
+<td>Trailing-stop style</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpTrailArmUsd</code></td>
+<td>double</td>
+<td>1.0</td>
+<td>Profit, $, needed before the trail arms</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpTrailKeep</code></td>
+<td>double</td>
+<td>0.92</td>
+<td>Proportional mode: fraction of profit kept</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpTrailOffsetUsd</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Proportional mode: $ give-back offset</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpTrailDistUsd</code></td>
+<td>double</td>
+<td>0.50</td>
+<td>Fixed mode: $ behind the best price</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpTrailStepUsd</code></td>
+<td>double</td>
+<td>0.10</td>
+<td>Minimum stop improvement worth sending</td>
+</tr>
+<tr>
+<td>6. Entry and exit [Custom]</td>
+<td><code>InpNeverBelowEntry</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Trailed stop may never pass breakeven</td>
+</tr>
+<tr>
+<td>7. Range gate [Custom]</td>
+<td><code>InpMinPrevDayRangePct</code></td>
+<td>double</td>
+<td>2.0</td>
+<td>Min prior-day range, % of price (0=off, gold only)</td>
+</tr>
+<tr>
+<td>7. Range gate [Custom]</td>
+<td><code>InpAdmit5dZone</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Admit a break into fresh 5-day territory</td>
+</tr>
+<tr>
+<td>8. Panel and chart</td>
+<td><code>InpPanel</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Show the control panel (Pause, Refresh orders, Lock profit, Close all)</td>
+</tr>
+<tr>
+<td>8. Panel and chart</td>
+<td><code>InpDrawTrades</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Describe the levels, orders and trades on the chart</td>
+</tr>
+<tr>
+<td>8. Panel and chart</td>
+<td><code>InpCleanChart</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Clean chart: hide the grid (put back when the EA is removed)</td>
+</tr>
+<tr>
+<td>8. Panel and chart</td>
+<td><code>InpTextSize</code></td>
+<td>int</td>
+<td>10</td>
+<td>Text size of the panel and the chart labels (8-16)</td>
+</tr>
+</tbody>
+</table>
 </main>
 <footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
 <a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
