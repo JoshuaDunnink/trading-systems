@@ -36,38 +36,39 @@
 <p>All figures in this note are Strategy Tester runs on real broker ticks at 100 % history quality. They are backtests, not a record of live trading. Every number names the build, the broker feed and the window it came from; a number that cannot be traced that way does not appear here.</p>
 <hr />
 <h2 id="0-the-result-in-one-table">0. The result in one table</h2>
-<p>Kingfisher runs out of the box on its <strong>Medium</strong> setting (1 % of balance per level). Three live broker feeds, 10,000 starting balance, compiled defaults:</p>
-<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion, windows shown per row.</em></p>
+<p>Kingfisher runs out of the box on its <strong>Medium</strong> setting (1 % of balance per level). Version 1.15, three live broker feeds, 10,000 starting balance, compiled defaults:</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Kingfisher 1.15, BlackBull / Fusion / Vantage, windows shown per row.</em></p>
 <table>
 <thead>
 <tr>
 <th>feed · window</th>
 <th>growth</th>
-<th>worst drawdown</th>
+<th>worst equity drawdown</th>
 <th>profit factor</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Pepperstone · 2025-01 → 2026-09</td>
-<td>×20.4</td>
-<td>9.3 %</td>
-<td>2.62</td>
-</tr>
-<tr>
-<td>Vantage · 2025-06 → 2026-09</td>
-<td>×22.4</td>
-<td>7.9 %</td>
-<td>2.36</td>
+<td>BlackBull · 2024-01 → 2026-09</td>
+<td>×21.7</td>
+<td>10.5 %</td>
+<td>2.38</td>
 </tr>
 <tr>
 <td>Fusion · 2024-01 → 2026-09</td>
-<td>×17.3</td>
-<td>10.2 %</td>
-<td>1.89</td>
+<td>×19.4</td>
+<td>10.6 %</td>
+<td>2.20</td>
+</tr>
+<tr>
+<td>Vantage · 2025-07 → 2026-09</td>
+<td>×27.7</td>
+<td>8.3 %</td>
+<td>3.01</td>
 </tr>
 </tbody>
 </table>
+<p>The first trades fall in 2024-04: gold was too quiet before that. A fourth broker (Pepperstone) is left out until its 2026 tick history is complete again; earlier versions measured it alongside these three.</p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2022-11 → 2026-09, fixed 0.01 lot.</em></p>
 <p>The same machine at a fixed 0.01 lot over four years on a fourth feed (BlackBull, 2022-11 → 2026-09): +25 %, worst drawdown 0.9 %, with two quiet years in which it placed 18 trades. That last row is the honest one: Kingfisher earned its result in one kind of market — gold moving in large daily bursts — and stands aside in the other kind rather than trading it.</p>
 <p>How the machine got from a raw idea to that table is the rest of this note. Each section names a mechanism, shows the figure that decided it, and states what it did to losses and to profit. The exact geometry (distances, widths, thresholds) is deliberately not written out here; it is in the product's inputs.</p>
@@ -119,7 +120,7 @@
 <p>A trending year pays <em>any</em> resting stop; the flat year separates the level from the drift. The level doubles the money per trade and flips the flat year's sign. That is the edge, and it is the only entry-side edge this note claims.</p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, 2022-11 → 2026-09 (per-feed windows as in section 0).</em></p>
 <p><strong>The win rate is a geometry, not a skill.</strong> With a 2.00 stop and a 15.00 target the fair-game win rate under zero drift is 2/17, about 12 %. The bracket-only machine wins 22–26 % of its fills on four feeds. The excess over 12 % is the level; the rest is the target being 7.5 times the stop. Readers who expect a 60 % win rate from a breakout system are expecting the wrong geometry (section 4 shows where a 71 % win rate comes from, and what it costs).</p>
-<p><img alt="Five feeds at a fixed lot" src="img/01_five_feeds.png" /></p>
+<p><img alt="Four feeds at a fixed lot, research machine" src="img/01_feeds_research.png" /></p>
 <hr />
 <h2 id="3-preventing-losses-the-quiet-market-gate">3. Preventing losses: the quiet-market gate</h2>
 <p>The raw machine bleeds in quiet markets. A fixed-dollar stop is a fixed <em>fraction of the hourly range</em> only while the range is large; when gold's hourly range shrinks, the same 2.00 stop sits inside the noise and is taken by it. Over eight years on a demo feed (OANDA, 2018 → 2026) the raw machine loses money in every year but 2019 and 2026.</p>
@@ -250,7 +251,7 @@
 <h2 id="5-sizing-one-bet-per-level-and-the-busy-hunters-budget">5. Sizing: one bet per level, and the busy hunter's budget</h2>
 <p><strong>Per level, not per order.</strong> When the four four-hour hunters fill on the same break they are one bet, not four. Sizing each order at 2 % of balance — the obvious setting — makes that one bet an 8 % bet. Even 2 % per <em>level</em> carries a 40–44 % worst drawdown for its climb (Fusion 2024-01 → 2026-09: ×100 at 40 %; Vantage ×114 at 25 %), and per order is worse still; on a netting account the tester refused most of the placements on margin before the drawdown could even be measured. Kingfisher sizes the <em>level</em>: the fraction is shared by the hunters that rest on it, and a five-lot cap brakes the tail.</p>
 <p><img alt="Medium on three feeds" src="img/02_sizing.png" /></p>
-<p><em>Medium (1 % per level) on three live feeds, log scale, with the drawdown track. The dashed line is the 20 % limit no run may cross.</em></p>
+<p><em>Version 1.15 at Medium (1 % per level) on three live feeds, log scale, with the drawdown track. The dashed line is the 20 % limit no run may cross.</em></p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, four live feeds (Pepperstone, Vantage, Fusion, BlackBull), Medium sizing (0.5 % per level), 2022-11 → 2026-09 (per-feed windows as in section 0).</em></p>
 <p><strong>The one-hour hunter's weight.</strong> Eighty percent of level events are the one-hour hunter alone, trading at a profit factor far below the four-hour events' (which win 39–47 % at profit factors of 2.3–5.0). Yet per-level sizing handed the one-hour hunter the full budget, because it is alone on its timeframe. Giving it a quarter of the budget was the single largest improvement in the programme:</p>
 <p><img alt="Hunter weight" src="img/08_hunter_weight.png" /></p>

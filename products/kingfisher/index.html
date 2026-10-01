@@ -10,7 +10,18 @@
 <link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
 <body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
-<a href="../../img/kingfisher_hero.jpg"><img class="hero" src="../../img/kingfisher_hero.jpg" width="800" height="800" alt="Kingfisher artwork"></a><h1>Kingfisher</h1><p class="lead">XAUUSD · M15 · MetaTrader 5 Expert Advisor</p><p><a class="btn" href="https://www.mql5.com/en/users/joshuadunnink">View on mql5</a><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><p class="note">Live signal 2392436 (real account): growth 0.50%, 6 trades, 1 week(s) live, as of 2026-09-28. <a href="../../signal.html">Details</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 2.15 · worst equity drawdown 12.4% · 1,479 trades · return x11.2 on 10,000</p><p class="stamp">Backtest, real ticks, Fusion Markets, 2024-01-02 to 2026-09-19, Medium risk, current defaults. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/kingfisher_headline.png" alt="Kingfisher balance curve (backtest)" loading="lazy"><figcaption>Chart: the same rules on five brokers at a fixed 0.01 lot, not the Medium-risk run whose figures are quoted here. It shows how closely the brokers agree.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>Kingfisher is an Expert Advisor for MetaTrader 5 (MT5) that trades gold (XAUUSD) with a level-breakout strategy: it enters on the break of the nearest unbroken price level, with a stop loss on every trade. Five hunters run side by side on one
+<a href="../../img/kingfisher_hero.jpg"><img class="hero" src="../../img/kingfisher_hero.jpg" width="800" height="800" alt="Kingfisher artwork"></a><h1>Kingfisher</h1><p class="lead">XAUUSD · M15 · MetaTrader 5 Expert Advisor</p><p><a class="btn" href="https://www.mql5.com/en/users/joshuadunnink">View on mql5</a><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><p class="note">Live signal 2392436 (real account): growth 0.50%, 6 trades, 1 week(s) live, as of 2026-09-28. <a href="../../signal.html">Details</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 2.20 · worst equity drawdown 10.6% · 1,490 trades · return x19.4 on 10,000</p><p class="stamp">Backtest, real ticks, Fusion Markets, 2024-01-02 to 2026-09-26, Medium risk, version 1.15 defaults. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/kingfisher_headline.png" alt="Kingfisher balance curve (backtest)" loading="lazy"><figcaption>Chart: the same rules on three live brokers at a fixed 0.01 lot (version 1.15), not the Medium-risk run whose figures are quoted here. It shows how closely the brokers agree.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><h2 id="what-to-expect">What to expect</h2>
+<blockquote>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, Kingfisher 1.15, BlackBull / Fusion / Vantage, 2024-01 to 2026-09.</p>
+</blockquote>
+<ul>
+<li><strong>Flat stretches.</strong> Kingfisher trades only when gold moves enough for a level break to be worth taking. In quiet markets it stands aside, sometimes for weeks; in the test window there was a month without a single trade. Flat is the design, not a fault.</li>
+<li><strong>Slow bleeds.</strong> Between active periods there are stretches where small breakouts keep failing: the balance can drift down for weeks, now and then for a few months, before the next active market lifts it again. They are the price of being in position when the large moves come.</li>
+<li><strong>Profit comes in bursts.</strong> Most of the result in the tests came from periods of large daily gold moves. A year without them is a small year.</li>
+<li><strong>Small accounts.</strong> On a small account every order is the smallest lot (0.01). We started an account of 100 on every day of the test window on three live brokers and followed each for twelve months: none of those starts was wiped out. Along the way it can swing far below its start before it recovers, so start that small only with money you can afford to see swing, and use leverage of 1:500 so that the up to seven orders that can be open at once fit. We do not recommend starting below 100.</li>
+</ul>
+<hr />
+<p>Kingfisher is an Expert Advisor for MetaTrader 5 (MT5) that trades gold (XAUUSD) with a level-breakout strategy: it enters on the break of the nearest unbroken price level, with a stop loss on every trade. Five hunters run side by side on one
 chart: four watch the most recent unbroken swing high and swing low on the four-hour bars, one watches the
 one-hour bars. Each rests a buy stop just inside the high and a sell stop just inside the low, so it is filled at
 the moment the level gives way.</p>
@@ -19,15 +30,15 @@ the moment the level gives way.</p>
 not traded through since. The nearest such swing above and below price is the level.</p>
 <p>Entry. A stop order rests a small percentage of price inside the level. Orders that are not triggered expire after
 each hunter's patience (15 to 60 hours) and are renewed while the level is still current.</p>
-<p>Risk per trade. Every position opens with a fixed stop loss and take profit in account currency (2.00 and 15.00 per
-0.01 lot by default). Position size is computed from the chosen risk level and shared by the hunters that rest on
+<p>Risk per trade. Every position opens with a fixed stop loss and take profit in the gold price (2.00 and 15.00 USD per
+0.01 lot by default, on any account currency). Position size is computed from the chosen risk level and shared by the hunters that rest on
 the same level, so one break is one bet, never four.</p>
 <p>When it does not trade. Kingfisher places orders only while the stop loss is at most 20 % of the hourly range
 (ATR). In quiet markets it stands aside; in the four-year test it placed 18 trades across two quiet years. Orders
 are removed before the weekend.</p>
 <p>Exit. On the first tick after a fill the EA reads how fast price arrived. A fast fill rides to the take profit. A
 slow fill is managed by the Grip: once 1.00 ahead per 0.01 lot, the trade is closed if it gives back half of its
-best profit.</p>
+best profit, or more than a set share of the 15-minute range, whichever comes first.</p>
 <p>What the EA does not do: no grid, no martingale, no averaging down, no position without a stop loss, no news
 trading logic, no files, no DLLs, no external resources.</p>
 <p>Settings. One short section, "Start here", is the whole setup: Account type (Personal, Prop firm 2-step, Prop firm
@@ -38,16 +49,14 @@ each hunter's level, offsets, stop, target and patience, the gates, the exits - 
 defaults are the tested configuration; the EA needs no .set file. On a chart that is not gold it loads, says why, and
 stays flat. The Journal's second line states the lot size your risk level buys at your balance.</p>
 <p>Results below are Strategy Tester runs on real broker ticks (100 % history quality), 10,000 starting balance,
-compiled defaults, and are backtests, not live trading:</p>
+version 1.15 defaults at the Medium risk level, and are backtests, not live trading:</p>
 <ul>
-<li>Pepperstone, 2025-01 to 2026-09: growth ×20.6, worst drawdown 5.3 %, profit factor 3.57</li>
-<li>Vantage, 2025-06 to 2026-09: growth ×15.8, worst drawdown 5.9 %, profit factor 3.06</li>
-<li>Fusion, 2024-01 to 2026-09: growth ×11.2, worst drawdown 12.4 % (on this wide-fill feed the Classic setting did
-  better: ×17.3 at 10.2 %)</li>
-<li>BlackBull, 2025-04 to 2026-09: growth x18.8, worst drawdown 8.8 % (version 1.11)</li>
+<li>BlackBull, 2024-01 to 2026-09: growth ×21.7, worst equity drawdown 10.5 %, profit factor 2.38</li>
+<li>Fusion, 2024-01 to 2026-09: growth ×19.4, worst equity drawdown 10.6 %, profit factor 2.20</li>
+<li>Vantage, 2025-07 to 2026-09: growth ×27.7, worst equity drawdown 8.3 %, profit factor 3.01</li>
 </ul>
-<p>(Medium risk level, the 1.10 default settings; version 1.10 places exactly the same deals as these runs, proved deal for
-deal.) In 2023 and 2024 gold was quiet and the EA placed few trades: flat years, not losing ones.</p>
+<p>(The first trades in these runs fall in 2024-04: gold was too quiet before that. A fourth broker is left out of this
+list until its tick history for 2026 is complete again.) In 2023 and 2024 gold was quiet and the EA placed few trades: flat years, not losing ones.</p>
 <p>Results differ by broker. The stop is a fixed 2.00 per 0.01 lot, so the spread takes a fixed share of it: on the four
 raw-spread brokers the losers closed 2.07 to 2.34 away from the entry at the median, while on a broker whose gold
 spread was about 0.24, 8.5 % of the same entries were stopped out within one second of the fill (0.1 to 3.0 % on the
