@@ -519,9 +519,10 @@ the middle of the day does not give it a fresh daily allowance.</p>
 <h2 id="5-reading-the-chart-the-panel-and-the-journal">5. Reading the chart, the panel and the journal</h2>
 <h3 id="51-what-kingfisher-draws-since-114-inpdrawtrades-on-by-default">5.1 What KINGFISHER draws (since 1.14; <code>InpDrawTrades</code>, on by default)</h3>
 <ul>
-<li><strong>The level behind every resting order</strong>: a dotted line at the swing high or low the order rests on, labelled with the hunter and
-  the timeframe, for example <code>Skim - 1-hour swing high 4187.61 -&gt; buy stop 4184.35</code>. The order itself sits a small percentage inside
-  the level, so it fills the moment the level gives way.</li>
+<li><strong>The level behind every resting order</strong>: a dotted line at the swing high or low the order rests on, and one label per level at the
+  right edge of the chart in two short lines: what the level is (<code>Dive 1+3 - 4-hour swing high 4219.30</code>) and the orders resting on it
+  (<code>-&gt; 2 buy stops 4218.34 - 4219.34</code>). Buy labels sit above their lines, sell labels on them; labels that would touch are stacked. The order
+  itself sits a small percentage inside the level, so it fills the moment the level gives way.</li>
 <li><strong>Where the Grip starts</strong>: a dashed gold line at the entry + 1.00, labelled <code>Grip starts at ...</code>, until the trade reaches it.</li>
 <li><strong>The Grip exit, as it trails</strong>: once the Grip is on, a solid gold staircase at the price where the trade would close (it keeps
   50 % of the best profit). It only ever steps in the trade's favour; <code>Grip exit ...</code> labels its current level.</li>
@@ -735,7 +736,8 @@ On a wide-fill feed (Fusion) the Grip's small wins are eaten by the fill cost - 
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion, 2024 to 2026 (comparative ranking across exit modes).</em></p>
 <ul>
 <li><strong>Smart (default).</strong> The fill is read on the first tick after it opens. If price arrived on a push (the last 5 seconds moved at least 4.5 % of the hourly range — <code>InpSmartPushAtr</code>), the trade rides to the 15.00 target. Otherwise the Grip manages it.</li>
-<li><strong>Grip every trade.</strong> The Grip on all trades: once 1.00 ahead per 0.01 lot (<code>InpGripStart</code>), close if profit falls to 50 % of its best (<code>InpGripKeepPct</code>). Highest win rate, lowest net — it sells the big winners.</li>
+<li><strong>Grip every trade.</strong> The Grip on all trades: once 1.00 ahead per 0.01 lot (<code>InpGripStart</code>), close if profit falls to 50 % of its best (<code>InpGripKeepPct</code>). Highest win rate, lowest net — it sells the big winners.
+  Since 1.15 the Grip also never gives back more than 0.40 x the 15-minute ATR (<code>InpGripAtrCap</code>): on a big winner in a calm hour it keeps more than half of the best profit (backtest, Grip cap 0.40 vs off, BlackBull / Fusion / Vantage, 2025-04 → 2026-09: a little more net and the same or a slightly smaller deepest dip on each).</li>
 <li><strong>Target only.</strong> Hold every trade to the stop or the target. Highest net, widest drawdown.</li>
 </ul>
 <p>In the testing, Smart kept Target-only's profit at about a quarter less drawdown, on four brokers.</p>
@@ -1197,6 +1199,13 @@ ticks produces a different, invalid result.</p>
 <td>double</td>
 <td>50.0</td>
 <td>Grip closes at this % of the best profit</td>
+</tr>
+<tr>
+<td>3. Exit [Custom]</td>
+<td><code>InpGripAtrCap</code></td>
+<td>double</td>
+<td>0.40</td>
+<td>Grip gives back at most this x the 15-minute ATR (0 = off; Classic: off)</td>
 </tr>
 <tr>
 <td>3. Exit [Custom]</td>

@@ -23,7 +23,8 @@
 <li><a href="#6-why-results-differ-by-broker">6. Why results differ by broker</a></li>
 <li><a href="#7-what-was-tested-and-rejected">7. What was tested and rejected</a></li>
 <li><a href="#8-september-2026-the-second-research-round">8. September 2026: the second research round</a></li>
-<li><a href="#9-limits">9. Limits</a></li>
+<li><a href="#9-october-2026-version-115">9. October 2026: version 1.15</a></li>
+<li><a href="#10-limits">10. Limits</a></li>
 <li><a href="#appendix-traceability">Appendix — traceability</a></li>
 </ul>
 </li>
@@ -31,7 +32,7 @@
 </div>
 </nav><h1 id="kingfisher-research-note">Kingfisher — Research Note</h1>
 <p><em>What the machine does, what was changed on the way to the shipped version, and what each change did — with the tests that decided it.</em></p>
-<p>Versions 1.05 – 1.14 · September 2026</p>
+<p>Versions 1.05 – 1.15 · September – October 2026</p>
 <p>All figures in this note are Strategy Tester runs on real broker ticks at 100 % history quality. They are backtests, not a record of live trading. Every number names the build, the broker feed and the window it came from; a number that cannot be traced that way does not appear here.</p>
 <hr />
 <h2 id="0-the-result-in-one-table">0. The result in one table</h2>
@@ -289,13 +290,26 @@
 <li><strong>Two views of every result:</strong> a fixed lot per trade (so position size cannot flatter a variant) and the result per unit of risk.</li>
 </ul>
 <p>What the round established:</p>
-<p><strong>The exit held its ground.</strong> Around sixty alternative ways to leave a trade were tested against the shipped exit: taking profit just short of the target, reacting to fading momentum, to older levels on the chart and to classic indicator signals and their rate of change, wider or trailing stops, break-even moves, a shared stop for stacked positions, and machine-learning confidence models. None beat the shipped exit at equal drawdown across brokers. Two candidates survived the offline stage and are in their final tester proof; everything else stays out.</p>
+<p><strong>The exit held its ground.</strong> Around sixty alternative ways to leave a trade were tested against the shipped exit: taking profit just short of the target, reacting to fading momentum, to older levels on the chart and to classic indicator signals and their rate of change, wider or trailing stops, break-even moves, a shared stop for stacked positions, and machine-learning confidence models. None beat the shipped exit at equal drawdown across brokers. Two candidates survived the offline stage and went to a full tester proof: one passed every check and is in the current version (next section); the other did not hold on every broker and stays out.</p>
 <p><strong>One system on every account.</strong> Since 1.13 the stops, targets and exit levels are the same distance in the gold price whatever currency the account is held in. An account in euros now trades exactly the system that was tested, proven trade for trade against a dollar account.</p>
 <p><strong>Restart-proof, and visible on the chart (1.14).</strong> A restart or a version update no longer changes how a running trade will exit: 480 simulated restarts in one test month produced exactly the same trades as an uninterrupted run. A panel on the chart shows why Kingfisher trades or waits, where each open trade's exit sits, and its closed result; the level behind every resting order and every exit are drawn on the chart. Pause, refresh, lock and close are sent by the EA itself and written to its log. 1.14 places exactly the same trades as 1.13; that was proven on the shipped file.</p>
-<p><strong>Market structure matters for the one-hour hunter.</strong> The largest finding of the round: the chart structure around a level changes how the one-hour hunter's breaks behave. In some structures they carry markedly further; in others they tend to fizzle, and those are the stretches where a quiet market slowly bleeds. A structure-aware admission rule is in its final tests.</p>
+<p><strong>Market structure matters for the one-hour hunter.</strong> The largest finding of the round: the chart structure around a level changes how the one-hour hunter's breaks behave. In some structures they carry markedly further; in others they tend to fizzle. The follow-up (next section) settled it: the structure is real and measurable, but the market already prices it - rules built on it smoothed today's market and did not carry to older ones, so they stay out.</p>
 <p><strong>How a change gets in.</strong> A candidate must improve the current market in <em>both</em> of its halves, 2025 and 2026 separately, and must do no harm on older years replayed at today's price. What fails stays out, and this note will say so.</p>
 <hr />
-<h2 id="9-limits">9. Limits</h2>
+<h2 id="9-october-2026-version-115">9. October 2026: version 1.15</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull / Fusion / Vantage / Pepperstone / IC Markets, 2025-04 → 2026-09; Dukascopy ticks 2013-05 → 2015-11 replayed at today's gold price level.</em></p>
+<p>The third round asked one question from many sides: can the quiet stretches be made flatter, and can a winner be allowed to run further, without giving anything away in today's active market? The work behind the answer:</p>
+<ul>
+<li><strong>Another fifteen studies in a few days</strong>, each again written down with its prediction and pass bar before any number was read, and each closed with a written verdict, including the ones that failed.</li>
+<li><strong>A faster, unchanged engine.</strong> Kingfisher's own calculations were made about six times lighter; a test month that took over two minutes now takes about twenty seconds. The faster build was proven to place exactly the same trades, so every idea could be checked on every broker within hours instead of days.</li>
+<li><strong>A fourth live broker feed and a data audit.</strong> A second Vantage account was added as a test feed. The audit also found a gap of several months in one broker's tick history; that broker now counts only on its complete months. A broker that suddenly looks better than the others is checked for gaps first.</li>
+<li><strong>Every money decision read from the charts as well as the tables.</strong> For each candidate, the result is drawn day by day on every broker with the market's calm and busy periods marked, so a gain that comes from one lucky stretch is told apart from one that holds through every kind of market.</li>
+</ul>
+<p><strong>What changed in 1.15.</strong> The Grip, the exit that protects a winning trade, now never hands back more than a set share of the market's current 15-minute range. In a calm hour a large winner keeps more of its best profit; in a fast market the exit loosens by itself. On the deciding brokers it added a little to every 18-month result and kept the deepest dip the same or slightly smaller, in 2025 and in 2026 separately, and it did no harm on the older market replayed at today's price. It is on by default and can be switched off.</p>
+<p><strong>How it was proven.</strong> Switched off, 1.15 places exactly the same trades as 1.14. As shipped, it reproduces the research result trade for trade over 18 months on a live-broker feed (2,967 deals). With a simulated restart every hour, it trades exactly as without restarts. Visible on the panel and in the start-up line.</p>
+<p><strong>What was tested and kept out.</strong> Stricter quiet-market filters for the one-hour hunter, slower-confirmed levels, chart-pattern and channel-rhythm filters, starting the Grip earlier (down to the moment a trade opens), farther profit targets and targets at the next level, and a counter-trade confirmed by chart structure. Several made the 2025-26 stretch look smoother. Each either cost too much in today's active market, did not hold on every broker, or did harm on the older market - so none of them is in the box.</p>
+<hr />
+<h2 id="10-limits">10. Limits</h2>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, windows as in section 0.</em></p>
 <ul>
 <li>Kingfisher earned its result in a market of large daily gold bursts (2025-10 onward on every feed) and stands aside in quiet markets. A quiet year means few trades and little income. That is the design, and the four-year feed shows it.</li>
@@ -384,6 +398,11 @@
 <td>1.14</td>
 <td>restart-proof exits, chart panel and drawings</td>
 <td>same trades as 1.13 on the shipped file; 480 simulated restarts identical</td>
+</tr>
+<tr>
+<td>1.15</td>
+<td>the Grip hands back at most a set share of the 15-minute range; six times lighter engine</td>
+<td>switched off equals 1.14 trade for trade; as shipped equals the research result over 18 months (2,967 deals); restarts every hour identical</td>
 </tr>
 </tbody>
 </table>
