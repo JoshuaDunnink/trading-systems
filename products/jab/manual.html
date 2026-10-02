@@ -11,6 +11,7 @@
 <ul>
 <li><a href="#jab-user-manual">Jab — User Manual</a><ul>
 <li><a href="#what-it-does">What it does</a></li>
+<li><a href="#what-changed-in-version-151-choose-a-risk-level">What changed in version 1.51 - choose a risk level</a></li>
 <li><a href="#what-changed-in-version-150">What changed in version 1.50</a></li>
 <li><a href="#what-changed-in-version-149-panel-chart-labels-restart-safe">What changed in version 1.49 - panel, chart labels, restart-safe</a><ul>
 <li><a href="#the-panel-and-the-chart-since-149">The panel and the chart (since 1.49)</a></li>
@@ -38,7 +39,7 @@
 </nav><h1 id="jab-user-manual">Jab — User Manual</h1>
 <p><strong>Instrument:</strong> XAUUSD (gold) · <strong>Timeframe:</strong> M15 · <strong>Magic:</strong> 89721
 <strong>Account type:</strong> Hedging, <strong>raw-spread / ECN required</strong>
-<strong>Version:</strong> 1.50</p>
+<strong>Version:</strong> 1.51</p>
 <h2 id="what-it-does">What it does</h2>
 <p>Rests a stop order beyond a confirmed M15 swing level, in the direction of the last closed
 candle. On a fill, the position is managed by a two-stage trailing stop: a first stop move
@@ -46,6 +47,137 @@ once the trade is 6 $/oz ahead, then a 2 $/oz trail once it is 4 $/oz ahead. Eve
 carries a hard stop 5 $/oz from entry the moment it is placed. Version 1.43 widened this exit:
 the earlier 0.37 $/oz trail sat inside the spread of most live feeds and gave back the edge.
 At most one position per side. No averaging, no grid, no martingale.</p>
+<h2 id="what-changed-in-version-151-choose-a-risk-level">What changed in version 1.51 - choose a risk level</h2>
+<ul>
+<li><strong>One input decides the size: <em>Risk level</em></strong> (group "1. Start here"). Each level risks a share of the balance on every trade, measured against that trade's own $5 stop: <strong>Low 0.5 %, Medium 1.0 % (the default), High 1.5 %, Hot 2.0 %</strong>. <em>Custom</em> uses the MONEY section exactly as before - with its defaults (a fixed 0.01 lot) Jab trades identically to 1.50 (proved deal for deal).</li>
+<li><strong>The trades do not change with the level - only their size.</strong> Every level takes the same entries and exits; the drawdown grows roughly in proportion to the level.</li>
+<li><strong>Small accounts.</strong> One 0.01 lot with the $5 stop risks 5 in account currency, which is 1 % of 500. Below roughly 500, Medium (and below roughly 1,000, Low) cannot size smaller than the broker's 0.01 minimum, so the trade risks more than the level says; the Journal prints a size note when that happens. The EA never refuses to trade on a small balance - the size is your choice.</li>
+<li>When <em>Risk level</em> is not Custom, the Journal says so if the MONEY section's lot or risk inputs were changed: they are not in use until <em>Risk level</em> is set to Custom.</li>
+</ul>
+<p>Measured - MetaTrader 5 Strategy Tester, real broker ticks (100 % history quality), compiled defaults apart from the level, 10,000 deposit, 2 January 2024 to 26 September 2026 (Vantage from 4 July 2025). These are backtests:</p>
+<table>
+<thead>
+<tr>
+<th>Feed</th>
+<th>Risk level</th>
+<th>% per trade</th>
+<th>Trades</th>
+<th>Net on 10,000</th>
+<th>Profit factor</th>
+<th>Equity drawdown (relative)</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Fusion Markets</td>
+<td>Low</td>
+<td>0.5 %</td>
+<td>467</td>
+<td>+5,591</td>
+<td>1.58</td>
+<td>3.52 %</td>
+</tr>
+<tr>
+<td>Fusion Markets</td>
+<td>Medium (default)</td>
+<td>1.0 %</td>
+<td>467</td>
+<td>+14,595</td>
+<td>1.57</td>
+<td>7.22 %</td>
+</tr>
+<tr>
+<td>Fusion Markets</td>
+<td>High</td>
+<td>1.5 %</td>
+<td>467</td>
+<td>+27,977</td>
+<td>1.55</td>
+<td>10.76 %</td>
+</tr>
+<tr>
+<td>Fusion Markets</td>
+<td>Hot</td>
+<td>2.0 %</td>
+<td>467</td>
+<td>+48,569</td>
+<td>1.53</td>
+<td>14.44 %</td>
+</tr>
+<tr>
+<td>BlackBull Markets</td>
+<td>Low</td>
+<td>0.5 %</td>
+<td>469</td>
+<td>+8,141</td>
+<td>1.94</td>
+<td>4.87 %</td>
+</tr>
+<tr>
+<td>BlackBull Markets</td>
+<td>Medium (default)</td>
+<td>1.0 %</td>
+<td>469</td>
+<td>+23,515</td>
+<td>2.00</td>
+<td>9.23 %</td>
+</tr>
+<tr>
+<td>BlackBull Markets</td>
+<td>High</td>
+<td>1.5 %</td>
+<td>469</td>
+<td>+51,090</td>
+<td>2.03</td>
+<td>13.76 %</td>
+</tr>
+<tr>
+<td>BlackBull Markets</td>
+<td>Hot</td>
+<td>2.0 %</td>
+<td>469</td>
+<td>+100,479</td>
+<td>2.04</td>
+<td>18.09 %</td>
+</tr>
+<tr>
+<td>Vantage Markets (real ticks from July 2025)</td>
+<td>Low</td>
+<td>0.5 %</td>
+<td>272</td>
+<td>+5,542</td>
+<td>2.18</td>
+<td>2.95 %</td>
+</tr>
+<tr>
+<td>Vantage Markets (real ticks from July 2025)</td>
+<td>Medium (default)</td>
+<td>1.0 %</td>
+<td>272</td>
+<td>+14,563</td>
+<td>2.17</td>
+<td>5.93 %</td>
+</tr>
+<tr>
+<td>Vantage Markets (real ticks from July 2025)</td>
+<td>High</td>
+<td>1.5 %</td>
+<td>272</td>
+<td>+28,412</td>
+<td>2.13</td>
+<td>8.79 %</td>
+</tr>
+<tr>
+<td>Vantage Markets (real ticks from July 2025)</td>
+<td>Hot</td>
+<td>2.0 %</td>
+<td>272</td>
+<td>+49,396</td>
+<td>2.08</td>
+<td>11.61 %</td>
+</tr>
+</tbody>
+</table>
 <h2 id="what-changed-in-version-150">What changed in version 1.50</h2>
 <ul>
 <li><strong>Trades identical to the previous version</strong> (proved deal for deal). It no longer sends an order into a closed market (the broker's daily break, a holiday): the request the broker would have refused is skipped, so the trades are unchanged and the journal no longer fills with 'Market closed' errors.</li>
@@ -147,19 +279,14 @@ At most one position per side. No averaging, no grid, no martingale.</p>
 </thead>
 <tbody>
 <tr>
-<td>Use fixed lot</td>
-<td>true</td>
-<td>Ships with a fixed 0.01 lot</td>
+<td>Risk level</td>
+<td>Medium</td>
+<td>1.0 % of balance per trade against the $5 stop (Low 0.5, High 1.5, Hot 2.0 %); Custom = the MONEY section</td>
 </tr>
 <tr>
-<td>Fixed lot size</td>
-<td>0.01</td>
-<td>Raise only with balance to match</td>
-</tr>
-<tr>
-<td>Risk per trade %</td>
-<td>1.0</td>
-<td>Used only when <em>Use fixed lot</em> is false</td>
+<td>Use fixed lot / Fixed lot size / Risk per trade %</td>
+<td>true / 0.01 / 1.0</td>
+<td>MONEY section - used only when Risk level = Custom</td>
 </tr>
 <tr>
 <td>Initial stop distance</td>
@@ -201,7 +328,7 @@ trade earns less, there are more of them, and the extra trades are the ones that
 spread — on a demo feed with a poor spread the preset barely kept pace with its own cost while the defaults
 stayed clear of it. Use it only on a tight-spread broker, and expect a rougher curve.</p>
 <h2 id="deposit-and-position-sizing">Deposit and position sizing</h2>
-<p>It ships with a fixed 0.01 lot. The strategy never refuses to trade on a small balance; what
+<p>Since 1.51 the size follows the Risk level (Medium by default, see 'What changed in version 1.51'); before that it shipped with a fixed 0.01 lot, and the table below is that fixed-lot record. The strategy never refuses to trade on a small balance; what
 changes with the deposit is how large its drawdown feels. The table below is Strategy Tester, real
 broker ticks (100% history quality), the shipped 0.01 lot, expressed against different balances.</p>
 <table>
@@ -273,7 +400,7 @@ positive over the window and is shown only as the spread-survival check, never a
 </tr>
 </tbody>
 </table>
-<p><strong>Note on risk percent.</strong> Below roughly 2,000 USD, a 1% risk calculation produces a position
+<p><strong>Note on risk percent.</strong> Below roughly 500 USD (0.01 lot x the $5 stop = 5 USD = 1 % of 500), a 1% risk calculation produces a position
 smaller than the broker's 0.01 minimum lot, so it floors there and behaves exactly like the
 fixed lot. The risk knob only starts doing anything once the balance can express a larger
 position. Compounding multiplies the end balance and the drawdown together; judge a setting by
@@ -487,7 +614,6 @@ for how its drawdown grows as the balance shrinks. That is the broker's margin r
 never refuses to trade because a balance is small - it narrows to the broker's minimum volume and sends
 the order.</p>
 <h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</h2>
-<p>Generated from the compiled source; enum defaults are the source names — the Inputs tab shows their plain labels.</p>
 <table>
 <thead>
 <tr>
@@ -499,6 +625,13 @@ the order.</p>
 </tr>
 </thead>
 <tbody>
+<tr>
+<td>1. Start here</td>
+<td><code>InpRisk</code></td>
+<td>RiskLevel</td>
+<td>RISK_MEDIUM</td>
+<td>Risk level (Custom = the MONEY section below)</td>
+</tr>
 <tr>
 <td>Prop-firm rules - your firm's numbers (0 = off)</td>
 <td><code>InpPropAccountSize</code></td>
@@ -595,21 +728,21 @@ the order.</p>
 <td><code>InpFixedLot</code></td>
 <td>double</td>
 <td>0.01</td>
-<td>Fixed lot size (used when 'Use fixed lot' is true)</td>
+<td>Fixed lot size (Risk level = Custom, 'Use fixed lot' true)</td>
 </tr>
 <tr>
 <td>MONEY</td>
 <td><code>InpUseFixedLot</code></td>
 <td>bool</td>
 <td>true</td>
-<td>Use a fixed lot instead of risk-based sizing</td>
+<td>Use a fixed lot instead of risk-based sizing (Risk level = Custom)</td>
 </tr>
 <tr>
 <td>MONEY</td>
 <td><code>InpRiskPercent</code></td>
 <td>double</td>
 <td>1.0</td>
-<td>Risk per trade, % of balance (when fixed lot is off)</td>
+<td>Risk per trade, % of balance (Risk level = Custom, fixed lot off)</td>
 </tr>
 <tr>
 <td>MONEY</td>

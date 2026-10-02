@@ -31,11 +31,11 @@
 </div>
 </nav><h1 id="jab-research-note">Jab — Research Note</h1>
 <p><em>What the machine does, what was changed on the way to the shipped version, and what each change did — with the tests that decided it.</em></p>
-<p>Version 1.50 · XAUUSD, M15</p>
+<p>Version 1.51 · XAUUSD, M15</p>
 <p>All figures in this note are Strategy Tester runs on real broker ticks at 100% history quality. They are backtest figures, not a record of live trading. Every number names the broker feed and the window it came from. Where a design decision is described without a number, it is because the underlying test produced a small or negative reading that this note does not repeat — the decision it led to is stated instead, in words.</p>
 <hr />
 <h2 id="0-the-result-in-one-table">0. The result in one table</h2>
-<p><strong>Version 1.50, compiled defaults.</strong> Backtest, MetaTrader 5 Strategy Tester, real ticks at 100 % history quality, 10,000 starting deposit, 2 January 2024 to 26 September 2026, three live broker feeds (Vantage's real-tick history starts in July 2025, so its row covers July 2025 on):</p>
+<p><strong>Version 1.51, compiled defaults (Risk level Medium, 1.0 % of balance per trade).</strong> Backtest, MetaTrader 5 Strategy Tester, real ticks at 100 % history quality, 10,000 starting deposit, 2 January 2024 to 26 September 2026, three live broker feeds (Vantage's real-tick history starts in July 2025, so its row covers July 2025 on):</p>
 <table>
 <thead>
 <tr>
@@ -50,31 +50,31 @@
 <tbody>
 <tr>
 <td>Fusion - the published figure, the weaker of the two feeds that cover the whole window</td>
-<td style="text-align: right;">469.77</td>
-<td style="text-align: right;">+4.7 %</td>
-<td style="text-align: right;">1.58</td>
+<td style="text-align: right;">14,594.75</td>
+<td style="text-align: right;">+145.9 %</td>
+<td style="text-align: right;">1.57</td>
 <td style="text-align: right;">467</td>
-<td style="text-align: right;">0.36 %</td>
+<td style="text-align: right;">7.22 %</td>
 </tr>
 <tr>
 <td>BlackBull</td>
-<td style="text-align: right;">628.13</td>
-<td style="text-align: right;">+6.3 %</td>
-<td style="text-align: right;">1.86</td>
+<td style="text-align: right;">23,515.39</td>
+<td style="text-align: right;">+235.2 %</td>
+<td style="text-align: right;">2.00</td>
 <td style="text-align: right;">469</td>
-<td style="text-align: right;">0.47 %</td>
+<td style="text-align: right;">9.23 %</td>
 </tr>
 <tr>
 <td>Vantage (from July 2025)</td>
-<td style="text-align: right;">460.05</td>
-<td style="text-align: right;">+4.6 %</td>
-<td style="text-align: right;">2.19</td>
+<td style="text-align: right;">14,563.17</td>
+<td style="text-align: right;">+145.6 %</td>
+<td style="text-align: right;">2.17</td>
 <td style="text-align: right;">272</td>
-<td style="text-align: right;">0.29 %</td>
+<td style="text-align: right;">5.93 %</td>
 </tr>
 </tbody>
 </table>
-<p><img alt="Jab 1.50 at its default settings on three live brokers" src="img/02_medium.png" /></p>
+<p><img alt="Jab 1.51 at its default settings on three live brokers" src="img/02_medium.png" /></p>
 <p>Pepperstone, used in earlier measurements, is left out of the current figures: its real-tick archive on our test terminal has gaps in 2026, and a figure built on filled-in ticks is not published.</p>
 <h3 id="earlier-measurement">Earlier measurement</h3>
 <p>Jab runs out of the box on its compiled defaults — no set file needed. Strategy Tester, real broker ticks, 100% history quality, a 10,000 starting balance, matched window 2025-07-01 to 2026-09-07, measured on build 1.42; every default through the current 1.48 build reproduces the same trades:</p>
