@@ -4,8 +4,8 @@
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html"><meta property="og:type" content="website">
 <meta property="og:title" content="Kingfisher manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Kingfisher user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/kingfisher_hero.jpg"><meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
-<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
 <p><a href="index.html">&larr; Kingfisher</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
 <ul>
@@ -36,6 +36,8 @@
 <li><a href="#73-since-112-rebound-reverse-after-a-skim-stop-out-opt-in-inprebound-off-by-default">7.3 Since 1.12: Rebound - reverse after a Skim stop-out (opt-in, InpRebound, off by default)</a></li>
 <li><a href="#74-since-113-the-same-stops-and-targets-on-every-account-currency">7.4 Since 1.13: the same stops and targets on every account currency</a></li>
 <li><a href="#75-since-114-the-grip-can-also-move-the-brokers-stop-opt-in-inpgripserverstop-off-by-default">7.5 Since 1.14: the Grip can also move the broker's stop (opt-in, InpGripServerStop, off by default)</a></li>
+<li><a href="#76-since-117-daybreak-a-sixth-hunter-on-the-prior-days-high-and-low-inpdaybreak-on-by-default">7.6 Since 1.17: Daybreak - a sixth hunter on the prior day's high and low (InpDaybreak, on by default)</a></li>
+<li><a href="#77-since-117-news-guard-spread-guard-and-stop-from-the-fill-all-on-by-default">7.7 Since 1.17: news guard, spread guard and stop from the fill (all on by default)</a></li>
 </ul>
 </li>
 <li><a href="#8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</a></li>
@@ -51,7 +53,7 @@
 </ul>
 </div>
 </nav><h1 id="kingfisher-user-manual">KINGFISHER — user manual</h1>
-<p><em>Version 1.16 · XAUUSD · MetaTrader 5</em></p>
+<p><em>Version 1.17 · XAUUSD · MetaTrader 5</em></p>
 <p>KINGFISHER sits still above the water and dives once, when the fish breaks the surface. On a gold chart it waits at the nearest price level that has not been broken yet, rests a small order just inside it, and is filled at the moment the level gives way. Every trade has a fixed stop loss and take profit from the second it opens. When the market is too quiet for that stop loss to make sense, KINGFISHER does not trade at all.</p>
 <p>This manual is written for someone who has never run an expert advisor before. If you only read one chapter, read chapter 3.</p>
 <hr />
@@ -96,7 +98,7 @@
 </table>
 <p>The four Dives rest on the <em>same</em> level and usually fill on the <em>same</em> break — that is deliberate, and it is why KINGFISHER sizes risk per <strong>level</strong>, not per order (chapter 3).</p>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, 2022 to 2026.</em></p>
-<p><strong>What each hunter contributes.</strong> In four years of live-tick testing on four brokers, Skim placed about 60 % of all trades and won 17–20 % of them; the four Dives won 32–40 % of theirs (profit factor 2.5–4.3) and earned three-quarters of the money. Skim is the busy one; the Dives are the profitable ones. Two per-hunter inputs let you tune this without touching anything else: <code>Inp&lt;Hunter&gt;RiskWeight</code> scales that hunter's position size (1.0 = as tested; 0.25 = a quarter), and <code>Inp&lt;Hunter&gt;GateStopAtr</code> gives that hunter its own quiet-market threshold (0 = use the global 0.20), and <code>Inp&lt;Hunter&gt;GateActivity</code> makes that hunter stand aside while the market is calm at the minute scale (average one-minute range of the last 15 minutes divided by the last four hours; 1.0 = only trade when the last quarter hour is at least as active as the afternoon behind it; 0 = off). In four years of testing, Skim's fills that arrived on a calm quarter hour won 12–14 % — below breakeven — and its fills on an active one won 20–25 %. The tested configuration keeps all five at weight 1.0 and the activity gates off.</p>
+<p><strong>What each hunter contributes.</strong> In four years of live-tick testing on four brokers, Skim placed about 60 % of all trades and won 17–20 % of them; the four Dives won 32–40 % of theirs (profit factor 2.5–4.3) and earned three-quarters of the money. Skim is the busy one; the Dives are the profitable ones. Two per-hunter inputs let you tune this without touching anything else: <code>Inp&lt;Hunter&gt;RiskWeight</code> scales that hunter's position size (1.0 = a full share; 0.25 = a quarter), and <code>Inp&lt;Hunter&gt;GateStopAtr</code> gives that hunter its own quiet-market threshold (0 = use the global 0.20), and <code>Inp&lt;Hunter&gt;GateActivity</code> makes that hunter stand aside while the market is calm at the minute scale (average one-minute range of the last 15 minutes divided by the last four hours; 1.0 = only trade when the last quarter hour is at least as active as the afternoon behind it; 0 = off). In four years of testing, Skim's fills that arrived on a calm quarter hour won 12–14 % — below breakeven — and its fills on an active one won 20–25 %. The default keeps the four Dives at weight 1.0, Skim at 0.25, and the activity gates off.</p>
 <p>Every position opens with a stop loss of 2.00 and a take profit of 15.00 (14.00 for Dive 2) US dollars per 0.01 lot - a 2.00 and a 15.00 move in the gold price - whatever currency your account is in (since 1.13, chapter 7.4). Nothing is averaged, nothing is added to a loser, no grid, no martingale.</p>
 <p><strong>Two things make it different from a plain breakout robot:</strong></p>
 <ol>
@@ -130,12 +132,12 @@ KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker min
 <tbody>
 <tr>
 <td><strong>1. Start here</strong></td>
-<td>Account type · Strategy settings · Risk level · Size as if the balance were · Max spread</td>
+<td>Account type · Strategy settings · Risk level · Daybreak size · Size as if the balance were · Max spread</td>
 <td>yes - this is the whole setup</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
-<td>the five hunters, the Rebound switch (off; chapter 7.3), buy/sell</td>
+<td>the five hunters, Rebound (off; ECN only; chapter 7.3), Daybreak (on; low-latency ECN only; chapter 7.6), buy/sell</td>
 <td>rarely</td>
 </tr>
 <tr>
@@ -150,13 +152,13 @@ KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker min
 </tr>
 <tr>
 <td>5. When not to trade</td>
-<td>weekend times (your broker's clock); the quiet-market gates [Custom]</td>
+<td>weekend times (your broker's clock); news and spread guards (on; chapter 7.7); the quiet-market gates [Custom]</td>
 <td>weekend times only if your broker's clock differs</td>
 </tr>
 <tr>
 <td>6. Safety</td>
-<td>maximum lot, margin cap, gold-only lock, magic number</td>
-<td>a second chart needs its own magic number</td>
+<td>maximum lot, margin cap, gold-only lock, magic number (Daybreak uses it + 1), stop from the fill (on; chapter 7.7)</td>
+<td>a second chart needs a magic number 2 apart</td>
 </tr>
 <tr>
 <td>7. Custom sizing</td>
@@ -908,8 +910,56 @@ dollar deposit (IC Markets, September 2026: 186 of 186), where 1.12 on a euro de
 never loosened), so if your terminal or VPS goes offline the broker still closes the trade near the same level. While the EA runs, its
 own close still comes first. It is off by default because a broker stop fills slightly differently from a market close; chapter 14
 shows the measured difference.</p>
+<h3 id="76-since-117-daybreak-a-sixth-hunter-on-the-prior-days-high-and-low-inpdaybreak-on-by-default">7.6 Since 1.17: Daybreak - a sixth hunter on the prior day's high and low (<code>InpDaybreak</code>, on by default)</h3>
+<p>The five hunters wait at swing levels on the 4-hour and 1-hour charts. Daybreak watches two other levels: <strong>yesterday's high and
+yesterday's low</strong>. Once today's first 15-minute bar has closed, a price move through either level opens a trade in that direction at
+market - a buy above yesterday's high, a sell below yesterday's low.</p>
+<ul>
+<li><strong>Stop and target</strong> sit at a fixed distance from the level itself (stop 5.00, target 50.00 on gold), not from the fill, so every
+  Daybreak trade risks the same distance. Once the trade is 1.00 ahead, its stop follows 0.50 behind the best price and is only ever
+  tightened.</li>
+<li><strong>One trade at a time</strong>, at most one per level per day. A level the market already passed at the open, or jumped through in one
+  move, is skipped for the day.</li>
+<li><strong>It stands aside</strong> on a US jobs-report day, a Fed rate-decision day and the thin year-end days (24, 26 and 31 December), and after
+  a quiet day (yesterday's range under 2 % of price) unless the break reaches ground the market has not traded in five days. Open
+  trades are still managed on those days.</li>
+<li><strong>Size</strong> follows your Risk level: one Daybreak trade risks <code>InpDaybreakRisk</code> (section 1, default 0.75) times what one Kingfisher
+  level risks 0.75 % of the balance at Medium. Prop-firm modes and the Custom sizing section apply the same way. Set <code>InpDaybreakRisk</code> lower to make it
+  smaller, or <code>InpDaybreak = false</code> to switch it off.</li>
+<li><strong>Why it is in the box.</strong> Daybreak's trades come on different days from the other hunters' (their daily results move together only
+  about 0.2), so its losing stretches rarely land on top of theirs. In the tester the two together grew the account faster at about the
+  same deepest drawdown as the five hunters alone (chapter 14).</li>
+<li><strong>Low latency, ECN account.</strong> Daybreak enters at market the moment price crosses a level and then trails tick by tick, so the delay
+  between your terminal and the broker's server costs it profit (the five other hunters rest their orders on the server and are not
+  affected). Run it on a raw-ECN account from a VPS close to the broker's server; on a home connection with a high or unsteady ping,
+  or on a wide-spread account, set <code>InpDaybreak = false</code>.</li>
+<li><strong>On your account</strong> its trades carry the comment <code>KF DB</code> and the magic number one above Kingfisher's (89831 by default). The panel
+  shows its two levels and its open trade; Pause, Close all and Lock profit act on it too; the prop-firm rules count it. It trades
+  gold only.</li>
+</ul>
+<h3 id="77-since-117-news-guard-spread-guard-and-stop-from-the-fill-all-on-by-default">7.7 Since 1.17: news guard, spread guard and stop from the fill (all on by default)</h3>
+<p>A resting stop order is filled by the broker's server the instant the price reaches it. In the second a major US figure is released the
+price can jump many dollars and the spread can widen from cents to tens of dollars, so a resting order fills far beyond its price and its
+stop fills far beyond the stop. On 2 October 2026 the US jobs report filled five buy stops $1-3.50 past their prices; all five were stopped
+seconds later, each losing more than twice its planned 2.00. Three guards stand between a resting order and that second:</p>
+<ul>
+<li><strong>News guard</strong> (<code>InpNewsGuard</code>, <code>InpNewsMinutes</code> = 10). From 10 minutes before to 10 minutes after every high-impact US release (jobs
+  report, inflation, Fed decision, retail sales, ISM, JOLTS, GDP and the other releases MT5 rates high-impact) KINGFISHER keeps no resting
+  order and Daybreak opens no trade. Open trades keep their stop, target and Grip. The release times come from MetaTrader 5's own economic
+  calendar (the Calendar tab), read every 30 minutes; if it does not answer, a stored list of 2024-2026 release times is used. The panel
+  shows "News guard" while it holds.</li>
+<li><strong>Spread guard</strong> (<code>InpSpreadGuard</code>, <code>InpSpreadGuardX</code> = 3.0, <code>InpSpreadGuardMinUsd</code> = 0.60). While the spread is more than 3 times its
+  own normal (the median of the last hour) and wider than 0.60, the resting orders are removed; they return when the spread calms. A thin
+  hour with a blown-out spread is a moment to skip, not to be filled in.</li>
+<li><strong>Stop from the fill</strong> (<code>InpStopFromFillUsd</code> = 1.00). If an order fills more than 1.00 past its price, its stop is moved to the planned
+  distance from the actual fill (never loosened), so a slipped trade risks its planned loss plus the stop's own slippage - not the
+  slippage twice.</li>
+</ul>
+<p>What they cost: on ordinary minutes the guards skip some trades that would have won. The tester's price history does not contain the
+release-second spreads (its stored ticks show spreads of 0.15-1.20 at releases where the live spread reached about 30), so a backtest can
+show the guards' cost but not what they save; chapter 14 lists both runs. Each guard can be switched off.</p>
 <h2 id="8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</h2>
-<p>Same entries, same hit rate on every broker tested; what differs is how far past the 2.00 stop you are filled on a fast move. Measured medians (2026, losers): 2.06, 2.11, 2.17, 2.30 on the four live feeds; the widest feed earned about 25 % less per trade than the tightest. Execution delay of 100–500 ms was tested and changed the result by at most 1 %; it is the broker's quote path, not latency, that costs.</p>
+<p>Same entries, same hit rate on every broker tested; what differs is how far past the 2.00 stop you are filled on a fast move. Measured medians (2026, losers): 2.06, 2.11, 2.17, 2.30 on the four live feeds; the widest feed earned about 25 % less per trade than the tightest. Execution delay of 100–500 ms was tested on the five level hunters and changed their result by at most 1 %; for them it is the broker's quote path, not latency, that costs. Daybreak is different - it enters at market and trails tick by tick (chapter 7.6).</p>
 <p><strong>Spread is the bigger cost, and it is visible before you trade.</strong> KINGFISHER's stop is a fixed 2.00 per 0.01 lot, so
 the spread takes a fixed share of it. Measured on the same entries on two brokers (2025–26): on a feed whose gold
 spread was about $0.24 at the median, 8.5 % of fills were stopped out within one second of the fill (0.1–3.0 % on
@@ -1127,6 +1177,13 @@ ticks produces a different, invalid result.</p>
 </tr>
 <tr>
 <td>1. Start here</td>
+<td><code>InpDaybreakRisk</code></td>
+<td>double</td>
+<td>0.75</td>
+<td>Daybreak size, x the risk of one level</td>
+</tr>
+<tr>
+<td>1. Start here</td>
 <td><code>InpVirtualBalance</code></td>
 <td>double</td>
 <td>0.0</td>
@@ -1179,7 +1236,14 @@ ticks produces a different, invalid result.</p>
 <td><code>InpRebound</code></td>
 <td>bool</td>
 <td>false</td>
-<td>Rebound - reverse after a Skim stop-out (opt-in; raw-ECN brokers)</td>
+<td>Rebound - reverse a stopped-out Skim (opt-in, ECN only)</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpDaybreak</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Daybreak - prior day's high / low (low-latency ECN only)</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
@@ -1221,7 +1285,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpGripAtrCap</code></td>
 <td>double</td>
 <td>0.40</td>
-<td>Grip gives back at most this x the 15-minute ATR (0 = off; Classic: off)</td>
+<td>Grip gives back at most this x the 15-minute ATR (0 = off)</td>
 </tr>
 <tr>
 <td>3. Exit [Custom]</td>
@@ -1358,6 +1422,41 @@ ticks produces a different, invalid result.</p>
 </tr>
 <tr>
 <td>5. When not to trade</td>
+<td><code>InpNewsGuard</code></td>
+<td>bool</td>
+<td>true</td>
+<td>News: no orders around high-impact USD releases</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpNewsMinutes</code></td>
+<td>int</td>
+<td>10</td>
+<td>News: minutes before and after the release</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpSpreadGuard</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Spread: no orders while the spread blows out</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpSpreadGuardX</code></td>
+<td>double</td>
+<td>3.0</td>
+<td>Spread: blow-out = this x its normal (last hour)</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
+<td><code>InpSpreadGuardMinUsd</code></td>
+<td>double</td>
+<td>0.60</td>
+<td>Spread: ... and wider than this, USD</td>
+</tr>
+<tr>
+<td>5. When not to trade</td>
 <td><code>InpGateStopAtr</code></td>
 <td>double</td>
 <td>0.20</td>
@@ -1417,7 +1516,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpMagic</code></td>
 <td>int</td>
 <td>89830</td>
-<td>Magic number (a 2nd chart needs another)</td>
+<td>Magic number (Daybreak uses this + 1; a 2nd chart needs one 2 apart)</td>
 </tr>
 <tr>
 <td>6. Safety</td>
@@ -1432,6 +1531,13 @@ ticks produces a different, invalid result.</p>
 <td>int</td>
 <td>50</td>
 <td>Maximum slippage, points</td>
+</tr>
+<tr>
+<td>6. Safety</td>
+<td><code>InpStopFromFillUsd</code></td>
+<td>double</td>
+<td>1.00</td>
+<td>Slipped fill: stop from the fill if slipped more than this USD (0 = off)</td>
 </tr>
 <tr>
 <td>7. Custom sizing (Risk level = Custom)</td>
@@ -1571,7 +1677,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpD1RiskWeight</code></td>
 <td>double</td>
 <td>1.0</td>
-<td>Risk weight (1 = as tested, 0 = min lot)</td>
+<td>Risk weight, x a full share (0 = minimum lot)</td>
 </tr>
 <tr>
 <td>9. Dive 1 - 4-hour level [Custom]</td>
@@ -1662,7 +1768,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpD2RiskWeight</code></td>
 <td>double</td>
 <td>1.0</td>
-<td>Risk weight (1 = as tested, 0 = min lot)</td>
+<td>Risk weight, x a full share (0 = minimum lot)</td>
 </tr>
 <tr>
 <td>10. Dive 2 - 4-hour level [Custom]</td>
@@ -1753,7 +1859,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpD3RiskWeight</code></td>
 <td>double</td>
 <td>1.0</td>
-<td>Risk weight (1 = as tested, 0 = min lot)</td>
+<td>Risk weight, x a full share (0 = minimum lot)</td>
 </tr>
 <tr>
 <td>11. Dive 3 - 4-hour level [Custom]</td>
@@ -1844,7 +1950,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpD4RiskWeight</code></td>
 <td>double</td>
 <td>1.0</td>
-<td>Risk weight (1 = as tested, 0 = min lot)</td>
+<td>Risk weight, x a full share (0 = minimum lot)</td>
 </tr>
 <tr>
 <td>12. Dive 4 - 4-hour level [Custom]</td>
@@ -1935,7 +2041,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpS1RiskWeight</code></td>
 <td>double</td>
 <td>0.25</td>
-<td>Risk weight (1 = as tested, 0 = min lot)</td>
+<td>Risk weight, x a full share (0 = minimum lot)</td>
 </tr>
 <tr>
 <td>13. Skim - 1-hour level [Custom]</td>

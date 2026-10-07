@@ -1,83 +1,101 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>The Crew - Gold session-specialist Expert Advisor for MT5 (XAUUSD M1)</title><meta name="description" content="The Crew is an MT5 Expert Advisor for gold (XAUUSD): eleven session-timed strategies run a shared equal-lot recovery grid under one account-level risk warden.">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "The Crew", "applicationCategory": "FinanceApplication", "operatingSystem": "MetaTrader 5 (Windows)", "description": "The Crew is an MT5 Expert Advisor for gold (XAUUSD): eleven session-timed strategies run a shared equal-lot recovery grid under one account-level risk warden.", "url": "https://joshuadunnink.github.io/trading-systems/products/the-crew/", "author": {"@type": "Person", "name": "Joshua Dunnink", "url": "https://www.mql5.com/en/users/joshuadunnink"}, "image": "https://joshuadunnink.github.io/trading-systems/img/the-crew_hero.jpg"}</script>
+<title>The Crew - Gold session-specialist Expert Advisor for MT5 (XAUUSD M1)</title><meta name="description" content="The Crew is an MT5 Expert Advisor for gold (XAUUSD): a recovery grid with a stop loss. Session-timed specialists run a shared equal-lot grid, and every grid...">
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "The Crew", "applicationCategory": "FinanceApplication", "operatingSystem": "MetaTrader 5 (Windows)", "description": "The Crew is an MT5 Expert Advisor for gold (XAUUSD): a recovery grid with a stop loss. Session-timed specialists run a shared equal-lot grid, and every grid...", "url": "https://joshuadunnink.github.io/trading-systems/products/the-crew/", "author": {"@type": "Person", "name": "Joshua Dunnink", "url": "https://www.mql5.com/en/users/joshuadunnink"}, "image": "https://joshuadunnink.github.io/trading-systems/img/the-crew_hero.jpg"}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://joshuadunnink.github.io/trading-systems/"}, {"@type": "ListItem", "position": 2, "name": "Products", "item": "https://joshuadunnink.github.io/trading-systems/products.html"}, {"@type": "ListItem", "position": 3, "name": "The Crew", "item": "https://joshuadunnink.github.io/trading-systems/products/the-crew/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which broker and account type does The Crew need?", "acceptedAnswer": {"@type": "Answer", "text": "A hedging account, on XAUUSD (any broker spelling: XAUUSD, XAUUSD+, XAUUSD-ECN, GOLD.pro) with reasonable gold spreads."}}, {"@type": "Question", "name": "What is the minimum deposit?", "acceptedAnswer": {"@type": "Answer", "text": "Validated at 10,000 in account currency. The EA never refuses a smaller account - it narrows the roster to what the balance can carry instead."}}, {"@type": "Question", "name": "Which chart and timeframe do I attach it to?", "acceptedAnswer": {"@type": "Answer", "text": "Any timeframe - The Crew runs its own internal one-minute clock, so the chart period does not matter."}}, {"@type": "Question", "name": "Which setting is the main risk decision, and where should I start?", "acceptedAnswer": {"@type": "Answer", "text": "Roster - how many of the eleven specialists trade. Balanced 6 at the Conservative risk tier is the shipped default and the recommended start."}}, {"@type": "Question", "name": "Does The Crew use a grid, and is it martingale?", "acceptedAnswer": {"@type": "Answer", "text": "It is an equal-lot recovery grid: a position that misses its small target is averaged by a ladder of same-sized layers, closed as one group. No martingale - every layer matches the first, and each specialist has a fixed maximum depth."}}, {"@type": "Question", "name": "Why does it hold floating losses instead of using a stop loss?", "acceptedAnswer": {"@type": "Answer", "text": "There is no per-trade stop loss; the recovery ladder is the exit mechanism, so open positions can float in loss while a group recovers. Protection is account-level: a free-margin guard on new positions, a per-direction exposure cap, and a hard flatten once floating loss passes the peak-to-trough percentage the user sets."}}, {"@type": "Question", "name": "Do I need a VPS?", "acceptedAnswer": {"@type": "Answer", "text": "A VPS or an always-on computer is recommended - the specialists work through the night and the account breaker needs the EA running to act."}}, {"@type": "Question", "name": "Can I backtest The Crew myself?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is one self-contained Expert Advisor with no DLLs or custom includes, so it runs in the MetaTrader 5 Strategy Tester on real ticks; use the feed, window and starting balance in the Results section above to reproduce a figure. ### Requirements XAUUSD (gold), a hedging account. Any chart timeframe - the EA keeps its own internal clock. A broker with reasonable gold spreads; the EA skips entries above a configurable spread ceiling. A VPS or an always-on computer is recommended, because the specialists work through the night. ### Risk disclosure Trading leveraged instruments carries a substantial risk of loss. This is a grid strategy without a per-trade stop loss: it holds losing positions through adverse moves by design and recovers them by adding equal-sized layers, which exposes the account to open-ended floating loss during a sustained adverse move. The only brake is an account-level breaker that flattens everything and realises the loss it was holding. The results above come from a period in which gold rose. A sustained decline is the condition this design has the least evidence about, because it has not faced a full one in the tested history. Worst-case floating exposure at a fixed 0.01 lot varies by broker feed - see the manual for the measured range and the sizing guidance by account balance. Past backtest performance does not predict future outcomes. Test on a demo account first, long enough to see a recovery ladder open, deepen and close, before funding a live account. ---"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which broker and account type does The Crew need?", "acceptedAnswer": {"@type": "Answer", "text": "A hedging account, on XAUUSD (any broker spelling: XAUUSD, XAUUSD+, XAUUSD-ECN, GOLD.pro) with reasonable gold spreads."}}, {"@type": "Question", "name": "What is the minimum deposit?", "acceptedAnswer": {"@type": "Answer", "text": "The Small Account preset (Low risk - 6 strategies, static 0.01 lot, every group closed at a 150 USD floating loss per 0.01 lot) needs about 330 if you accept a 1-in-40 chance of losing 35 percent of the starting balance within a year, and about 690 if you want that chance below 1 in 100 for a 20 percent loss (backtest, raw-spread feeds 2022-2026). One stop costs about 150-165 at 0.01 lot. The EA runs whatever you choose on any balance and prints at start-up what your configuration needs."}}, {"@type": "Question", "name": "Which council should I start with?", "acceptedAnswer": {"@type": "Answer", "text": "Low risk - 6 strategies, the default: the smallest capital need and no group stop on the four test records. Medium and High add specialists that earn more and stop more often."}}, {"@type": "Question", "name": "Which chart and timeframe do I attach it to?", "acceptedAnswer": {"@type": "Answer", "text": "Any timeframe on a gold chart - The Crew runs its own internal one-minute clock."}}, {"@type": "Question", "name": "Do I have to set my broker's clock?", "acceptedAnswer": {"@type": "Answer", "text": "No. With Broker clock = Auto-detect (the default) The Crew finds gold's daily pause in your broker's price history and prints the shift it uses in the journal at start-up."}}, {"@type": "Question", "name": "Is it a grid, and is it martingale?", "acceptedAnswer": {"@type": "Answer", "text": "It is an equal-lot recovery grid: a position that misses its small target is averaged by a ladder of same-sized layers and closed as one group. No martingale - every layer matches the first, each specialist has a fixed maximum depth, and every group has a 150 USD per 0.01 lot stop."}}, {"@type": "Question", "name": "Can it run on the same account as another EA?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It manages only its own trades by their magic numbers. Put it on its own gold chart; the account breaker and the free margin are shared with the other EA, and the manual explains how to size for that."}}, {"@type": "Question", "name": "Does The Crew trade through news?", "acceptedAnswer": {"@type": "Answer", "text": "By default it opens no new groups on NFP Fridays, FOMC decision days, 15 December - 15 January and late Friday, and Delphine stands aside around the 08:30 and 10:00 New York releases. Open groups keep their exit."}}, {"@type": "Question", "name": "Do I need a VPS?", "acceptedAnswer": {"@type": "Answer", "text": "A VPS or an always-on computer is recommended - the specialists work through the night and the stops and the breaker need the EA running to act."}}, {"@type": "Question", "name": "Can I backtest The Crew myself?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is one self-contained Expert Advisor with no DLLs or custom includes; it runs in the MetaTrader 5 Strategy Tester on real ticks. Use the feed, window and starting balance in the Results section to reproduce a figure. ### Requirements XAUUSD (gold), a hedging account. Any chart timeframe - the EA keeps its own internal clock. A broker with reasonable gold spreads; the EA skips entries above a configurable spread ceiling. A VPS or an always-on computer is recommended, because the specialists work through the night. ### Risk disclosure Trading leveraged instruments carries a substantial risk of loss. This is a grid strategy: it holds losing positions through adverse moves and recovers them by adding equal-sized layers. Each group is bounded by its dollar stop - on a small account one stop is a large share of the balance (the manual gives the figures) - and the account breaker flattens everything if equity falls further than you allow. Both realise the loss they were holding. The results above come from a period in which gold rose overall. A long decline without bounces is the condition this design has the least evidence about; it is the condition in which the group stop fires most often. Past backtest performance does not predict future outcomes. Test on a demo account first, long enough to see a recovery ladder open, deepen and close, before funding a live account. ---"}}]}</script>
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/the-crew/"><meta property="og:type" content="website">
-<meta property="og:title" content="The Crew - Gold session-specialist Expert Advisor for MT5 (XAUUSD M1)"><meta property="og:description" content="The Crew is an MT5 Expert Advisor for gold (XAUUSD): eleven session-timed strategies run a shared equal-lot recovery grid under one account-level risk warden.">
+<meta property="og:title" content="The Crew - Gold session-specialist Expert Advisor for MT5 (XAUUSD M1)"><meta property="og:description" content="The Crew is an MT5 Expert Advisor for gold (XAUUSD): a recovery grid with a stop loss. Session-timed specialists run a shared equal-lot grid, and every grid...">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/the-crew/"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/the-crew_hero.jpg"><meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../../assets/style.css?v=7e8e1cc06b"></head>
-<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
-<a href="../../img/the-crew_hero.jpg"><img class="hero" src="../../img/the-crew_hero.jpg" width="800" height="800" alt="The Crew artwork"></a><h1>The Crew</h1><p class="lead">XAUUSD · M1 · MetaTrader 5 Expert Advisor</p><p class="note"><strong>Coming soon.</strong> This Expert Advisor is in final testing and is not for sale yet. Its description, manual and research are published so you can follow it before release.</p><p><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 4.42 · worst equity drawdown 6.5% · 627 trades · return +75.7% on 10,000</p><p class="stamp">Backtest, real ticks, Pepperstone, 2025-07-01 to 2026-09-07, version 2.83. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/the-crew_headline.png" alt="The Crew balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>The Crew is an MT5 Expert Advisor for gold (XAUUSD): eleven session-timed strategies run a shared equal-lot recovery grid under one account-level risk warden.</p>
+<a href="../../img/the-crew_hero.jpg"><img class="hero" src="../../img/the-crew_hero.jpg" width="800" height="800" alt="The Crew artwork"></a><h1>The Crew</h1><p class="lead">XAUUSD · M1 · MetaTrader 5 Expert Advisor</p><p class="note"><strong>Coming soon.</strong> This Expert Advisor is in final testing and is not for sale yet. Its description, manual and research are published so you can follow it before release.</p><p><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 5.7 · worst equity drawdown 8.76% · 625 trades · return +128.0% on 10,000</p><p class="stamp">Backtest, real ticks, BlackBull Markets, 2025-07-01 to 2026-09-07, version 3.10. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/the-crew_headline.png" alt="The Crew balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>The Crew is an MT5 Expert Advisor for gold (XAUUSD): a recovery grid with a stop loss. Session-timed specialists run a shared equal-lot grid, and every grid group carries its own hard stop (150 USD per 0.01 lot, read on every tick), so a one-way night closes the group at a known, fixed cost instead of averaging down until the margin runs out. Above the groups sits one account-level warden.</p>
 <h3 id="eleven-specialists-one-warden">Eleven specialists, one warden</h3>
 <p>There is an old idea in markets that one method should work at every hour of the day. Anyone who
 has watched gold trade at three in the morning and again at nine knows better. The Asian hours
-breathe slowly. London opens like a door thrown wide. The last hour of the American session has a
-character of its own that nothing else in the day shares.</p>
+breathe slowly. London opens like a door thrown wide. The last hours of the American session have a
+character of their own that nothing else in the day shares.</p>
 <p>So this expert does not send one method into all of them. It runs eleven, each built for one
-window and no other, under one warden who is not one of the eleven and who outranks all of them.</p>
-<p>The warden keeps the ledger for the whole book. She decides who may open at all, refuses any
-specialist the moment the book is carrying more than it should, and closes the whole house down if
-the account falls further than the configured limit. None of the eleven can overrule her.</p>
-<p>Below her, the eleven, by temperament: Nadia and Nerissa and Nova work the quiet night hours on
-different time horizons. Amara works before the Western session stirs and carries the deepest
-reserves. Selene and Thea hold the hours either side of midnight (neither ships in a validated
-roster yet - see Settings). Imogen goes through the London open with the crowd; Cassandra leans
-against it. Clara works the long European morning. Juno takes the hours where Europe and America
-overlap. Evelyn steps in as the American session closes out its business.</p>
-<h3 id="how-it-trades">How it trades</h3>
-<p>Each specialist waits for its own hour, its own conditions, and takes at most one position per
-day. When a position does not reach its small target quickly, an equal-lot recovery ladder
-averages the entry and exits the whole group as one. There is no martingale: every rung of the
-ladder is the same size as the first, and each specialist has a fixed maximum number of rungs, so
-the ladder's depth is a design constant, not a surprise.</p>
-<p>There is no per-trade stop loss. Protection is at the account level: a free-margin guard on new
-positions (existing recovery ladders are never blocked), a per-direction exposure cap across the
-whole book, and a hard flatten once the account's floating loss passes the percentage below its
-peak that the user sets.</p>
-<p>Three of the eleven specialists can want the same hour and the same direction. A fixed priority
-order decides which one takes a contested moment, so the book behaves the same way on every run;
-this makes behaviour predictable, it is not offered as a risk control.</p>
-<h3 id="what-it-does-not-do">What it does not do</h3>
-<p>No martingale or lot escalation inside a recovery: every layer is the same size as the one before
-it. No per-trade stop loss - the account-level breaker is the only brake. No news calendar logic,
-no grid depth guessing based on volatility, no DLL imports and no custom includes. No licensing or
-account-locking code.</p>
-<h3 id="settings">Settings</h3>
-<p>Twelve inputs. Everything else - each specialist's own hour, gate, ladder spacing and depth - is
-fixed at the value it was validated on, because the parts interlock: moving one without the others
-produces a configuration that was never tested.</p>
+window and no other, under Constance, the warden, who is not one of the eleven and who outranks
+all of them. She keeps the ledger for the whole book and applies the limits you set: who may open
+at all, how far any one group may fall before it is closed, and the point at which she closes the
+whole house down. None of the eleven can overrule her, and she never overrules you.</p>
+<p>Below her, the eleven, by temperament. Nadia, Nerissa and Nova work the quiet night hours on
+different horizons. Thea fades the last of the night. Delphine buys sharp dips at any hour, and
+stands aside around the 08:30 and 10:00 New York releases. Cassandra leans against the crowd at the
+London open. Amara works before the Western session stirs. Clara works the long European morning.
+Juno takes London's midday push. Imogen goes through the London open with the crowd. Evelyn steps
+in as the American session closes out its business.</p>
+<h3 id="three-councils-you-choose-how-much-of-the-house-works">Three councils - you choose how much of the house works</h3>
 <ul>
-<li>Roster - how many of the eleven specialists trade. Balanced 6 is the shipped default; a wider
-  roster puts more of the eleven to work across more hours, and both the money made and the
-  floating exposure grow together (see the manual for the measured figures).</li>
-<li>Broker clock shift - the one setting a user must get right. The specialists are calibrated to
-  market hours on a server at GMT+2 (winter) / GMT+3 (summer). Check the line the EA prints in the
-  journal at start-up and set this if the broker's server clock differs.</li>
-<li>Risk tier - how much floating exposure the book is allowed to budget for, as a share of the
-  balance. Conservative is the shipped default. Fixed lot is available for a user who prefers to
-  size by hand.</li>
-<li>Broker profile - selects which measured reference table the position sizing divides by; worst
-  floating exposure at a fixed lot is a property of the broker's feed, not only of the strategy
-  (see Results below).</li>
-<li>Sizing policy - Automatic adapts the validated configuration to the account; Exact uses the
-  user's own numbers and lets the broker decline what it cannot carry rather than silently
-  trading something smaller.</li>
-<li>Protection - the account-level loss limit and how long a breach must persist before it fires,
-  the maximum spread accepted, a hard lot cap, and whether the end-of-run risk report is printed.</li>
+<li>Low risk - 6 strategies (the default): the night crew (Nadia, Nerissa, Thea, Nova) with Delphine
+  and Cassandra. No group of this council reached its stop on any of the four test records below.</li>
+<li>Medium risk - 9 strategies: Low plus Amara, Clara and Juno - about a third more profit and about
+  half as much again in the capital it needs.</li>
+<li>High risk - 11 strategies: every specialist.</li>
+<li>Custom: choose the specialists one by one.</li>
+</ul>
+<p>Each council contains the one before it. Their measured profit, stops and capital needs are in
+the Results section.</p>
+<h3 id="how-it-trades">How it trades</h3>
+<p>Each specialist waits for its own hour and its own conditions. When a position does not reach its
+small target quickly, an equal-lot recovery ladder averages the entry and closes the whole group as
+one. There is no martingale: every layer is the same size as the first, and each specialist has a
+fixed maximum number of layers, so the ladder's depth is a design constant, not a surprise.</p>
+<p>Every group has a hard dollar stop: it is closed when its floating loss reaches 150 USD per 0.01
+lot (the same gold move on a USD, EUR or cent account), read on every price tick. A one-way move
+that never turns costs a known amount instead of growing with the move. Above that sits the
+account level: a free-margin floor for new groups, a per-direction exposure cap, and a breaker that
+flattens The Crew's groups if the account's value falls the percentage below its peak that you set
+(thirty percent by default).</p>
+<h3 id="new-in-this-version">New in this version</h3>
+<ul>
+<li>The broker clock sets itself. Gold pauses for an hour every day; The Crew finds that pause in
+  your broker's own price history and aligns every specialist to it, following the broker's
+  daylight-saving changes. A manual shift remains available.</li>
+<li>A status panel on the chart: council, lot, the equity level of the breaker, each specialist's
+  trading hours on your server clock and what she is doing, and for every open group its target,
+  the price of the next layer and its stop - drawn as lines on the chart.</li>
+<li>Static lot or compounding - your choice. Static trades the same lot on every group; compounding
+  sizes each new group from your balance and a risk tier.</li>
+<li>Runs beside other gold EAs on the same account: it recognises only its own trades, and its
+  exposure cap counts only its own positions.</li>
+</ul>
+<h3 id="scheduled-news-and-holidays">Scheduled news and holidays</h3>
+<p>By default The Crew opens no new groups on the first Friday of the month (US Non-Farm Payrolls), on
+FOMC decision days (the Federal Reserve's published schedule, built in through December 2027), from
+15 December to 15 January, and after 22:00 on Friday. Groups that are already open keep their
+normal exit. Each filter is a switch you can turn off.</p>
+<p>These are the only dates in the code. There is no list of good or bad trading days taken from the
+backtest: every result shown was produced by rules that apply the same way to dates the EA has never
+seen.</p>
+<h3 id="what-it-does-not-do">What it does not do</h3>
+<p>No martingale or lot escalation inside a recovery. No backtest-derived day lists. No DLL imports
+and no custom includes. No licensing or account-locking code. It never changes a setting you chose:
+it warns in the journal, and then it does what you configured.</p>
+<h3 id="settings">Settings</h3>
+<p>Thirty-five inputs, and every one of them is yours. The presets load the tested configurations.</p>
+<ul>
+<li>Council - Low risk - 6 strategies (default), Medium risk - 9, High risk - 11, or Custom.</li>
+<li>Broker clock - Auto-detect (default) or Manual.</li>
+<li>Sizing - Static lot, or Compounding with a risk tier (Conservative 10 percent is the default).</li>
+<li>Protection - account breaker, free-margin floor, spread ceiling, daily entry cap, per-direction
+  exposure caps, lot cap.</li>
+<li>No new groups on - payrolls Friday, FOMC days, Friday night, the holiday pause.</li>
+<li>Group stop: 150 USD per 0.01 lot, read on every tick (0 switches it off).</li>
+<li>Chart - the status panel and its lines.</li>
 </ul>
 <h3 id="results">Results</h3>
-<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, 100 percent history quality, XAUUSD,
-2025-07-01 to 2026-09-07, 10,000 starting balance, compiled defaults (Roster Balanced 6, Risk tier
-Conservative), measured on build 2.83. The shipped 2.84 build was verified behaviour-identical to
-2.83 by a trade-for-trade parity test on the same feed and window (identical deal count, profit matched to
-the cent). These are backtest figures; nothing below is from a live account.</p>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, 100 percent history quality, XAUUSD, 10,000
+starting balance, the shipped defaults of build 3.10 (Low risk - 6 strategies, Compounding
+Conservative, group stop 150, news and holiday filters on). These are backtest figures; nothing
+below is from a live account.</p>
 <table>
 <thead>
 <tr>
 <th>feed</th>
+<th>window</th>
 <th style="text-align: right;">net</th>
 <th style="text-align: right;">profit factor</th>
 <th style="text-align: right;">trades</th>
@@ -86,85 +104,122 @@ the cent). These are backtest figures; nothing below is from a live account.</p>
 </thead>
 <tbody>
 <tr>
-<td>Pepperstone</td>
-<td style="text-align: right;">+7,569.28 (+75.7%)</td>
-<td style="text-align: right;">4.42</td>
-<td style="text-align: right;">627</td>
-<td style="text-align: right;">6.5%</td>
-</tr>
-<tr>
-<td>BlackBull</td>
-<td style="text-align: right;">+8,083.94 (+80.8%)</td>
-<td style="text-align: right;">4.12</td>
-<td style="text-align: right;">627</td>
-<td style="text-align: right;">6.17%</td>
-</tr>
-<tr>
-<td>Fusion</td>
-<td style="text-align: right;">+7,965.23 (+79.7%)</td>
-<td style="text-align: right;">4.87</td>
-<td style="text-align: right;">617</td>
-<td style="text-align: right;">6.11%</td>
+<td>BlackBull (raw spread)</td>
+<td>2025-07-01 to 2026-09-07</td>
+<td style="text-align: right;">+12,797.30 (+128.0%)</td>
+<td style="text-align: right;">5.70</td>
+<td style="text-align: right;">625</td>
+<td style="text-align: right;">8.76%</td>
 </tr>
 <tr>
 <td>Vantage</td>
-<td style="text-align: right;">+8,011.91 (+80.1%)</td>
-<td style="text-align: right;">4.43</td>
-<td style="text-align: right;">631</td>
-<td style="text-align: right;">6.13%</td>
+<td>2025-07-01 to 2026-09-07</td>
+<td style="text-align: right;">+12,858.87 (+128.6%)</td>
+<td style="text-align: right;">4.72</td>
+<td style="text-align: right;">637</td>
+<td style="text-align: right;">9.64%</td>
 </tr>
 <tr>
-<td>OANDA (demo, spread-survival check only)</td>
-<td style="text-align: right;">+1,827.46 (+18.3%)</td>
-<td style="text-align: right;">4.31</td>
-<td style="text-align: right;">581</td>
-<td style="text-align: right;">2.01%</td>
+<td>Pepperstone</td>
+<td>2025-07-01 to 2026-09-07</td>
+<td style="text-align: right;">+13,269.68 (+132.7%)</td>
+<td style="text-align: right;">5.39</td>
+<td style="text-align: right;">622</td>
+<td style="text-align: right;">9.99%</td>
 </tr>
 </tbody>
 </table>
-<p>The same configuration takes near-identical trades on every broker and earns different money on
-each: results differ by broker, and a demo feed is not a substitute for testing on the broker a
-user intends to trade with.</p>
+<p>The headline is the lowest of the three, BlackBull: the same configuration takes near-identical trades on
+every broker, so plan with the lowest figure, not the highest. No group stop fired on any of
+the three. Results differ by broker; test on the broker you intend to trade with.</p>
+<p>The three councils - backtest, The Crew councils at a static 0.01 lot with the 150 group stop, BlackBull,
+IC Markets and Vantage, the windows in the column headers, real ticks; net per record; the last column
+is the minimum balance at 0.01 lot for a Cautious / Balanced / Bold risk appetite (see the manual):</p>
+<table>
+<thead>
+<tr>
+<th>council</th>
+<th style="text-align: right;">BlackBull 2025-01 to 2026-09</th>
+<th style="text-align: right;">BlackBull 2022-11 to 2024-12</th>
+<th style="text-align: right;">IC Markets 2026-04 to 2026-09</th>
+<th style="text-align: right;">Vantage 2025-07 to 2026-09</th>
+<th style="text-align: right;">group stops (4 records)</th>
+<th>minimum balance at 0.01 lot</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low risk - 6 (default)</td>
+<td style="text-align: right;">+1,743</td>
+<td style="text-align: right;">+480</td>
+<td style="text-align: right;">+570</td>
+<td style="text-align: right;">+1,339</td>
+<td style="text-align: right;">0</td>
+<td>684 / 333 / 221</td>
+</tr>
+<tr>
+<td>Medium risk - 9</td>
+<td style="text-align: right;">+2,303</td>
+<td style="text-align: right;">+776</td>
+<td style="text-align: right;">+894</td>
+<td style="text-align: right;">+1,673</td>
+<td style="text-align: right;">5</td>
+<td>1,004 / 463 / 280</td>
+</tr>
+<tr>
+<td>High risk - 11</td>
+<td style="text-align: right;">+2,591</td>
+<td style="text-align: right;">+950</td>
+<td style="text-align: right;">+856</td>
+<td style="text-align: right;">+1,859</td>
+<td style="text-align: right;">8</td>
+<td>1,319 / 676 / 414</td>
+</tr>
+</tbody>
+</table>
 <h2 id="frequently-asked-questions">Frequently asked questions</h2>
 <p><strong>Q: Which broker and account type does The Crew need?</strong>
 A: A hedging account, on XAUUSD (any broker spelling: XAUUSD, XAUUSD+, XAUUSD-ECN, GOLD.pro) with reasonable gold spreads.</p>
 <p><strong>Q: What is the minimum deposit?</strong>
-A: Validated at 10,000 in account currency. The EA never refuses a smaller account - it narrows the roster to what the balance can carry instead.</p>
+A: The Small Account preset (Low risk - 6 strategies, static 0.01 lot, every group closed at a 150 USD floating loss per 0.01 lot) needs about 330 if you accept a 1-in-40 chance of losing 35 percent of the starting balance within a year, and about 690 if you want that chance below 1 in 100 for a 20 percent loss (backtest, raw-spread feeds 2022-2026). One stop costs about 150-165 at 0.01 lot. The EA runs whatever you choose on any balance and prints at start-up what your configuration needs.</p>
+<p><strong>Q: Which council should I start with?</strong>
+A: Low risk - 6 strategies, the default: the smallest capital need and no group stop on the four test records. Medium and High add specialists that earn more and stop more often.</p>
 <p><strong>Q: Which chart and timeframe do I attach it to?</strong>
-A: Any timeframe - The Crew runs its own internal one-minute clock, so the chart period does not matter.</p>
-<p><strong>Q: Which setting is the main risk decision, and where should I start?</strong>
-A: Roster - how many of the eleven specialists trade. Balanced 6 at the Conservative risk tier is the shipped default and the recommended start.</p>
-<p><strong>Q: Does The Crew use a grid, and is it martingale?</strong>
-A: It is an equal-lot recovery grid: a position that misses its small target is averaged by a ladder of same-sized layers, closed as one group. No martingale - every layer matches the first, and each specialist has a fixed maximum depth.</p>
-<p><strong>Q: Why does it hold floating losses instead of using a stop loss?</strong>
-A: There is no per-trade stop loss; the recovery ladder is the exit mechanism, so open positions can float in loss while a group recovers. Protection is account-level: a free-margin guard on new positions, a per-direction exposure cap, and a hard flatten once floating loss passes the peak-to-trough percentage the user sets.</p>
+A: Any timeframe on a gold chart - The Crew runs its own internal one-minute clock.</p>
+<p><strong>Q: Do I have to set my broker's clock?</strong>
+A: No. With Broker clock = Auto-detect (the default) The Crew finds gold's daily pause in your broker's price history and prints the shift it uses in the journal at start-up.</p>
+<p><strong>Q: Is it a grid, and is it martingale?</strong>
+A: It is an equal-lot recovery grid: a position that misses its small target is averaged by a ladder of same-sized layers and closed as one group. No martingale - every layer matches the first, each specialist has a fixed maximum depth, and every group has a 150 USD per 0.01 lot stop.</p>
+<p><strong>Q: Can it run on the same account as another EA?</strong>
+A: Yes. It manages only its own trades by their magic numbers. Put it on its own gold chart; the account breaker and the free margin are shared with the other EA, and the manual explains how to size for that.</p>
+<p><strong>Q: Does The Crew trade through news?</strong>
+A: By default it opens no new groups on NFP Fridays, FOMC decision days, 15 December - 15 January and late Friday, and Delphine stands aside around the 08:30 and 10:00 New York releases. Open groups keep their exit.</p>
 <p><strong>Q: Do I need a VPS?</strong>
-A: A VPS or an always-on computer is recommended - the specialists work through the night and the account breaker needs the EA running to act.</p>
+A: A VPS or an always-on computer is recommended - the specialists work through the night and the stops and the breaker need the EA running to act.</p>
 <p><strong>Q: Can I backtest The Crew myself?</strong>
-A: Yes. It is one self-contained Expert Advisor with no DLLs or custom includes, so it runs in the MetaTrader 5 Strategy Tester on real ticks; use the feed, window and starting balance in the Results section above to reproduce a figure.</p>
+A: Yes. It is one self-contained Expert Advisor with no DLLs or custom includes; it runs in the MetaTrader 5 Strategy Tester on real ticks. Use the feed, window and starting balance in the Results section to reproduce a figure.</p>
 <h3 id="requirements">Requirements</h3>
 <p>XAUUSD (gold), a hedging account. Any chart timeframe - the EA keeps its own internal clock. A
 broker with reasonable gold spreads; the EA skips entries above a configurable spread ceiling. A
 VPS or an always-on computer is recommended, because the specialists work through the night.</p>
 <h3 id="risk-disclosure">Risk disclosure</h3>
-<p>Trading leveraged instruments carries a substantial risk of loss. This is a grid strategy without
-a per-trade stop loss: it holds losing positions through adverse moves by design and recovers them
-by adding equal-sized layers, which exposes the account to open-ended floating loss during a
-sustained adverse move. The only brake is an account-level breaker that flattens everything and
-realises the loss it was holding.</p>
-<p>The results above come from a period in which gold rose. A sustained decline is the condition this
-design has the least evidence about, because it has not faced a full one in the tested history.
-Worst-case floating exposure at a fixed 0.01 lot varies by broker feed - see the manual for the
-measured range and the sizing guidance by account balance. Past backtest performance does not
-predict future outcomes. Test on a demo account first, long enough to see a recovery ladder open,
-deepen and close, before funding a live account.</p>
+<p>Trading leveraged instruments carries a substantial risk of loss. This is a grid strategy: it holds
+losing positions through adverse moves and recovers them by adding equal-sized layers. Each group
+is bounded by its dollar stop - on a small account one stop is a large share of the balance (the
+manual gives the figures) - and the account breaker flattens everything if equity falls further
+than you allow.
+Both realise the loss they were holding.</p>
+<p>The results above come from a period in which gold rose overall. A long decline without bounces is
+the condition this design has the least evidence about; it is the condition in which the group stop
+fires most often. Past backtest performance does not predict future outcomes. Test on a demo
+account first, long enough to see a recovery ladder open, deepen and close, before funding a live
+account.</p>
 <hr />
 <h2 id="property-description-for-the-mq5-a-few-lines">#property description (for the .mq5, a few lines)</h2>
-<pre><code>THE CREW - eleven session specialists on XAUUSD under one risk warden.
-Equal-lot recovery, fixed ladder depth, account-level drawdown breaker.
-Hedging account. Twelve inputs; strategy internals fixed at validated values.
-Backtest only. Worst-case floating exposure at 0.01 lots varies by broker
-feed; see the description and the manual for the measured range.
+<pre><code>THE CREW - eleven session specialists on XAUUSD under Constance, the warden.
+Equal-lot recovery, fixed ladder depth, a dollar stop on every group.
+Hedging account. Thirty-five inputs, every one obeyed; presets load the tested setups.
+Backtest only. Default council: Low risk - 6 strategies.
 </code></pre>
 <h2 id="pre-submission-checklist">Pre-submission checklist</h2>
 <ul>
@@ -174,12 +229,15 @@ feed; see the description and the manual for the measured range.
 <li>[x] No profit promise, no superlatives, no money imagery</li>
 <li>[x] Backtest figures labelled as backtest, with broker, window and history quality</li>
 <li>[x] English only, no emojis, no external links</li>
-<li>[x] Twelve inputs, English names and comments</li>
+<li>[x] Thirty-five inputs (3.10), English names, labels fit the Inputs tab (tests/test_crew_inputs_fit.py)</li>
+<li>[x] Results = the 3.10 claim battery (BlackBull, Vantage, Pepperstone; 2025-07-01 to 2026-09-07); Fusion pending (stale binary on that install)</li>
+<li>[ ] <code>#property description</code> in the source updated to the block above (needs a rebuild + neutrality leg; the binary's
+      brand strings wait for the owner's rebrand decision)</li>
 <li>[ ] 3 logo PNGs exported (200x200, 140x140, 60x60)</li>
-<li>[ ] Screenshots exported and cropped to the list below</li>
+<li>[ ] Screenshots exported from the 3.10 battery and the status panel</li>
 <li>[ ] #property link set once the product URL exists</li>
 <li>[ ] Validator pass: arbitrary symbol/timeframe, tiny deposit, Errors-only journal empty</li>
-</ul><h2>Evidence</h2><figure><img src="img/01_equity_PEPPERSTONE.png" alt="equity PEPPERSTONE (backtest chart)" loading="lazy"><figcaption>equity PEPPERSTONE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_BLACKBULL.png" alt="equity BLACKBULL (backtest chart)" loading="lazy"><figcaption>equity BLACKBULL - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_FUSION.png" alt="equity FUSION (backtest chart)" loading="lazy"><figcaption>equity FUSION - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_VANTAGE.png" alt="equity VANTAGE (backtest chart)" loading="lazy"><figcaption>equity VANTAGE - Strategy Tester, real ticks, backtest</figcaption></figure>
+</ul><h2>Evidence</h2><figure><img src="img/01_equity_BLACKBULL.png" alt="equity BLACKBULL (backtest chart)" loading="lazy"><figcaption>equity BLACKBULL - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_FUSION.png" alt="equity FUSION (backtest chart)" loading="lazy"><figcaption>equity FUSION - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_OANDA.png" alt="equity OANDA (backtest chart)" loading="lazy"><figcaption>equity OANDA - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_OANDA_FULL.png" alt="equity OANDA FULL (backtest chart)" loading="lazy"><figcaption>equity OANDA FULL - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_PEPPERSTONE.png" alt="equity PEPPERSTONE (backtest chart)" loading="lazy"><figcaption>equity PEPPERSTONE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/01_equity_VANTAGE.png" alt="equity VANTAGE (backtest chart)" loading="lazy"><figcaption>equity VANTAGE - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/02_per_year.png" alt="per year (backtest chart)" loading="lazy"><figcaption>per year - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/03_feed_comparison.png" alt="feed comparison (backtest chart)" loading="lazy"><figcaption>feed comparison - Strategy Tester, real ticks, backtest</figcaption></figure><figure><img src="img/04_trade_distribution.png" alt="trade distribution (backtest chart)" loading="lazy"><figcaption>trade distribution - Strategy Tester, real ticks, backtest</figcaption></figure>
 </main>
 <footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
 <a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
