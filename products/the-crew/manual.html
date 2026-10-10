@@ -42,6 +42,12 @@
 </li>
 <li><a href="#7b-the-status-panel-and-the-chart-lines">7b. The Status Panel and the Chart Lines</a></li>
 <li><a href="#7c-running-the-crew-beside-another-ea">7c. Running THE CREW Beside Another EA</a></li>
+<li><a href="#7d-prop-firm-rules-your-firms-own-numbers-since-311">7d. Prop-firm rules: your firm's own numbers (since 3.11)</a><ul>
+<li><a href="#the-inputs-group-6b-prop-firm-rules-0-rule-off">The inputs (group "=== 6b. PROP-FIRM RULES (0 = rule off) ===")</a></li>
+<li><a href="#examples-what-to-type">Examples - what to type</a></li>
+<li><a href="#what-these-rules-do-not-do">What these rules do not do</a></li>
+</ul>
+</li>
 <li><a href="#8-the-arbiter-and-what-it-does-not-do">8. The Arbiter — and what it does not do</a></li>
 <li><a href="#9-what-to-expect-day-to-day">9. What to Expect Day to Day</a></li>
 <li><a href="#10-troubleshooting">10. Troubleshooting</a></li>
@@ -994,6 +1000,167 @@ positions. Three things are shared, and you should set THE CREW up knowing them:
 <p>Before 3.09 THE CREW's long-exposure cap (<em>Max open long ounces</em>, 24 oz) counted every gold position on the account,
 so a second gold EA holding 0.24 lot or more long would have blocked THE CREW's new buy groups. From 3.09 the cap
 counts THE CREW's own positions only.</p>
+<h2 id="7d-prop-firm-rules-your-firms-own-numbers-since-311">7d. Prop-firm rules: your firm's own numbers (since 3.11)</h2>
+<p>The input group <strong>Prop-firm rules</strong> enforces your firm's limits. Every rule is off (0) until you type your firm's number, and with every rule off the EA trades exactly as it did before the group existed.</p>
+<p>When a limit is about to be reached, the EA <strong>closes its own trades, deletes its own orders and stops opening new
+ones</strong>: until the firm's next day for the daily rules, for good for the maximum loss and the profit target. The
+Journal says which rule acted and at what equity:</p>
+<pre><code>THE_CREW prop-firm rule: daily loss limit (equity 95512.40, day start 100020.00, firm limit 95020.00) - trades closed, orders deleted, paused until the firm's next day
+</code></pre>
+<p>and the start line lists what is on:</p>
+<pre><code>THE_CREW prop-firm rules: account size 100000.00 | daily loss 5.00% of account size from the higher of day-start balance and equity - the EA acts at 4.50% of account size | maximum loss 10.00% (fixed) - the EA acts at 9.50% | ...
+</code></pre>
+<h3 id="the-inputs-group-6b-prop-firm-rules-0-rule-off">The inputs (group "=== 6b. PROP-FIRM RULES (0 = rule off) ===")</h3>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>What to enter</th>
+<th>Default</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Account size (<code>InpPropAccountSize</code>)</td>
+<td>the challenge's account size, e.g. 100000 (0 = the balance when the EA first starts)</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Daily loss limit % (<code>InpPropDailyLossPct</code>)</td>
+<td>the firm's daily loss, e.g. 5</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Daily loss limit is a % of (<code>InpPropDailyPctOf</code>)</td>
+<td><em>Account size</em> (the same amount every day - most firms) or <em>the day-start value</em></td>
+<td>Account size</td>
+</tr>
+<tr>
+<td>Daily loss is counted from (<code>InpPropDailyFrom</code>)</td>
+<td>the value at the start of the firm's day: <em>the higher of balance and equity</em> (strictest, safe for every firm), <em>balance</em> or <em>equity</em></td>
+<td>the higher of the two</td>
+</tr>
+<tr>
+<td>Maximum loss limit % (<code>InpPropMaxLossPct</code>)</td>
+<td>the firm's maximum loss, e.g. 10</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Maximum loss limit type (<code>InpPropMaxRule</code>)</td>
+<td><em>Fixed</em> (account size minus the limit - most two-step challenges), <em>Trailing: highest day-start balance</em>, <em>Trailing: highest equity, live</em></td>
+<td>Fixed</td>
+</tr>
+<tr>
+<td>A trailing limit stops rising at the account size (<code>InpPropTrailLock</code>)</td>
+<td>most trailing firms stop moving the limit once it reaches the starting balance</td>
+<td>yes</td>
+</tr>
+<tr>
+<td>Act this many % before each loss limit (<code>InpPropSafetyPct</code>)</td>
+<td>the safety margin: 0.5 means the EA acts at 4.5 % when the firm's limit is 5 %</td>
+<td>0.5</td>
+</tr>
+<tr>
+<td>Profit target % (<code>InpPropTargetPct</code>)</td>
+<td>close everything and stop when equity reaches the target (0 = keep trading)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Best-day cap % (<code>InpPropDayGainPct</code>)</td>
+<td>close everything and pause for the day once the day's gain reaches this (for firms with a consistency rule)</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>Hour the firm's day starts (<code>InpPropDayStartHour</code>)</td>
+<td>the hour on your platform's clock (the Market Watch time) at which the firm restarts its daily loss</td>
+<td>0</td>
+</tr>
+<tr>
+<td>Friday: close all at this hour (<code>InpPropFridayCloseHour</code>)</td>
+<td>for firms that do not allow holding over the weekend; trading resumes on Monday</td>
+<td>0 = off</td>
+</tr>
+<tr>
+<td>New challenge on the same login (<code>InpPropResetState</code>)</td>
+<td>set to <em>true</em> for ONE start when you begin a new challenge on the same login, then back to <em>false</em></td>
+<td>false</td>
+</tr>
+</tbody>
+</table>
+<h3 id="examples-what-to-type">Examples - what to type</h3>
+<p>From the LuxAlgo prop-firm directory on 23 September 2026 (the daily-loss wording is inferred by that directory; your
+firm's own rules page is always the authority, and firms change their rules):</p>
+<table>
+<thead>
+<tr>
+<th>Challenge (100,000 account)</th>
+<th>Daily loss %</th>
+<th>Maximum loss % and type</th>
+<th>Profit target %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>FTMO Normal, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>10, then 5</td>
+</tr>
+<tr>
+<td>FTMO Normal, 1-step</td>
+<td>3</td>
+<td>10, Trailing: highest day-start balance (FTMO calls it "EOD trailing"; owner screenshot 7 October 2026)</td>
+<td>10</td>
+</tr>
+<tr>
+<td>FundingPips, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>FundingPips, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+<tr>
+<td>The 5%ers High Stakes, 2-step</td>
+<td>5</td>
+<td>10, Fixed</td>
+<td>8, then 5</td>
+</tr>
+<tr>
+<td>Blue Guardian Pro, 1-step</td>
+<td>3</td>
+<td>6, Fixed</td>
+<td>10</td>
+</tr>
+</tbody>
+</table>
+<p>All six count the daily loss as a share of the account size from the previous day's closing balance, open trades
+included. Leave <em>counted from</em> at <em>the higher of balance and equity</em> - it is never later than the firm's own meter.</p>
+<p><strong>Profit target: set it for the challenge phases only.</strong> When the target is reached the EA stops for good on that
+login; on the funded account set it back to 0.</p>
+<p><strong>The firm's day.</strong> Most firms restart the daily loss at midnight of the platform's own clock: leave 0. If your firm
+names another time, convert it to the Market Watch clock. Gold is closed for about an hour around the broker's
+midnight on most platforms, so for gold an hour's difference rarely matters; a market that trades through midnight
+(Bitcoin) needs the exact hour.</p>
+<p><strong>Restarts.</strong> The EA remembers the account size, the day's starting value, the highest balance and whether a rule
+stopped it, across restarts of the platform (terminal global variables named <code>PR&lt;login&gt;_&lt;magic&gt;_...</code>). A restart in
+the middle of the day does not give it a fresh daily allowance.</p>
+<h3 id="what-these-rules-do-not-do">What these rules do not do</h3>
+<ul>
+<li>They close <strong>this EA's</strong> trades only. The limits are measured on the whole account's equity, so trades from another
+  EA or by hand count toward them; give every EA on the account the same numbers.</li>
+<li>The EA acts on the first price tick past its limit. A gap or a very fast market can carry the loss a little further
+  before the closing trades fill - that is what the safety margin is for; do not set it to 0 on a real challenge.</li>
+<li><strong>No news filter.</strong> Some funded accounts forbid opening or closing trades a few minutes around high-impact releases.
+  The platform's economic calendar cannot be replayed in the Strategy Tester, so a news rule could not be proved the way
+  every rule above was; pause the EA by hand around those releases if your firm requires it.</li>
+<li>No minimum trade duration and no minimum number of trading days.</li>
+</ul>
+<p><strong>Proof.</strong> With every rule off, this version placed the same deals as the version before it, deal for deal (37 trades, net +327.18, Pepperstone real ticks, 28 August - 19 September 2026). Each rule was then switched on at a level the same weeks reach; at all 8 triggers the EA closed its trades, opened nothing until the pause ended, and placed exactly the same deals as with the rules off up to the first trigger.</p>
 <h2 id="8-the-arbiter-and-what-it-does-not-do">8. The Arbiter — and what it does <em>not</em> do</h2>
 <p>Three specialists trade the same hour in the same direction. The arbiter is fixed at <strong>Scoped</strong>:
 only the highest-priority one takes a contested moment, scoped so that specialists which never

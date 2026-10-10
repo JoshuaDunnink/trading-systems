@@ -13,6 +13,7 @@
 <li><a href="#1-what-it-does">1. What it does</a></li>
 <li><a href="#2-installation">2. Installation</a></li>
 <li><a href="#3-the-only-setting-that-matters">3. The only setting that matters</a></li>
+<li><a href="#3g-what-changed-in-version-112-the-early-lock-your-choice">3g. What changed in version 1.12 - the Early lock, your choice</a></li>
 <li><a href="#3f-what-changed-in-version-111">3f. What changed in version 1.11</a></li>
 <li><a href="#3e-what-changed-in-version-110-panel-chart-labels-restart-safe">3e. What changed in version 1.10 - panel, chart labels, restart-safe</a><ul>
 <li><a href="#the-panel-and-the-chart-since-110">The panel and the chart (since 1.10)</a></li>
@@ -39,7 +40,7 @@
 </nav><h1 id="captain-karat-smash-user-manual">Captain Karat-Smash — user manual</h1>
 <p><em>He waits patiently for the walls of consolidation to close in, and then BAM! Punches right through the
 resistance line to grab the gold. The rest of this manual explains exactly how he does it.</em></p>
-<p>Version 1.11 · XAUUSD · attach to one H1 chart · hedging account</p>
+<p>Version 1.12 · XAUUSD · attach to one H1 chart · hedging account</p>
 <hr />
 <h2 id="1-what-it-does">1. What it does</h2>
 <p>Captain Karat-Smash trades breakouts of intraday support and resistance on gold. It is not one strategy but
@@ -125,6 +126,26 @@ double, and to stop and review a system if drawdown in practice reaches one and 
 <p><strong>Suggested minimum balance:</strong> 3,000 at Medium. The EA never refuses to trade on a small balance — it
 falls back to the broker's minimum lot — but below that figure a single minimum lot is a large share of the
 account and the drawdown percentages above no longer apply.</p>
+<h2 id="3g-what-changed-in-version-112-the-early-lock-your-choice">3g. What changed in version 1.12 - the Early lock, your choice</h2>
+<p>One new input in <strong>1. Start here</strong>: <strong>Exit lock</strong> = <em>Standard</em> (the default, every trade exactly as 1.11) or <em>Early</em>.</p>
+<ul>
+<li><strong>What Early does.</strong> Every strategy moves its stop to break-even at <strong>half</strong> the usual move (S1 at 0.09 % of price instead of 0.18 %, S4 at
+  0.055 % instead of 0.11 %, and so on). The trail, the target, the bounce exit and the London Grip are untouched. A break that fades back
+  after its first push now costs about zero instead of the full stop; a break that runs keeps its trail.</li>
+<li><strong>What it is worth (backtest, real ticks, 2025-01 to 2026-10, per 0.01 lot; the same trades, only the stop differs).</strong> Full stop-outs
+  fall by about 30 % (BlackBull 139 to 98, Vantage 78 to 52). The worst five days, the time under water and the maximum drawdown are all
+  about a third shallower (BlackBull max drawdown 441 to 295, Vantage 303 to 197; the worst five days at equal profit 257 to 177). Profit
+  is 12-14 % lower on raw-spread brokers (BlackBull 6,392 to 5,485, Vantage 4,709 to 4,145) and 4 % higher on IC Markets 2026. Profit per
+  unit of drawdown rises 1.3-1.5 x on every feed tested, and the 2023-2024 years are not harmed.</li>
+<li><strong>What it is not.</strong> Not a quiet-market edge: on the quietest third of days it costs slightly <em>more</em> per trade than on others, because a
+  winner that retraces to the entry is stopped at break-even and runs again without you. It is a shallower path for the last 12-14 % of
+  profit.</li>
+<li><strong>When to choose it.</strong> A drawdown-limited account, a prop challenge, or a period in which you would otherwise switch the EA off.
+  Switch it back to Standard when you want the full move; the choice is yours on every restart and it is never changed by the EA.</li>
+<li><strong>Proofs.</strong> Standard == 1.11 deal for deal (BlackBull 169 trades +892.95, Vantage 143 trades +883.69 on 2026-07 to 2026-10); Early ==
+  the measured research arm deal for deal (BlackBull 1,168 entries +5,484.62, Vantage 742 entries +4,145.25 on 2025-01 to 2026-10).</li>
+<li><strong>Preset.</strong> <code>presets/CAPTAIN_KARAT-SMASH_medium_early_lock.set</code> = Medium risk with the Early lock.</li>
+</ul>
 <h2 id="3f-what-changed-in-version-111">3f. What changed in version 1.11</h2>
 <ul>
 <li><strong>Trades identical to the previous version</strong> (proved deal for deal). It no longer sends an order or a stop change into a closed market (the broker's daily break, a holiday): the request the broker would have refused is skipped at the same point, so nothing about the trades changes and the journal no longer fills with 'Market closed' errors.</li>
@@ -398,6 +419,11 @@ the same 48 deals as 1.05 (+213.78).</p>
 <td>The one knob. Custom hands sizing to section 5.</td>
 </tr>
 <tr>
+<td>Exit lock</td>
+<td>Standard</td>
+<td>Standard = the measured lock trigger (1.11 exits). Early = break-even at half the move: about 30 % fewer full stop-outs, drawdowns about a third shallower, 12-14 % less profit (chapter 3g). Your choice; the EA never changes it.</td>
+</tr>
+<tr>
 <td>Virtual balance</td>
 <td>0 (off)</td>
 <td>Size as if the balance were at most this amount — run a large account at a smaller account's size.</td>
@@ -664,7 +690,7 @@ firm's own rules page is always the authority, and firms change their rules):</p
 <tr>
 <td>FTMO Normal, 1-step</td>
 <td>3</td>
-<td>10, Fixed</td>
+<td>10, Trailing: highest day-start balance (FTMO calls it "EOD trailing"; owner screenshot 7 October 2026)</td>
 <td>10</td>
 </tr>
 <tr>
@@ -783,6 +809,13 @@ swing before it places anything, and the daily strategies can wait days.</p>
 <td>RiskLevel</td>
 <td>RISK_MEDIUM</td>
 <td>Risk level</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpLockMode</code></td>
+<td>LockMode</td>
+<td>LOCK_STANDARD</td>
+<td>Exit lock: Standard, or Early (shallower drawdowns, less profit)</td>
 </tr>
 <tr>
 <td>1. Start here</td>
