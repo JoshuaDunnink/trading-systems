@@ -1,0 +1,223 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lamplighter research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="How Lamplighter was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/lamplighter/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Lamplighter research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="How Lamplighter was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/lamplighter/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/lamplighter_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Lamplighter</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#lamplighter-research-note">Lamplighter - Research Note</a><ul>
+<li><a href="#0-the-result-in-one-table">0. The result in one table</a></li>
+<li><a href="#1-how-it-was-tested">1. How it was tested</a></li>
+<li><a href="#2-the-mechanism-four-lamps">2. The mechanism: four lamps</a><ul>
+<li><a href="#21-morning-breakout-the-early-session-range">2.1 Morning Breakout - the early-session range</a></li>
+<li><a href="#22-london-open-the-overnight-range">2.2 London Open - the overnight range</a></li>
+<li><a href="#23-swing-breakout-the-nearest-unbroken-hourly-swing">2.3 Swing Breakout - the nearest unbroken hourly swing</a></li>
+<li><a href="#24-pullback-a-four-day-extreme">2.4 Pullback - a four-day extreme</a></li>
+<li><a href="#25-where-the-four-ideas-come-from">2.5 Where the four ideas come from</a></li>
+</ul>
+</li>
+<li><a href="#3-the-guards">3. The guards</a></li>
+<li><a href="#4-risk-levels-a-lot-per-balance-not-a-percentage">4. Risk levels: a lot per balance, not a percentage</a></li>
+<li><a href="#5-execution-who-does-what">5. Execution: who does what</a></li>
+<li><a href="#6-regime-honesty-a-system-for-a-moving-market">6. Regime honesty: a system for a moving market</a></li>
+<li><a href="#7-small-accounts-what-the-tests-show-about-balance">7. Small accounts: what the tests show about balance</a></li>
+<li><a href="#8-what-was-tested-and-left-out">8. What was tested and left out</a></li>
+<li><a href="#9-limits">9. Limits</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="lamplighter-research-note">Lamplighter - Research Note</h1>
+<p><em>What the machine does, how each part is bounded, and what the tests behind each figure are.</em></p>
+<p>Version 1.01 - October 2026 - DRAFT</p>
+<p>Every figure in this note is a Strategy Tester run on real broker ticks; those are backtests, not a record of live trading. Every number names the broker feed and the window it came from, and a number that cannot be traced that way does not appear. The results by risk level are not in yet: that place is marked [CLAIM: ...], and the few facts still to be confirmed are marked [TO VERIFY].</p>
+<hr />
+<h2 id="0-the-result-in-one-table">0. The result in one table</h2>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, version 1.01 at its defaults (Risk level Medium), deposit 10,000, 150 ms execution delay.</p>
+<table>
+<thead>
+<tr>
+<th>feed</th>
+<th style="text-align: right;">net</th>
+<th style="text-align: right;">% of deposit</th>
+<th style="text-align: right;">profit factor</th>
+<th style="text-align: right;">trades</th>
+<th style="text-align: right;">relative equity drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull, 2022-11-01 to 2026-10-09 (headline)</td>
+<td style="text-align: right;">+24,636</td>
+<td style="text-align: right;">+246 %</td>
+<td style="text-align: right;">1.57</td>
+<td style="text-align: right;">2,327</td>
+<td style="text-align: right;">8.5 %</td>
+</tr>
+<tr>
+<td>Vantage, 2025-07-04 to 2026-10-09</td>
+<td style="text-align: right;">+12,258</td>
+<td style="text-align: right;">+123 %</td>
+<td style="text-align: right;">1.64</td>
+<td style="text-align: right;">742</td>
+<td style="text-align: right;">7.5 %</td>
+</tr>
+</tbody>
+</table>
+<p>How the machine is built, what it leaves out on a quiet day, what a losing stretch can do to a small account, and which market its history belongs to is the rest of this note.</p>
+<hr />
+<h2 id="1-how-it-was-tested">1. How it was tested</h2>
+<ul>
+<li><strong>Real ticks only.</strong> Every figure in this note is a Strategy Tester run on a broker's own tick archive, not a one-minute-bar approximation. The strategies place stop orders and trail stops, so the path of the ticks decides the fills.</li>
+<li><strong>A stated execution delay.</strong> Every order in every run is filled 150 ms after it is sent, the median broker delay measured on live gold accounts.</li>
+<li><strong>Several feeds are one gold market, not several samples.</strong> Two brokers can price the same market along almost the same path. Agreement across feeds shows that the mechanism survives the broker; it does not multiply the evidence.</li>
+<li><strong>The compiled defaults are the tested configuration.</strong> The headline rows ran with every input at its compiled default.</li>
+<li><strong>Stops are a percentage of price.</strong> A stop set as a percentage of price is a different amount of money when gold is at 1,800 and when it is at 4,100. For the small-account research in section 7, every historical trade was re-expressed at a gold price of 4,100, so a 0.01-lot trade means the same in money in every year of the window. In practice each trade's money was multiplied by 4,100 divided by its entry price, because the stops and targets are a percentage of price.</li>
+</ul>
+<hr />
+<h2 id="2-the-mechanism-four-lamps">2. The mechanism: four lamps</h2>
+<p>Lamplighter runs four strategies side by side on one gold chart. Each one rests orders at a place on the chart or at a time of the server day and waits for price to carry through. None of them predicts direction; each takes the break of a defined level when the market brings price there. They share nothing: not positions, not orders, not stops. Each has its own magic number, which is how the EA tells its own trades apart.</p>
+<p>Because Swing Breakout and Pullback each rest an order on both sides, each can hold a buy and a sell at the same time, so up to six positions can be open at once (in the backtests the most open at one time was four). That is why the product needs a <strong>hedging account</strong>: a netting account would merge the positions of the four lamps into one.</p>
+<h3 id="21-morning-breakout-the-early-session-range">2.1 Morning Breakout - the early-session range</h3>
+<p>The EA measures the range of the early session. At 06:05 server time it places a buy stop above the range and a sell stop below it. The stop loss is a fixed percentage of price. When one side fills, the other is cancelled, so the strategy holds at most one trade a day. Once the trade has moved by the size of the session range, the stop goes to breakeven, and from there it follows price. Any Morning trade still open at 17:55 server time is closed.</p>
+<h3 id="22-london-open-the-overnight-range">2.2 London Open - the overnight range</h3>
+<p>The EA measures the overnight range and at 09:55 server time places a buy stop and a sell stop around it. The stop loss sits at the middle of the range and the target is the full range. Once the trade is in profit, the stop locks most of the best profit reached. When the range is wide enough that a stop at its middle would risk too large a share of price, London Open stands aside for the day instead of shrinking the stop.</p>
+<h3 id="23-swing-breakout-the-nearest-unbroken-hourly-swing">2.3 Swing Breakout - the nearest unbroken hourly swing</h3>
+<p>A swing is an hourly bar whose high or low is more extreme than the bars on both sides of it. Swing Breakout takes the nearest swing high above price and the nearest swing low below price that no later hourly bar has traded through, and rests one stop order at each. The stop loss is a fixed percentage of price. Once the trade is ahead, the stop follows price. An early false-breakout exit closes a trade that does not follow through within minutes of its entry, so a break that fails at once costs less than the full stop.</p>
+<h3 id="24-pullback-a-four-day-extreme">2.4 Pullback - a four-day extreme</h3>
+<p>On days when a four-day extreme qualifies, the EA rests a stop order at the four-day high above price and at the four-day low below price. A trade opens only if price comes back to that extreme and breaks it. The stop loss is a fixed percentage of price, and once the trade is ahead the stop follows price.</p>
+<h3 id="25-where-the-four-ideas-come-from">2.5 Where the four ideas come from</h3>
+<p>All four are ordinary, widely known market-structure ideas: a break of the opening range, a break of the overnight range, a break of an unbroken swing, a return to a recent extreme. Nothing here is a new discovery. What the research added is the way they are combined, the guard that keeps each one out when its conditions are poor, and the stop on every order.</p>
+<hr />
+<h2 id="3-the-guards">3. The guards</h2>
+<ul>
+<li><strong>A stop loss on every order.</strong> It is attached when the order is placed, so it lives on the broker's server and holds even if the terminal goes offline.</li>
+<li><strong>Quiet-market protection (Morning Breakout).</strong> Morning Breakout sits out a day when the recent daily range is small compared with price. The threshold is an input (1.2 percent of price by default; zero switches the protection off). It is on by default.</li>
+<li><strong>Wide-range stand-aside (London Open).</strong> See section 2.2. There is no input; it is part of the strategy.</li>
+<li><strong>Spread guard.</strong> A new order waits while the spread is wider than a limit (0.60 in dollars by default). It acts when an order is about to be placed. It does not remove an order that is already resting.</li>
+<li><strong>Account drawdown stop.</strong> If the account's equity falls a set percentage (twenty by default) below the highest equity the EA has seen, the EA closes all of its trades, deletes its orders and stops. Zero switches it off. Because the stop is measured from a peak and not from the starting balance, on a small account it can stop the EA while the account is still above where it began. The stop keeps its state through a terminal restart; only Resume on the panel clears it, and the peak then restarts at the current equity.</li>
+<li><strong>Safe trade layer.</strong> Before any request is sent, the EA checks that the broker's server would accept it: the market is open, the symbol allows trading, the volume is inside the broker's limits, free margin covers the order with a 10 % buffer, the account's limit on pending orders is not reached, stop orders sit on the correct side of price, and stops and targets are outside the broker's stop level and freeze level. A request that would fail is not sent, and the reason is printed once a day in the Experts journal. The layer changes no trading rule; a request the server would have refused is simply not made.</li>
+<li><strong>Restart safety.</strong> On a live account the EA saves which strategies have placed their orders today, the morning range the breakeven step measures in, London Open's starting risk, and the account stop's peak and state, and restores them when it starts again. A terminal restart therefore does not place a day's straddles twice.</li>
+<li><strong>No news filter.</strong> The EA does not read an economic calendar. A stop order fills at the broker's server the moment price reaches it, and in a release second the fill and the stop can both slip.</li>
+</ul>
+<hr />
+<h2 id="4-risk-levels-a-lot-per-balance-not-a-percentage">4. Risk levels: a lot per balance, not a percentage</h2>
+<p>One input, Risk level, sets the lot from the balance: 0.01 lot for every whole 8,000 (Low), 4,000 (Medium, the default), 2,000 (High) or 1,000 (Hot) of balance, with the broker's minimum lot as the floor. Custom takes a fixed lot or a balance of your own per 0.01 lot. The recommended deposit is 4,000 for the default Medium level; on a smaller balance the EA trades the broker's minimum lot, and the dips of section 7 take a larger share of the account. On a symbol that is not gold the EA trades the broker's minimum lot whatever the level.</p>
+<table>
+<thead>
+<tr>
+<th>balance</th>
+<th style="text-align: right;">Low</th>
+<th style="text-align: right;">Medium</th>
+<th style="text-align: right;">High</th>
+<th style="text-align: right;">Hot</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1,000</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr>
+<td>2,000</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.02</td>
+</tr>
+<tr>
+<td>5,000</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.05</td>
+</tr>
+<tr>
+<td>10,000</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.10</td>
+</tr>
+<tr>
+<td>20,000</td>
+<td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.20</td>
+</tr>
+</tbody>
+</table>
+<p>(Lots on a broker whose lot step is 0.01. A table of sizes, not of results.)</p>
+<p>A higher level buys more lots for the same balance, so the same series of trades moves the account further in both directions. There is no level that avoids that trade-off. Because the stops are a percentage of price, one stop on a given lot costs more when gold is expensive; the panel's "Risk now" line shows what every open stop would cost in the account currency.</p>
+<p>[CLAIM: results by risk level - growth, profit factor and deepest dip for Low, Medium and High on the claim feeds, from the product battery]</p>
+<hr />
+<h2 id="5-execution-who-does-what">5. Execution: who does what</h2>
+<ul>
+<li><strong>On the broker's server:</strong> the resting stop orders, and the stop loss and take profit of every order and trade.</li>
+<li><strong>Inside the EA:</strong> moving the stop to breakeven, the trailing and locking stops, the early false-breakout exit, the end-of-day close of Morning trades, the spread guard, the safe trade layer and the account drawdown stop. These need the terminal running, which is why a VPS or an always-on computer is recommended.</li>
+<li><strong>What a broker adds.</strong> The entries are the same on every broker; what differs is the spread and how far the fills and the trailing stops land from the plan. [CLAIM: broker-to-broker spread of results in the battery]</li>
+<li><strong>A tester limit.</strong> The tester's stored ticks may not contain the widest spreads of a data release, so a backtest can understate what trading through a release costs.</li>
+</ul>
+<hr />
+<h2 id="6-regime-honesty-a-system-for-a-moving-market">6. Regime honesty: a system for a moving market</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2022-11 to 2026-10.</em></p>
+<p>The backtested profit came mainly from the volatile, trending gold market of 2024 to 2026. In the quiet, sideways gold market of 2023 the same rules lost money for most of a year before recovering. Lamplighter is built for a gold market that moves. It is not offered as an all-weather system, and a return to a quiet, sideways gold market would be expected to bring a flat or losing stretch with it.</p>
+<hr />
+<h2 id="7-small-accounts-what-the-tests-show-about-balance">7. Small accounts: what the tests show about balance</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, every trade re-expressed at gold 4,100, BlackBull 2022-11..2026-10 / VT Markets 2024-03..2026-10.</em></p>
+<p>The 2022-11 to 2026-10 BlackBull window includes the quiet 2023 market; the 2024-03 to 2026-10 VT Markets window covers the volatile years only. At the minimum lot of 0.01, the deepest dip from any start day was:</p>
+<table>
+<thead>
+<tr>
+<th>starting balance</th>
+<th style="text-align: right;">BlackBull 2022-11..2026-10 (includes 2023)</th>
+<th style="text-align: right;">VT Markets 2024-03..2026-10</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2,000</td>
+<td style="text-align: right;">about 42 % of the balance</td>
+<td style="text-align: right;">about 13 %</td>
+</tr>
+<tr>
+<td>1,000</td>
+<td style="text-align: right;">about 82 %</td>
+<td style="text-align: right;">about 27 %</td>
+</tr>
+</tbody>
+</table>
+<p>In money, the dip was about 840 per 0.01 lot on BlackBull (window including 2023) and about 270 per 0.01 lot on VT Markets (2024-03..2026-10); a balance smaller than the dip is wiped out. A 500 account was wiped out in the 2023-type market (same BlackBull window). The dip is measured below the running peak of the account, not below the starting balance (BlackBull: equity marked every minute at the worst side of each one-minute bar; VT Markets: closed trades).</p>
+<p>The margin is a second limit. One 0.01 lot of gold is one ounce on a broker with a 100-ounce lot. At leverage 1:30 and gold near 4,100, each open position needs about 137 of margin. Up to six positions can be open at once, so six need about 820; in the backtests the most open at one time was four, about 550 (backtest, MetaTrader 5 Strategy Tester, real ticks). Below roughly 820 at 1:30 a full set of six positions cannot be carried, and the safe trade layer does not send an order that free margin, with a 10 % buffer, cannot cover.</p>
+<p>The account stop is measured from the highest value the account has reached, not from the starting balance. An account that grows from 2,000 to 3,000 and then falls to 2,400 stands twenty percent below that high point; the stop would close everything and halt the EA although the account is still above where it began.</p>
+<hr />
+<h2 id="8-what-was-tested-and-left-out">8. What was tested and left out</h2>
+<p>The product has no grid, no martingale, no averaging into a losing position, no order without a stop loss, no news-trading logic, no prop-firm rule inputs, no DLL and no external files. No grid or martingale code is in it at all; none is switched off. Along the way four ideas were tested or proposed and did not make it in:</p>
+<ul>
+<li><strong>A volatility gate on Morning Breakout, tuned on older data.</strong> Rejected. It reduced the dip in the quiet gold market of 2023 but hurt the other periods. The quiet-market protection that ships is a simpler fixed threshold (the recent daily range against price) that was measured to cost little.</li>
+<li><strong>A recovery grid for each strategy.</strong> Removed. A grid turns a loss that is bounded by a stop into one that is not, which is the opposite of what this product is for.</li>
+<li><strong>Risk-per-trade sizing as a percentage of the account.</strong> Not shipped. The levels that set a lot per balance are simpler to read, and the panel shows the money at the stops for every open trade.</li>
+<li><strong>Excluding bad months from the history by date.</strong> Refused. Choosing the months to leave out after seeing which ones lost is hindsight, and it would make the figures look better than the rule deserves.</li>
+</ul>
+<hr />
+<h2 id="9-limits">9. Limits</h2>
+<ul>
+<li>These are backtests on tick archives, not a record of live trading. A live account adds real spread, slippage and a broker's own fill behaviour on top of what the archive can show.</li>
+<li>The result belongs to a moving gold market (section 6). A quiet gold market means fewer or smaller wins and, on the evidence of 2023, a long stretch that can lose money.</li>
+<li>A small account has two limits of its own, the broker's margin and the depth of the dips (section 7). Neither is a setting of the EA.</li>
+<li>The account drawdown stop keeps its state through a terminal restart. After it acts, the EA stays stopped until Resume is pressed on the panel, so keep the panel switched on.</li>
+<li>Lamplighter needs a hedging account. The strategies can hold opposite positions at the same time (Swing Breakout and Pullback can each hold a buy and a sell), and a netting account would merge them. The EA does not check the account type itself.</li>
+<li>Past results, backtested or live, do not predict future results. Test on a demo account with your own broker before trading real funds.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
