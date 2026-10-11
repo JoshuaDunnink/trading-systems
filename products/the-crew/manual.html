@@ -37,7 +37,7 @@
 <li><a href="#5-no-new-groups-on">5. No new groups on</a></li>
 <li><a href="#6-group-stop">6. Group stop</a></li>
 <li><a href="#7-chart">7. Chart</a></li>
-<li><a href="#settings-we-deliberately-do-not-offer-as-risk-controls">Settings we deliberately do NOT offer as risk controls</a></li>
+<li><a href="#settings-that-increase-risk-when-set-tight-one-offered-so-you-can-see-it-one-not">Settings that increase risk when set tight - one offered so you can see it, one not</a></li>
 </ul>
 </li>
 <li><a href="#7b-the-status-panel-and-the-chart-lines">7b. The Status Panel and the Chart Lines</a></li>
@@ -48,6 +48,7 @@
 <li><a href="#what-these-rules-do-not-do">What these rules do not do</a></li>
 </ul>
 </li>
+<li><a href="#7e-the-max-layers-input-since-314-measure-the-cap-yourself">7e. The max-layers input (since 3.14) — measure the cap yourself</a></li>
 <li><a href="#8-the-arbiter-and-what-it-does-not-do">8. The Arbiter — and what it does not do</a></li>
 <li><a href="#9-what-to-expect-day-to-day">9. What to Expect Day to Day</a></li>
 <li><a href="#10-troubleshooting">10. Troubleshooting</a></li>
@@ -58,7 +59,7 @@
 </ul>
 </div>
 </nav><h1 id="the-crew">THE CREW</h1>
-<p><em>Version 3.10 · XAUUSD · MetaTrader 5</em></p>
+<p><em>Version 3.14 · XAUUSD · MetaTrader 5</em></p>
 <h3 id="eleven-session-specialists-under-one-warden-equal-lot-recovery-you-choose-how-many-run"><em>Eleven session specialists under one warden. Equal-lot recovery. You choose how many run.</em></h3>
 <p><strong>Symbol:</strong> XAUUSD (Gold) — any broker spelling (<code>XAUUSD</code>, <code>XAUUSD+</code>, <code>XAUUSD-ECN</code>, <code>GOLD.pro</code>)
 <strong>Timeframe:</strong> any — the EA runs its own internal clock · <strong>Platform:</strong> MetaTrader 5 · <strong>Account type:</strong> hedging</p>
@@ -819,6 +820,11 @@ before you fund anything.</p>
 <td>Blocks <strong>new</strong> groups when free margin falls below this share of equity; never blocks a layer of an open group (section 2 explains why). <code>0</code> = off.</td>
 </tr>
 <tr>
+<td><strong>Max layers per group (0 = measured depth)</strong> (<code>InpMaxLayers</code>, since 3.14)</td>
+<td><code>0</code></td>
+<td><code>0</code> = each specialist's own measured depth (3.13 trade for trade). A lower number caps every specialist deeper than it; a number above raises every shallower specialist to it (untested ground; the group stop is then the only bound). Measured harmful when it binds - the start-up journal says so and chapter 7e gives the numbers, so you can run the comparison yourself.</td>
+</tr>
+<tr>
 <td><strong>Skip entries above this spread (USD)</strong> (<code>InpMaxSpreadUsd</code>)</td>
 <td><code>1.00</code></td>
 <td>No entry while the spread is wider than this many dollars of gold price (not points). <strong>Do not lower it</strong> — a tighter value silently starves the EA on wide-spread brokers.</td>
@@ -920,12 +926,14 @@ before you fund anything.</p>
 <p><strong>Still fixed inside each specialist:</strong> the scoped arbiter, the one-minute evaluation clock, the entry
 filter, and every ladder constant (spacing, target, maximum depth) — each specialist keeps its own. None of
 these is a preference; each is a measurement.</p>
-<h3 id="settings-we-deliberately-do-not-offer-as-risk-controls">Settings we deliberately do NOT offer as risk controls</h3>
+<h3 id="settings-that-increase-risk-when-set-tight-one-offered-so-you-can-see-it-one-not">Settings that increase risk when set tight - one offered so you can see it, one not</h3>
 <p>Both were tested and both <strong>increase</strong> risk when set tight:</p>
 <ul>
-<li><strong>Depth cap.</strong> Capping the deepest specialist's layers moved its worst floating drawdown
+<li><strong>Depth cap</strong> (<code>InpMaxLayers</code>, offered since 3.14 at the owner's decision so that anyone can
+  measure it). Capping the deepest specialist's layers moved its worst floating drawdown
   substantially deeper and stretched one group's hold time from hours to weeks. Adding layers is
-  what lets a group close.</li>
+  what lets a group close. The input exists so you can run the comparison in your own tester;
+  chapter 7e gives the measured numbers and the journal warns at start-up whenever the cap binds.</li>
 <li><strong>A tight floating-loss stop.</strong> Closing a group once it is underwater by a small fixed amount
   converts recoverable groups into realised losses: at 100 per 0.01 lot, eight of nine stopped groups
   would have finished ahead. The group stop (<code>InpMaxBasketLossUsd</code>) is therefore set beyond the depth normal
@@ -1161,6 +1169,70 @@ the middle of the day does not give it a fresh daily allowance.</p>
 <li>No minimum trade duration and no minimum number of trading days.</li>
 </ul>
 <p><strong>Proof.</strong> With every rule off, this version placed the same deals as the version before it, deal for deal (37 trades, net +327.18, Pepperstone real ticks, 28 August - 19 September 2026). Each rule was then switched on at a level the same weeks reach; at all 8 triggers the EA closed its trades, opened nothing until the pause ended, and placed exactly the same deals as with the rules off up to the first trigger.</p>
+<h2 id="7e-the-max-layers-input-since-314-measure-the-cap-yourself">7e. The max-layers input (since 3.14) — measure the cap yourself</h2>
+<p>Since 3.14 the depth cap is an input: <strong>Max layers per group (0 = measured depth)</strong> (<code>InpMaxLayers</code>),
+group 4 Protection. At <code>0</code> every specialist runs her own measured depth — the deepest ladder she needed
+over five years of real ticks — and the EA trades exactly as 3.13 (proved deal for deal: BlackBull 169
+trades, Vantage 156, identical tick counts). A lower number caps every specialist deeper than it; a
+number above a specialist's depth raises her ladder to it - untested ground, where the group stop is the only bound. When the cap binds, the start-up journal
+says how many specialists it caps, the deepest measured depth, and what the measurement found.</p>
+<p>The input is offered so that you can see the effect in your own tester rather than take our word for
+it. This is what it does on the shipped defaults (Low risk - 6 strategies, Compounding Conservative,
+group stop 150, filters on), per 0.01 lot:</p>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2022-11-01 to 2024-12-31, version 3.14:</p>
+<table>
+<thead>
+<tr>
+<th>Max layers per group</th>
+<th style="text-align: right;">net</th>
+<th style="text-align: right;">account equity drawdown</th>
+<th style="text-align: right;">realised (balance) drawdown</th>
+<th style="text-align: right;">worst five days</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0 = measured depth</td>
+<td style="text-align: right;">+485</td>
+<td style="text-align: right;">7.3%</td>
+<td style="text-align: right;">0.3%</td>
+<td style="text-align: right;">-4</td>
+</tr>
+<tr>
+<td>12</td>
+<td style="text-align: right;">+485</td>
+<td style="text-align: right;">7.3%</td>
+<td style="text-align: right;">0.3%</td>
+<td style="text-align: right;">-4</td>
+</tr>
+<tr>
+<td>8</td>
+<td style="text-align: right;">+305</td>
+<td style="text-align: right;">16.6%</td>
+<td style="text-align: right;">9.3%</td>
+<td style="text-align: right;">-154</td>
+</tr>
+<tr>
+<td>5</td>
+<td style="text-align: right;">+130</td>
+<td style="text-align: right;">16.1%</td>
+<td style="text-align: right;">15.8%</td>
+<td style="text-align: right;">-150</td>
+</tr>
+</tbody>
+</table>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull and Vantage, 2025-07-01 to 2026-09-07, version 3.14:
+on this window no ladder went deep (no group stop fired), so a cap of 5, 8 or 12 changes the result by
+less than three percent either way and the equity drawdown not at all (8.5% in every arm). The harm of a
+cap shows only when a group needs its depth — the 2022–2024 record above — which is exactly when you
+would want it not to be there.</p>
+<p>Why: a group closes when its weighted average comes back within reach of price. A deep ladder's
+average sits close to price, so a small retrace closes it; a capped ladder stops averaging and floats
+until price travels much further, and often reaches the group stop instead. Capping the deepest
+specialist's layers was measured earlier to move her worst floating drawdown substantially deeper and
+to stretch one group's hold from hours to weeks. If you run a cap, keep the group stop on — it remains
+the bound on what a stranded group can cost.</p>
+<hr />
 <h2 id="8-the-arbiter-and-what-it-does-not-do">8. The Arbiter — and what it does <em>not</em> do</h2>
 <p>Three specialists trade the same hour in the same direction. The arbiter is fixed at <strong>Scoped</strong>:
 only the highest-priority one takes a contested moment, scoped so that specialists which never
