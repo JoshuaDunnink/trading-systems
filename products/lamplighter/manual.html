@@ -18,7 +18,7 @@
 </ul>
 </li>
 <li><a href="#3a-minimum-balance-read-this-if-your-account-is-small">3a. Minimum balance - read this if your account is small</a></li>
-<li><a href="#3b-the-account-drawdown-stop">3b. The account drawdown stop</a></li>
+<li><a href="#3b-the-account-stop">3b. The account stop</a></li>
 <li><a href="#4-your-first-week">4. Your first week</a></li>
 <li><a href="#5-reading-the-chart-the-panel-and-the-journal">5. Reading the chart, the panel and the journal</a><ul>
 <li><a href="#51-the-panel-inppanel-on-by-default">5.1 The panel (InpPanel, on by default)</a></li>
@@ -48,8 +48,8 @@
 </ul>
 </div>
 </nav><h1 id="lamplighter-user-manual">LAMPLIGHTER - user manual</h1>
-<p><em>Version 1.01 - XAUUSD - MetaTrader 5 - DRAFT (the results by risk level are not in yet: that place is marked [CLAIM: ...])</em></p>
-<p>The Lamplighter walks the same round on gold every day and lights four lamps, each at its hour. He lights the first when the morning range is drawn, the second when London opens, the third where a swing level gives way and the fourth where price comes back to a recent extreme. Every lamp has a stop loss. When the street is too quiet he leaves a lamp dark.</p>
+<p><em>Version 1.04 - XAUUSD - MetaTrader 5</em></p>
+<p>The Lamplighter walks the same round on gold every day and lights four lamps, each at its hour. He lights the first when the morning range is drawn, the second when London opens, the third where a swing level gives way and the fourth where price comes back to a recent extreme. Every lamp has a stop loss. When the street is too quiet he leaves a lamp dark, and when the lamps keep blowing out he turns two of them down.</p>
 <p>This manual is written for someone who has never run an expert advisor before. If you only read one chapter, read chapter 3a: it says what a small account can expect.</p>
 <hr />
 <h2 id="1-what-it-does-in-plain-words">1. What it does, in plain words</h2>
@@ -100,7 +100,14 @@
 <p>Normally each lamp holds one position. Swing Breakout and Pullback rest one order on each side, so in a whipsaw each of them can end up holding a buy and a sell together. Up to six positions can therefore be open at once; in the backtests the most open at one time was four (backtest, MetaTrader 5 Strategy Tester, real ticks).</p>
 <p><strong>Lamplighter needs a hedging account.</strong> The four lamps keep separate positions, and two of them can hold a buy and a sell on gold at the same time. A netting account (one position per symbol) would merge them into one. Chapter 2 says more.</p>
 <p><strong>Server time.</strong> All session times are broker server times, for a server on GMT+2 in winter and GMT+3 in summer. If your broker's clock is different, chapter 10 shows the three inputs that move the strategies to the right moments.</p>
-<p><strong>Two protections that keep a lamp dark.</strong> Quiet-market protection (on by default) keeps Morning Breakout out on a day when the recent daily range is small compared with price. London Open stands aside on a day when the overnight range is so wide that a stop at its middle would risk too much of price.</p>
+<p><strong>What keeps a lamp dark or turns it down.</strong> All of these are on by default, and each shows on the panel (chapter 5):</p>
+<ul>
+<li><strong>Quiet-market protection.</strong> Morning Breakout sits out a day when the recent daily range is small compared with price. London Open sits out the days when gold's recent range is in the quietest third of its own past year.</li>
+<li><strong>Wide range.</strong> London Open stands aside on a day when the overnight range is so wide that a stop at its middle would risk too much of price.</li>
+<li><strong>News guard.</strong> Around a high-impact US dollar release, resting orders are taken off and no new ones are placed, from 10 minutes before to 10 minutes after.</li>
+<li><strong>Spread guard.</strong> A new order waits while the spread is above the limit, and resting orders are taken off while the spread blows out against its normal.</li>
+<li><strong>Steady mode.</strong> When the range breakouts of the last weeks have kept failing, Morning Breakout and London Open trade at half size until breakouts hold again.</li>
+</ul>
 <h2 id="2-installation-five-minutes">2. Installation (five minutes)</h2>
 <ol>
 <li>If you bought Lamplighter from the Market, it appears in the Navigator under <strong>Market</strong>. If you have the file, open MetaTrader 5, <strong>File -&gt; Open Data Folder</strong>, open <code>MQL5\Experts</code> and copy <code>LAMPLIGHTER.ex5</code> there; then right-click the <strong>Navigator</strong> panel and choose <strong>Refresh</strong>.</li>
@@ -110,10 +117,11 @@
 <li>Check your broker's clock (chapter 4, step 2).</li>
 </ol>
 <p>The journal (<strong>Toolbox -&gt; Experts</strong>) shows one line on start, for example:</p>
-<pre><code>LAMPLIGHTER v1.01 | Symbol=XAUUSD TF=PERIOD_M15 | S1=1 S2=1 S3=1 S4=1 | magics 89860..89863 | GMT=off shift=0 | risk RISK_MEDIUM | account stop 20.0% | quiet-market protection 1.20%
+<pre><code>LAMPLIGHTER v1.04 | Symbol=XAUUSD TF=PERIOD_M15 | S1=1 S2=1 S3=1 S4=1 | magics 89860..89863 | GMT=off shift=0 | risk RISK_MEDIUM | account stop 50.0% | quiet-market protection 1.20%
 </code></pre>
-<p>It names the symbol and chart timeframe, which of the four strategies are on (1 = on), the four magic numbers, whether the broker-clock adjustment is on and by how many hours it shifts the session times right now, the risk level, the account stop in percent and the quiet-market protection threshold in percent of price (a zero in either place means that protection is off).</p>
+<p>It names the symbol and chart timeframe, which of the four strategies are on (1 = on), the four magic numbers, whether the broker-clock adjustment is on and by how many hours it shifts the session times right now, the risk level, the account stop in percent below the starting balance and Morning Breakout's quiet-market threshold in percent of price (a zero in either place means that protection is off).</p>
 <p><strong>Account type: hedging.</strong> A hedging account lets one symbol hold several positions at once, including a buy and a sell together. Lamplighter needs that: on a netting account the positions of the four lamps would merge, and a stop or an exit would no longer belong to the lamp that opened the trade. The EA does not check the account type for you. If you are not sure which type you have, ask your broker before you attach it.</p>
+<p><strong>Gold only.</strong> On a live or demo chart of a symbol that is not gold, the EA places no orders and says so in the Experts tab. The input <em>Allow live trading on a non-gold symbol</em> lets it trade there at the broker's minimum lot; the strategies were built and tested on gold only.</p>
 <h2 id="2a-the-inputs-at-a-glance">2a. The inputs at a glance</h2>
 <p>The Inputs tab is ordered by how often you should touch it. Most users change only section 1.</p>
 <table>
@@ -127,38 +135,43 @@
 <tbody>
 <tr>
 <td><strong>1. Start here</strong></td>
-<td>Risk level, the account stop, Maximum spread</td>
+<td>Risk level, the account stop and its starting balance, Maximum spread</td>
 <td>yes - this is the whole setup</td>
 </tr>
 <tr>
 <td>2. Strategies</td>
-<td>switches for the four lamps, and the quiet-market protection threshold</td>
+<td>switches for the four lamps, and the two quiet-market protections</td>
 <td>rarely</td>
 </tr>
 <tr>
-<td>3. Broker clock</td>
+<td>3. When not to trade</td>
+<td>steady mode, the news guard, the spread blow-out guard</td>
+<td>rarely</td>
+</tr>
+<tr>
+<td>4. Broker clock</td>
 <td>the session-time adjustment for a server that is not on GMT+2 / GMT+3</td>
 <td>only if your broker's clock differs</td>
 </tr>
 <tr>
-<td>4. Custom sizing</td>
-<td>a fixed lot, or a balance per 0.01 lot</td>
+<td>5. Custom sizing</td>
+<td>a fixed lot, or a balance per 0.01 lot, and the maximum lot per order</td>
 <td>only with Risk level = Custom</td>
 </tr>
 <tr>
-<td>5. Trading</td>
-<td>magic number base, order comment</td>
+<td>6. Trading</td>
+<td>magic number base, order comment, trading on a non-gold symbol</td>
 <td>a second chart needs its own magic number</td>
 </tr>
 <tr>
-<td>6. Panel and chart</td>
+<td>7. Panel and chart</td>
 <td>the control panel, the order and stop drawings, the text size</td>
 <td>cosmetic</td>
 </tr>
 </tbody>
 </table>
 <p><strong>Maximum spread</strong> is in price units; for gold that is dollars. A new order waits while the spread is wider (chapter 6).</p>
-<p><strong>Account drawdown stop</strong> closes everything and stops the EA when the account falls the set percentage below its high point. The chapter on the account stop explains how.</p>
+<p><strong>Account stop</strong> closes everything and stops the EA when the account's equity falls the set percentage below your starting balance. The account stop chapter explains it.</p>
 <h2 id="3-the-only-setting-that-matters-risk-level">3. The only setting that matters: risk level</h2>
 <p><code>InpRisk</code> is one choice: Low, Medium (the default), High, Hot or Custom. It sets the lot per order from your balance:</p>
 <table>
@@ -166,28 +179,34 @@
 <tr>
 <th>Level</th>
 <th>Lot rule</th>
+<th style="text-align: right;">Smallest balance for this level</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Low</td>
-<td>0.01 lot per 8,000 of balance</td>
+<td>0.01 lot per 4,000 of balance</td>
+<td style="text-align: right;">4,000</td>
 </tr>
 <tr>
 <td><strong>Medium (default)</strong></td>
-<td><strong>0.01 lot per 4,000 of balance</strong></td>
+<td><strong>0.01 lot per 2,000 of balance</strong></td>
+<td style="text-align: right;"><strong>2,000</strong></td>
 </tr>
 <tr>
 <td>High</td>
-<td>0.01 lot per 2,000 of balance</td>
+<td>0.01 lot per 1,000 of balance</td>
+<td style="text-align: right;">1,000</td>
 </tr>
 <tr>
 <td>Hot</td>
-<td>0.01 lot per 1,000 of balance - drawdowns can exceed 20 %; for experienced users, with risk capital only</td>
+<td>0.01 lot per 500 of balance - the minimum account, the deepest dips; for experienced users, with risk capital only</td>
+<td style="text-align: right;">500</td>
 </tr>
 <tr>
 <td>Custom</td>
-<td>a fixed lot, or a balance per 0.01 lot of your own (section 4 of the Inputs tab)</td>
+<td>a fixed lot, or a balance per 0.01 lot of your own (section 5 of the Inputs tab)</td>
+<td style="text-align: right;">-</td>
 </tr>
 </tbody>
 </table>
@@ -204,91 +223,112 @@
 </thead>
 <tbody>
 <tr>
+<td>500</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.01</td>
+</tr>
+<tr>
 <td>1,000</td>
 <td style="text-align: right;">0.01</td>
 <td style="text-align: right;">0.01</td>
 <td style="text-align: right;">0.01</td>
-<td style="text-align: right;">0.01</td>
+<td style="text-align: right;">0.02</td>
 </tr>
 <tr>
 <td>2,000</td>
 <td style="text-align: right;">0.01</td>
 <td style="text-align: right;">0.01</td>
-<td style="text-align: right;">0.01</td>
 <td style="text-align: right;">0.02</td>
+<td style="text-align: right;">0.04</td>
 </tr>
 <tr>
 <td>5,000</td>
-<td style="text-align: right;">0.01</td>
-<td style="text-align: right;">0.01</td>
-<td style="text-align: right;">0.02</td>
-<td style="text-align: right;">0.05</td>
-</tr>
-<tr>
-<td>10,000</td>
 <td style="text-align: right;">0.01</td>
 <td style="text-align: right;">0.02</td>
 <td style="text-align: right;">0.05</td>
 <td style="text-align: right;">0.10</td>
 </tr>
 <tr>
-<td>20,000</td>
+<td>10,000</td>
 <td style="text-align: right;">0.02</td>
 <td style="text-align: right;">0.05</td>
 <td style="text-align: right;">0.10</td>
 <td style="text-align: right;">0.20</td>
 </tr>
+<tr>
+<td>20,000</td>
+<td style="text-align: right;">0.05</td>
+<td style="text-align: right;">0.10</td>
+<td style="text-align: right;">0.20</td>
+<td style="text-align: right;">0.40</td>
+</tr>
 </tbody>
 </table>
-<p>On a small account every level therefore trades the same minimum lot, and the level changes nothing until the balance grows. The lot is the same for all four strategies. The Maximum lot per order input (5.0 by default) caps every single order at every level; it does not cap the total of open lots.</p>
-<p><strong>Recommended deposit.</strong> 4,000 for the default Medium level, which trades 0.01 lot per 4,000 of balance. The other levels follow the same rule: Low 8,000, High 2,000 and Hot 1,000 per 0.01 lot. Below the balance of the level you chose, the EA trades the broker's minimum lot (chapter 3a says what that means for the dips).</p>
-<p><strong>Not gold.</strong> The sizing is built for gold. On a symbol that is not gold the EA trades the broker's minimum lot whatever the risk level, and it prints one line in the Experts tab saying it is built for gold.</p>
+<p>Below the smallest balance of the level you chose, the EA trades the broker's minimum lot, so the dips take a larger share of the account (chapter 3a). The lot is the same for all four strategies, except that steady mode halves it for Morning Breakout and London Open while it acts (chapter 6). The Maximum lot per order input (5.0 by default) caps every single order at every level; it does not cap the total of open lots.</p>
 <p>This is a lot per balance, not a risk percentage. The stops are a percentage of price (or a share of a measured range), so one stop on a given lot costs more when gold is expensive. The panel's <strong>Risk now</strong> line shows what every open stop would cost in your account currency (chapter 5).</p>
-<p><strong>What the testing showed at each level.</strong> [CLAIM: growth, profit factor and deepest dip for Low, Medium and High, with broker, window, deposit and execution delay - from the product battery]</p>
-<p>Higher levels grow the account faster in a good market and cut it deeper in a bad one. There is no level that avoids that trade-off. Choose the level whose dips you could sit through (chapter 3a).</p>
-<h3 id="custom-sizing">Custom sizing</h3>
-<p>Set Risk level = Custom, then either:
-- <strong>Fixed lot</strong> - leave "Sizing" on Fixed lot and give the lot in "Fixed lot" (0.01 by default), or
-- <strong>Scale with balance</strong> - set "Sizing" to Scale with balance and give the balance per 0.01 lot.</p>
-<h2 id="3a-minimum-balance-read-this-if-your-account-is-small">3a. Minimum balance - read this if your account is small</h2>
-<p>Lamplighter has no minimum balance of its own. Two limits decide how small is too small, and neither is a setting of the EA.</p>
-<p><strong>Limit 1 - how deep the dips go.</strong></p>
-<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, every trade re-expressed at gold 4,100, BlackBull 2022-11..2026-10 / VT Markets 2024-03..2026-10.</em></p>
-<p>At the minimum lot of 0.01, the deepest dip from any start day was:</p>
+<p><strong>What the testing showed at each level.</strong> Each level was run with every other input at its default, starting from the smallest balance made for it, over the whole window of each broker. <em>Backtest, MetaTrader 5 Strategy Tester, real ticks, version 1.03 (version 1.04 makes the same trades), 150 ms execution delay; BlackBull 2022-11-01 to 2026-10-09 (includes the quiet 2023 gold market), Vantage 2025-07-04 to 2026-10-09.</em></p>
 <table>
 <thead>
 <tr>
-<th>starting balance</th>
-<th style="text-align: right;">BlackBull 2022-11..2026-10 (includes the quiet 2023 market)</th>
-<th style="text-align: right;">VT Markets 2024-03..2026-10 (the volatile years only)</th>
+<th>Level, starting balance</th>
+<th style="text-align: right;">Lowest equity, as a share of the start (BlackBull / Vantage)</th>
+<th style="text-align: right;">Deepest fall below a running high (BlackBull / Vantage)</th>
+<th style="text-align: right;">Profit factor (BlackBull / Vantage)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>2,000</td>
-<td style="text-align: right;">about 42 % of the balance</td>
-<td style="text-align: right;">about 13 %</td>
+<td>Low, 4,000</td>
+<td style="text-align: right;">95 % / 97 %</td>
+<td style="text-align: right;">8.5 % / 7.1 %</td>
+<td style="text-align: right;">1.55 / 1.66</td>
 </tr>
 <tr>
-<td>1,000</td>
-<td style="text-align: right;">about 82 %</td>
-<td style="text-align: right;">about 27 %</td>
+<td>Medium, 2,000</td>
+<td style="text-align: right;">91 % / 95 %</td>
+<td style="text-align: right;">16.3 % / 11.7 %</td>
+<td style="text-align: right;">1.58 / 1.62</td>
+</tr>
+<tr>
+<td>High, 1,000</td>
+<td style="text-align: right;">82 % / 90 %</td>
+<td style="text-align: right;">30.3 % / 18.6 %</td>
+<td style="text-align: right;">1.53 / 1.58</td>
+</tr>
+<tr>
+<td>Hot, 500</td>
+<td style="text-align: right;">64 % / 80 %</td>
+<td style="text-align: right;">52.8 % / 41.5 %</td>
+<td style="text-align: right;">1.54 / 1.52</td>
 </tr>
 </tbody>
 </table>
-<p>In money, the dip was about 840 per 0.01 lot on BlackBull (window including 2023) and about 270 per 0.01 lot on VT Markets (2024-03..2026-10); a balance smaller than the dip is wiped out. A 500 account was wiped out in the 2023-type market (BlackBull, same window). The dip is measured below the running peak of the account, not below the starting balance (backtest, 0.01 lot, BlackBull 2022-11..2026-10: equity marked every minute at the worst side of each bar; backtest, 0.01 lot, VT Markets 2024-03..2026-10: closed trades).</p>
-<p>"Every trade re-expressed at gold 4,100" means each historical trade was rescaled to what it would have been at a gold price of 4,100, so a 0.01-lot trade means the same in money in every year of the window. In practice each trade's money was multiplied by 4,100 divided by its entry price, because the stops and targets are a percentage of price. These dips are for 0.01 lot, which is what Low, Medium and High trade on a 2,000 balance and what every level trades on a 1,000 balance; Hot trades 0.02 on 2,000. Read the two columns together: the volatile years alone look far gentler than a window that includes a quiet year, and a quiet year can come again.</p>
-<p><strong>Limit 2 - the broker's margin.</strong> One 0.01 lot of gold is one ounce on a broker with a 100-ounce lot, and its margin is the gold price divided by your leverage. At leverage 1:30 (the EU retail limit for gold) and gold near 4,100, one 0.01 position needs about 137 of margin. Up to six positions can be open at once, because Swing Breakout and Pullback can each hold a buy and a sell at the same time, next to one position each for Morning Breakout and London Open; six positions need about 820. In the backtests the most open at one time was four, about 550 (backtest, MetaTrader 5 Strategy Tester, real ticks). Below roughly 820 at 1:30 a full set of six positions cannot be carried. Before it sends an order the EA checks that your free margin covers the order plus a 10 % buffer; an order that fails the check is not sent, and the Experts tab says why (chapter 8). At leverage 1:500 the same position needs about 8.</p>
-<p><strong>The account stop on a small account.</strong> The stop is measured from the highest value the account has reached while the EA runs, not from your starting balance. A 2,000 account that grows to 3,000 and then falls to 2,400 stands twenty percent below its high point, and the stop closes everything and halts the EA although the account is still above where it began. On a small account this can happen early, and after it happens the EA stays off until you press Resume on the panel (chapter 3b). Setting the stop to 0 removes that behaviour and also removes the protection.</p>
-<p><strong>Recommended deposit.</strong> 4,000 for the default Medium level, which is where the lot is 0.01 per 4,000 of balance (chapter 3). The other levels read: Low 8,000, High 2,000, Hot 1,000 per 0.01 lot. On a balance below that the lot cannot fall under the broker's minimum, so the dips above take a larger share of the account, not a smaller one. For scale: at 0.01 lot the deepest dip of about 840 is about 21 % of 4,000 (BlackBull 2022-11..2026-10, includes the quiet 2023 market), and the dip of about 270 is about 7 % of 4,000 (VT Markets 2024-03..2026-10, the volatile years only); both are the stamped figures above divided by 4,000. Choose the balance for the dip you could sit through, not for a good month.</p>
-<h2 id="3b-the-account-drawdown-stop">3b. The account drawdown stop</h2>
-<p><code>InpAccountDDPct</code> (20 by default, 0 = off).</p>
+<p>"Lowest equity" is the lowest the account's equity (balance plus open profit and loss) went, as a share of the money it started with: 64 % means a 500 account went as low as about 320 before it grew (BlackBull, 2022-11 to 2026-10, the backtest above). "Deepest fall below a running high" is the report's relative equity drawdown: the largest drop from a high point the account had reached, in percent of that high. In none of these runs did the account fall to the account stop (fifty percent below the start).</p>
+<p>Higher levels grow the account faster in a good market and cut it deeper in a bad one. There is no level that avoids that trade-off. Choose the level whose dips you could sit through (chapter 3a).</p>
+<h3 id="custom-sizing">Custom sizing</h3>
+<p>Set Risk level = Custom, then either:
+- <strong>Fixed lot</strong> - leave "Sizing" on Fixed lot and give the lot in "Fixed lot" (0.01 by default), or
+- <strong>Scale with balance</strong> - set "Sizing" to Scale with balance and give the balance per 0.01 lot (2,000 by default).</p>
+<h2 id="3a-minimum-balance-read-this-if-your-account-is-small">3a. Minimum balance - read this if your account is small</h2>
+<p><strong>The minimum is 500, at Risk level Hot.</strong> From a start of 500 the account survived in every test: on BlackBull, over a window that includes the quiet gold market of 2023, its equity went as low as 64 % of the starting balance before it grew; on Vantage (2025-07 to 2026-10) as low as 80 %. The account stop, fifty percent below the start, was never reached. In the most recent stretch tested, 2026-09-01 to 2026-10-09, a 500 account at Hot never closed a day below its starting balance on either broker, and its equity went no lower than 96 % of it. <em>Backtest, MetaTrader 5 Strategy Tester, real ticks, version 1.03 (version 1.04 makes the same trades) at its defaults with Risk level Hot, 150 ms execution delay.</em></p>
+<p><strong>The recommended start is 2,000, at the default Medium level.</strong> It is chosen for a fall of no more than about twenty percent: from 2,000 at Medium the deepest fall below a running high was 16.3 % on BlackBull (including 2023) and 11.7 % on Vantage, and the equity went no lower than 91 % of the start. From 1,000 at High the deepest fall was 30.3 % on BlackBull, from 500 at Hot 52.8 %. The table in chapter 3 has every level.</p>
+<p>Why the small account dips deeper: below its level's balance, and at Hot from the start, the EA trades the broker's minimum lot, and a minimum-lot stop is a larger share of a small balance. Steady mode cannot help there either: half of the minimum lot is still the minimum lot, so steady mode starts to act once the lot is 0.02 or more.</p>
+<p><strong>The broker's margin is the second limit.</strong> One 0.01 lot of gold is one ounce on a broker with a 100-ounce lot, and its margin is the gold price divided by your leverage. At leverage 1:30 (the EU retail limit for gold) and gold near 4,100, one 0.01 position needs about 137 of margin. Up to six positions can be open at once, because Swing Breakout and Pullback can each hold a buy and a sell at the same time, next to one position each for Morning Breakout and London Open; six positions need about 820. In the backtests the most open at one time was four, about 550 (backtest, MetaTrader 5 Strategy Tester, real ticks). On a 500 account at 1:30 a full set of positions cannot be carried: the later orders are not sent. Before it sends an order the EA checks that your free margin covers the order plus a 10 % buffer; an order that fails the check is not sent, and the Experts tab says why (chapter 8). At leverage 1:500 the same position needs about 8.</p>
+<p><strong>The account stop on a small account</strong> is measured from the money you started with (chapter 3b), so profit made along the way never counts against you: an account that grows from 500 to 900 and falls back to 600 is still above its start, and the stop does not act.</p>
+<p>Choose the balance for the dip you could sit through, not for a good month.</p>
+<h2 id="3b-the-account-stop">3b. The account stop</h2>
+<p><code>InpAccountDDPct</code> (50 by default, 0 = off) and <code>InpStartBalance</code> (0 by default).</p>
 <ul>
-<li>The EA keeps the highest account equity it has seen since it was started. Equity is balance plus the open profit and loss.</li>
-<li>When equity is the set percentage or more below that peak, the EA closes all of its trades, deletes all of its orders and stops. The panel's status word reads <strong>Stopped</strong>, and the journal says: <code>LAMPLIGHTER: account drawdown stop reached - every trade closed, the EA stopped</code>.</li>
+<li>The EA remembers your <strong>starting balance</strong>: the balance when it first starts on the account, or the figure you enter in <em>Starting balance for the account stop</em>.</li>
+<li>When the account's equity (balance plus open profit and loss) is the set percentage or more below that starting balance, the EA closes all of its trades, deletes all of its orders and stops. The panel's status word reads <strong>Stopped</strong>, and the journal says: <code>LAMPLIGHTER: account drawdown stop reached - every trade closed, the EA stopped</code>.</li>
+<li>The default of fifty percent is the line below which the account is no longer the account you started. Set it tighter if you prefer.</li>
+<li>Profit made since the start does not count against you: the stop looks at the money you started with, not at the best day.</li>
 <li>It measures the whole account's equity, so losses on other EAs or by hand count toward it; it closes only this EA's trades.</li>
-<li>It keeps its state through a terminal restart. On a live account the EA saves the stop's state and the equity peak; after a restart the panel still reads <strong>Stopped</strong>, and the journal line <code>restart: saved state restored</code> ends with <code>account drawdown stop TRIPPED - press Resume to clear it</code>. A restart does not clear the stop and does not restart the peak.</li>
-<li><strong>Resume clears it.</strong> Press Resume on the panel: the peak restarts at the current equity and each lamp places again at its next check. If the left button still reads <strong>Pause</strong> after the stop acted, press it once; it then reads <strong>Resume</strong>. The buttons are part of the panel, so keep <strong>Show the control panel</strong> (<code>InpPanel</code>) switched on.</li>
+<li>It keeps its state through a terminal restart. On a live account the EA saves the starting balance and whether the stop has acted; after a restart the panel still reads <strong>Stopped</strong>, and the journal line <code>restart: saved state restored</code> ends with <code>account drawdown stop TRIPPED - press Resume to clear it</code>.</li>
+<li><strong>Resume clears it.</strong> Press Resume on the panel: the starting balance restarts at the current equity and each lamp places again at its next check. If the left button still reads <strong>Pause</strong> after the stop acted, press it once; it then reads <strong>Resume</strong>. The buttons are part of the panel, so keep <strong>Show the control panel</strong> (<code>InpPanel</code>) switched on.</li>
+<li>Taking the EA off the chart forgets the saved state; attaching it again starts with today's balance as the new start (or the figure you enter).</li>
 <li>0 switches the stop off: nothing is closed by the account rule.</li>
 <li>It is a guard, not a guarantee: a price gap can carry the loss past the line before the closing orders fill.</li>
 </ul>
@@ -314,15 +354,15 @@
 <tbody>
 <tr>
 <td><strong>Lamplighter</strong> + a status word</td>
-<td><strong>Trading</strong>, <strong>Paused</strong> (entries paused from the panel), <strong>Closed</strong> (the market is closed), <strong>Algo off</strong> (Algo Trading is switched off, so the EA cannot place or manage orders) or <strong>Stopped</strong> (the account drawdown stop acted)</td>
+<td><strong>Trading</strong>, <strong>Paused</strong> (entries paused from the panel), <strong>Closed</strong> (the market is closed), <strong>Algo off</strong> (Algo Trading is switched off, so the EA cannot place or manage orders) or <strong>Stopped</strong> (the account stop acted)</td>
 </tr>
 <tr>
 <td>Morning, London, Swing, Pullback rows</td>
 <td>one dot and one word per lamp: the time of the next setup (<code>06:05</code>, or <code>Mon 06:05</code> over a weekend), <code>done today</code>, <code>1 order</code> / <code>2 orders</code> waiting, <code>BUY +12.40</code> or <code>SELL -3.10</code> for an open trade (your account currency), <code>quiet day</code>, <code>wide range</code>, <code>watching</code>, <code>closed</code>, <code>paused</code> or <code>off</code>. Hover for the detail.</td>
 </tr>
 <tr>
-<td>Guard strip: <strong>Spread</strong>, <strong>Quiet day</strong>, <strong>Wide range</strong>, <strong>Protection</strong></td>
-<td>four chips, always visible, dim when idle and lit when the guard acts. Spread lights while the spread is above the limit; Quiet day while quiet-market protection keeps Morning Breakout out; Wide range while London Open stands aside; Protection is lit green while quiet-market protection is on.</td>
+<td>Guard strip: <strong>News</strong>, <strong>Spread</strong>, <strong>Quiet</strong>, <strong>Steady</strong></td>
+<td>four chips, always visible. News, Spread and Quiet are dim when idle and light up gold while the guard acts: News around a high-impact USD release, Spread while the spread is above the limit or blows out, Quiet while a lamp stands aside for the day (a quiet market or a range too wide for its stop). Steady is green while steady mode is on and watching, and gold while it acts (Morning Breakout and London Open at half size, or standing aside if you chose that). Hover over a chip for the detail.</td>
 </tr>
 <tr>
 <td><strong>Risk now</strong></td>
@@ -330,7 +370,7 @@
 </tr>
 <tr>
 <td><strong>Account</strong></td>
-<td>a bar showing how far the account stands below its high point against the stop level, with the number beside it, for example <code>3.1 / 20%</code></td>
+<td>a bar showing how far the account stands below your starting balance against the stop level, with the number beside it, for example <code>3.1 / 50%</code></td>
 </tr>
 <tr>
 <td><strong>Today</strong> / <strong>7 days</strong></td>
@@ -353,7 +393,7 @@
 <tbody>
 <tr>
 <td><strong>Pause / Resume</strong></td>
-<td>Pause: deletes the resting orders and places no new ones; open trades keep being managed. The pause is saved and survives a restart. Resume: each lamp places again at its next check. Resume also clears a tripped account drawdown stop; its peak restarts at the current equity.</td>
+<td>Pause: deletes the resting orders and places no new ones; open trades keep being managed. The pause is saved and survives a restart. Resume: each lamp places again at its next check. Resume also clears a tripped account stop; the starting balance then restarts at the current equity.</td>
 <td>one</td>
 </tr>
 <tr>
@@ -381,20 +421,32 @@
 </thead>
 <tbody>
 <tr>
-<td><code>LAMPLIGHTER v1.01 \| Symbol=... \| ...</code></td>
+<td><code>LAMPLIGHTER v1.04 \| Symbol=... \| ...</code></td>
 <td>started (chapter 2)</td>
 </tr>
 <tr>
 <td><code>restart: saved state restored (today's placements, range, locks)</code></td>
-<td>the EA started and found the state it saved earlier (see the chapter on what is saved). If the account stop had acted, the line ends <code>account drawdown stop TRIPPED - press Resume to clear it</code>.</td>
+<td>the EA started and found the state it saved earlier (see what is saved, below). If the account stop had acted, the line ends <code>account drawdown stop TRIPPED - press Resume to clear it</code>.</td>
 </tr>
 <tr>
-<td><code>note: the four strategies are built and tested on gold (XAUUSD); on ... they trade the minimum lot only</code></td>
-<td>the chart is not a gold symbol (chapter 3)</td>
+<td><code>note: the four strategies are built and tested on gold (XAUUSD) - on ... the EA places no orders (allow it in the settings to trade the minimum lot)</code></td>
+<td>the chart is not a gold symbol (chapter 2)</td>
+</tr>
+<tr>
+<td><code>news guard: high-impact USD release at 15:30 - no orders from 10 min before to 10 min after</code></td>
+<td>the news guard is about to act (chapter 6)</td>
+</tr>
+<tr>
+<td><code>news guard: MT5 calendar on - 2 tier-1 USD release(s) in the next 2 days</code></td>
+<td>the news guard reads your terminal's economic calendar; if the calendar does not answer, it says so and uses the release table stored in the EA</td>
+</tr>
+<tr>
+<td><code>spread guard: spread 2.40 (normal 0.30) - resting orders parked until it calms</code></td>
+<td>the spread blew out; resting orders are off until it calms</td>
 </tr>
 <tr>
 <td><code>LAMPLIGHTER panel: ...</code></td>
-<td>a panel action and its result, for example <code>entries paused - resting orders removed; open trades are still managed</code>, or <code>account drawdown stop cleared - its peak restarts at today's equity</code></td>
+<td>a panel action and its result, for example <code>entries paused - resting orders removed; open trades are still managed</code>, or <code>account stop cleared - its reference restarts at today's equity</code></td>
 </tr>
 <tr>
 <td><code>LAMPLIGHTER: account drawdown stop reached - every trade closed, the EA stopped</code></td>
@@ -422,18 +474,38 @@
 <tbody>
 <tr>
 <td>Quiet market: the recent daily range is small compared with price</td>
-<td>Morning Breakout sits out the day; the <strong>Quiet day</strong> chip lights</td>
-<td>Quiet-market protection (0 = off)</td>
+<td>Morning Breakout sits out the day; the <strong>Quiet</strong> chip lights</td>
+<td>Quiet-market protection, Morning Breakout (0 = off)</td>
+</tr>
+<tr>
+<td>Quiet market: gold's recent range is in the quietest third of its own past year</td>
+<td>London Open sits out the day; the <strong>Quiet</strong> chip lights</td>
+<td>Quiet-market protection, London Open (on / off)</td>
 </tr>
 <tr>
 <td>London Open's range is too wide for its stop</td>
-<td>London Open stands aside for the day; the <strong>Wide range</strong> chip lights</td>
+<td>London Open stands aside for the day; the <strong>Quiet</strong> chip lights, the London row reads <code>wide range</code></td>
 <td>none - part of the strategy</td>
 </tr>
 <tr>
+<td>Range breakouts keep failing</td>
+<td>the share of recent Morning and London range breakouts that held, over the last 15 trading days, is in the lowest third of its own past year: Morning Breakout and London Open trade at half size until it recovers; the <strong>Steady</strong> chip turns gold</td>
+<td>Steady mode (Off / Half size / Stand aside)</td>
+</tr>
+<tr>
+<td>A high-impact USD release is due</td>
+<td>from 10 minutes before to 10 minutes after, resting orders are taken off and no new ones are placed; the <strong>News</strong> chip lights</td>
+<td>News guard, News minutes</td>
+</tr>
+<tr>
 <td>Spread above the limit</td>
-<td>a new order waits; Morning Breakout and London Open try again until about two hours after their time, then skip the day. Orders already resting are not removed.</td>
+<td>a new order waits; Morning Breakout and London Open try again until about two hours after their time, then skip the day</td>
 <td>Maximum spread</td>
+</tr>
+<tr>
+<td>Spread blows out (four times its normal of the last hour, and above 1.00)</td>
+<td>resting orders are taken off until it calms; the <strong>Spread</strong> chip lights</td>
+<td>Spread guard, blow-out multiple, blow-out floor</td>
 </tr>
 <tr>
 <td>Weekend</td>
@@ -451,9 +523,9 @@
 <td>the Pause / Resume button</td>
 </tr>
 <tr>
-<td>The account drawdown stop acted</td>
+<td>The account stop acted</td>
 <td>everything closed, the EA stopped (status <strong>Stopped</strong>) until Resume</td>
-<td>Account drawdown stop</td>
+<td>Account stop</td>
 </tr>
 <tr>
 <td>Algo Trading off, or the market closed</td>
@@ -470,8 +542,15 @@
 <td>no second order on that side until it closes</td>
 <td>by design</td>
 </tr>
+<tr>
+<td>The chart is not gold</td>
+<td>no orders on a live or demo account</td>
+<td>Allow live trading on a non-gold symbol</td>
+</tr>
 </tbody>
 </table>
+<p><strong>Orders taken off by the news or spread guard</strong> are put back when the guard clears, at the same price, stop and target. An order whose price was crossed while the guard held, or that expired meanwhile, is not put back: the move it was waiting for happened inside the guarded minutes. Open trades are never closed by these guards; their stops stay on the broker's server.</p>
+<p><strong>Steady mode</strong> reads the market, not the EA's own results: for every past day it checks whether the first break of the Morning range still held at 17:55 and the first break of the London range at 15:55. It reads the five-minute bars of the last 300 trading days, which fit inside MetaTrader's default chart history ("Max bars in chart", 100,000). Right after the first start, while the terminal may still be downloading that history, it waits and tries again every five minutes; until then it does not act. Half of the broker's minimum lot is still the minimum lot, so on a small account steady mode has nothing to halve until the lot is 0.02 or more. <em>Stand aside</em> skips those two lamps instead of halving them: in the tests it rode slightly flatter than half size and earned clearly less.</p>
 <h2 id="7-exit-mechanics">7. Exit mechanics</h2>
 <p>A trade can end at its stop loss, at a stop that has been moved (breakeven, a lock or a trail), at its take profit, at the 17:55 close (Morning Breakout only) or at the false-breakout exit (Swing Breakout only).</p>
 <ul>
@@ -484,8 +563,8 @@
 <h2 id="8-execution-quality-what-your-broker-adds">8. Execution quality - what your broker adds</h2>
 <p>Lamplighter rests stop orders, which the broker's server fills the instant price reaches them. Two things from your broker decide how close the fills are to the plan.</p>
 <ul>
-<li><strong>Spread.</strong> The spread is paid on every entry. A wider spread takes a larger share of each stop. The spread guard only stops <em>new</em> orders from being placed while the spread is wide.</li>
-<li><strong>Fills in fast markets.</strong> In the second a major data release comes out, price can jump and the spread can widen, and a resting stop order can fill beyond its price and its stop beyond the stop. Lamplighter has <strong>no news filter</strong>. The tester's stored ticks may not contain the widest release-second spreads, so a backtest can understate this cost.</li>
+<li><strong>Spread.</strong> The spread is paid on every entry. A wider spread takes a larger share of each stop. The spread guards keep new orders back while the spread is wide and take resting orders off while it blows out; they do not touch open trades.</li>
+<li><strong>Fills in fast markets.</strong> In the second a major data release comes out, price can jump and the spread can widen, and a stop order can fill beyond its price and a stop beyond the stop. The news guard keeps resting orders off the market around the high-impact USD releases it knows of, but an open trade keeps its stop through a release, and a release the guard does not know of is not covered. The tester's stored ticks may not contain the widest release-second spreads, so a backtest can understate this cost.</li>
 </ul>
 <p>Prefer a broker with tight gold spreads and fast order execution, and a VPS close to the broker's server.</p>
 <h3 id="the-safe-trade-layer">The safe trade layer</h3>
@@ -501,11 +580,11 @@
 <p>When a request is held back, the Experts tab shows one line, <code>safe trade layer: &lt;reason&gt; - request not sent (shown once a day)</code>, once a day for each kind of reason. The reason tells you whether it is the account (margin, the pending-order limit) or the broker (stop level, volume limit, market hours).</p>
 <h2 id="9-sizing-and-margin">9. Sizing and margin</h2>
 <ul>
-<li>The lot per order comes from the risk level and the balance (chapter 3). It is the same for all four strategies.</li>
+<li>The lot per order comes from the risk level and the balance (chapter 3). It is the same for all four strategies, except while steady mode halves it for Morning Breakout and London Open.</li>
 <li>There is no cap on the total of open lots, only on each order (Maximum lot per order).</li>
 <li>Margin per 0.01 lot of gold is about the gold price divided by your leverage. Up to six positions can be open at once (four at most in the backtests). Chapter 3a gives the 1:30 and 1:500 figures.</li>
-<li>The recommended deposit is 4,000 for the default Medium level (0.01 lot per 4,000); on a smaller balance the EA trades the broker's minimum lot (chapter 3 and 3a).</li>
-<li>On a symbol that is not gold the EA trades the broker's minimum lot whatever the risk level, and prints one line saying it is built for gold.</li>
+<li>The minimum balance is 500 at Hot; the recommended start is 2,000 at the default Medium level (chapter 3a).</li>
+<li>On a symbol that is not gold the EA places no orders on a live or demo account unless you allow it; allowed, it trades the broker's minimum lot whatever the risk level.</li>
 <li>Before every order the safe trade layer checks free margin with a 10 % buffer (chapter 8). An order that the account cannot carry is not sent, and the reason shows in the Experts tab. The EA does not shrink an order to fit.</li>
 <li>Use one chart per gold symbol. Two copies on the same symbol with the same magic number would manage each other's orders; a second copy needs a magic number base at least four apart.</li>
 </ul>
@@ -530,10 +609,11 @@
 <li>which lamps have already placed their orders today, so a restart inside a lamp's placement hour does not place that day's orders again;</li>
 <li>Morning Breakout's session range, which the breakeven step measures in, so a Morning trade that is open across a restart still gets its breakeven step;</li>
 <li>London Open's starting risk and the best profit an open trade has reached, which its locking stop measures from;</li>
-<li>the account drawdown stop: the equity peak and whether the stop has acted (it stays <strong>Stopped</strong> until Resume);</li>
+<li>the account stop: the starting balance and whether the stop has acted (it stays <strong>Stopped</strong> until Resume);</li>
 <li>the Pause from the panel, in a terminal global variable named <code>LLP&lt;magic base&gt;_pause</code> (<code>LLP89860_pause</code> by default).</li>
 <li>Open orders and open positions are re-adopted after a restart by their magic number.</li>
-<li><strong>Not saved:</strong> nothing is saved in the Strategy Tester; every tester run starts clean.</li>
+<li><strong>Not saved:</strong> orders taken off by the news or spread guard. After a restart inside a guard window, Swing Breakout and Pullback place again at their next check; a Morning or London straddle taken off that day is not placed again until the next day. Nothing is saved in the Strategy Tester; every tester run starts clean.</li>
+<li><strong>Taking the EA off the chart</strong> forgets the saved state, so attaching it again starts fresh.</li>
 <li>The saved state is keyed by the magic number base, so two copies with different bases keep separate states (chapter 9).</li>
 </ul>
 <h2 id="12-troubleshooting">12. Troubleshooting</h2>
@@ -548,8 +628,18 @@
 <tbody>
 <tr>
 <td>No orders at the lamp's time</td>
-<td>quiet day or wide range (check the guard strip), the spread above the limit, a weekend, <strong>Paused</strong>, the lamp switched off, or a server clock that is not GMT+2 / GMT+3</td>
+<td>a guard (check the guard strip: News, Spread, Quiet), a weekend, <strong>Paused</strong>, the lamp switched off, or a server clock that is not GMT+2 / GMT+3</td>
 <td>read the panel; chapter 6; chapter 10 for the clock</td>
+</tr>
+<tr>
+<td>Resting orders disappeared and came back</td>
+<td>the news or spread guard took them off and put them back</td>
+<td>intended (chapter 6)</td>
+</tr>
+<tr>
+<td>Morning or London trades are smaller than the other two</td>
+<td>steady mode is acting (the <strong>Steady</strong> chip is gold)</td>
+<td>intended (chapter 6); set Steady mode to Off to trade them at full size</td>
 </tr>
 <tr>
 <td>Orders appear at other clock times than 06:05 and 09:55</td>
@@ -582,14 +672,14 @@
 <td>the line names the reason; chapter 8</td>
 </tr>
 <tr>
-<td>The Experts tab says the strategies are built for gold</td>
-<td>the chart is not a gold symbol, so the EA trades the minimum lot only</td>
+<td>No orders, and the Experts tab says the strategies are built for gold</td>
+<td>the chart is not a gold symbol</td>
 <td>attach it to a gold chart</td>
 </tr>
 <tr>
 <td>Lot smaller or larger than expected</td>
-<td>the lot comes from the balance in blocks (chapter 3), with the broker minimum as the floor</td>
-<td>read the table in chapter 3; check Risk level</td>
+<td>the lot comes from the balance in blocks (chapter 3), with the broker minimum as the floor, and steady mode halves it for two lamps while it acts</td>
+<td>read the table in chapter 3; check Risk level and the Steady chip</td>
 </tr>
 <tr>
 <td>Nothing new appears after <strong>Close all</strong></td>
@@ -623,8 +713,8 @@
 <li>[ ] Demo run of at least four weeks on your broker</li>
 <li>[ ] A hedging account (Lamplighter needs one)</li>
 <li>[ ] Broker clock checked: the Morning orders appear at 06:05 server time (or the adjustment is set)</li>
-<li>[ ] You have read chapter 3a and chosen a balance for the deepest dip you could sit through, not for a good month (4,000 for the default Medium level)</li>
-<li>[ ] Algo Trading enabled; a VPS or a PC that stays on (the stops are on the server, but the moving stops and the account drawdown stop need the EA running)</li>
+<li>[ ] You have read chapter 3a and chosen a balance for the deepest dip you could sit through, not for a good month (2,000 for the default Medium level; 500 is the minimum, at Hot)</li>
+<li>[ ] Algo Trading enabled; a VPS or a PC that stays on (the stops are on the server, but the moving stops, the guards and the account stop need the EA running)</li>
 <li>[ ] You accept that a quiet, sideways gold market can mean months of flat or losing results</li>
 </ul>
 <p><strong>Disclaimer.</strong> Trading leveraged products carries a high level of risk and may not be suitable for all investors. All performance statements in this manual and its listing come from Strategy Tester runs on historical broker tick data; they are not results from live trading and do not predict future performance. Past performance is not indicative of future results. Only trade with money you can afford to lose.</p>
@@ -640,7 +730,7 @@
 <tbody>
 <tr>
 <td>1</td>
-<td>Expert: <code>LAMPLIGHTER</code> - the Journal's first line must read <code>LAMPLIGHTER v1.01</code></td>
+<td>Expert: <code>LAMPLIGHTER</code> - the Journal's first line must read <code>LAMPLIGHTER v1.04</code></td>
 </tr>
 <tr>
 <td>2</td>
@@ -672,7 +762,7 @@
 </tr>
 </tbody>
 </table>
-<p>Expect 2,327 trades, net +24,636, profit factor 1.57 and a relative equity drawdown of 8.5 % (backtest, MetaTrader 5 Strategy Tester, real ticks, version 1.01 at its defaults (Risk level Medium), deposit 10,000, 150 ms execution delay, BlackBull). On another broker the entries are the same and the money differs. The Journal must say "real ticks" for the whole window: a tester that fills a gap with generated ticks produces a different, invalid result.</p>
+<p>Expect 2,054 trades, net +98,562, profit factor 1.60 and a relative equity drawdown of 14.05 % (backtest, MetaTrader 5 Strategy Tester, real ticks, version 1.04 at its defaults (Risk level Medium), deposit 10,000, 150 ms execution delay, BlackBull). The lot grows with the balance, so most of that money was made late in the window on larger lots; the profit factor and the drawdown are the figures to compare. For the level table of chapter 3, set the deposit to the level's smallest balance and the Risk level to that level. On another broker the entries are the same and the money differs. The Journal must say "real ticks" for the whole window: a tester that fills a gap with generated ticks produces a different, invalid result.</p>
 <hr />
 <h2 id="complete-reference-every-input-its-set-file-key-and-default">Complete reference - every input, its set-file key and default</h2>
 <p>The Inputs tab shows the plain labels in the Meaning column; enum defaults are the source names.</p>
@@ -692,14 +782,21 @@
 <td><code>InpRisk</code></td>
 <td>RiskLevel</td>
 <td>RISK_MEDIUM</td>
-<td>Risk level</td>
+<td>Risk level (Low 4,000 / Medium 2,000 / High 1,000 / Hot 500 of balance per 0.01 lot, or Custom)</td>
 </tr>
 <tr>
 <td>1. Start here</td>
 <td><code>InpAccountDDPct</code></td>
 <td>double</td>
-<td>20.0</td>
-<td>Account drawdown stop: close all and stop, % below the equity peak (0 = off)</td>
+<td>50.0</td>
+<td>Account stop: close all and stop at this % below the starting balance (0 = off)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
+<td><code>InpStartBalance</code></td>
+<td>double</td>
+<td>0.0</td>
+<td>Starting balance for the account stop (0 = the balance when the EA first starts)</td>
 </tr>
 <tr>
 <td>1. Start here</td>
@@ -744,84 +841,140 @@
 <td>Quiet-market protection: Morning Breakout sits out below this % daily range (0 = off)</td>
 </tr>
 <tr>
-<td>3. Broker clock</td>
+<td>2. Strategies</td>
+<td><code>InpS2QuietGate</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Quiet-market protection: London Open sits out the quietest third of gold's own year</td>
+</tr>
+<tr>
+<td>3. When not to trade</td>
+<td><code>InpFtMode</code></td>
+<td>SteadyMode</td>
+<td>STEADY_HALF</td>
+<td>Steady mode: when range breakouts keep failing, Morning / London trade smaller (Off / Half size / Stand aside)</td>
+</tr>
+<tr>
+<td>3. When not to trade</td>
+<td><code>InpNewsGuard</code></td>
+<td>bool</td>
+<td>true</td>
+<td>News: park orders and place none around high-impact USD releases</td>
+</tr>
+<tr>
+<td>3. When not to trade</td>
+<td><code>InpNewsMinutes</code></td>
+<td>int</td>
+<td>10</td>
+<td>News: minutes before and after the release</td>
+</tr>
+<tr>
+<td>3. When not to trade</td>
+<td><code>InpSpreadGuard</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Spread: park orders while the spread blows out</td>
+</tr>
+<tr>
+<td>3. When not to trade</td>
+<td><code>InpSpreadGuardX</code></td>
+<td>double</td>
+<td>4.0</td>
+<td>Spread: blow-out = this x its normal (last hour)</td>
+</tr>
+<tr>
+<td>3. When not to trade</td>
+<td><code>InpSpreadGuardMinUsd</code></td>
+<td>double</td>
+<td>1.00</td>
+<td>Spread: ... and wider than this (price units; gold: USD)</td>
+</tr>
+<tr>
+<td>4. Broker clock</td>
 <td><code>InpUseGMTOffset</code></td>
 <td>bool</td>
 <td>false</td>
 <td>Adjust the session times (off = broker on GMT+2 winter / GMT+3 summer)</td>
 </tr>
 <tr>
-<td>3. Broker clock</td>
+<td>4. Broker clock</td>
 <td><code>InpGMTWinter</code></td>
 <td>int</td>
 <td>2</td>
 <td>This broker's server offset from GMT, winter</td>
 </tr>
 <tr>
-<td>3. Broker clock</td>
+<td>4. Broker clock</td>
 <td><code>InpGMTSummer</code></td>
 <td>int</td>
 <td>3</td>
 <td>This broker's server offset from GMT, summer</td>
 </tr>
 <tr>
-<td>4. Custom sizing (Risk level = Custom)</td>
+<td>5. Custom sizing (Risk level = Custom)</td>
 <td><code>InpLotMode</code></td>
 <td>LotMode</td>
 <td>LOT_FIXED</td>
 <td>Sizing (Fixed lot / Scale with balance)</td>
 </tr>
 <tr>
-<td>4. Custom sizing (Risk level = Custom)</td>
+<td>5. Custom sizing (Risk level = Custom)</td>
 <td><code>InpFixedLot</code></td>
 <td>double</td>
 <td>0.01</td>
 <td>Fixed lot</td>
 </tr>
 <tr>
-<td>4. Custom sizing (Risk level = Custom)</td>
+<td>5. Custom sizing (Risk level = Custom)</td>
 <td><code>InpBalancePer001</code></td>
 <td>double</td>
-<td>4000</td>
+<td>2000</td>
 <td>Balance per 0.01 lot (Scale with balance)</td>
 </tr>
 <tr>
-<td>4. Custom sizing (Risk level = Custom)</td>
+<td>5. Custom sizing (Risk level = Custom)</td>
 <td><code>InpMaxLotCap</code></td>
 <td>double</td>
 <td>5.0</td>
 <td>Maximum lot per order (every risk level)</td>
 </tr>
 <tr>
-<td>5. Trading</td>
+<td>6. Trading</td>
 <td><code>InpMagicBase</code></td>
 <td>int</td>
 <td>89860</td>
 <td>Magic number (the four strategies use this + 0, 1, 2, 3)</td>
 </tr>
 <tr>
-<td>5. Trading</td>
+<td>6. Trading</td>
 <td><code>InpComment</code></td>
 <td>string</td>
 <td>LL</td>
 <td>Order comment</td>
 </tr>
 <tr>
-<td>6. Panel and chart</td>
+<td>6. Trading</td>
+<td><code>InpAllowOtherSymbols</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Allow live trading on a non-gold symbol (minimum lot)</td>
+</tr>
+<tr>
+<td>7. Panel and chart</td>
 <td><code>InpPanel</code></td>
 <td>bool</td>
 <td>true</td>
 <td>Show the control panel (status, strategies, guards, Pause / Close all)</td>
 </tr>
 <tr>
-<td>6. Panel and chart</td>
+<td>7. Panel and chart</td>
 <td><code>InpDrawOrders</code></td>
 <td>bool</td>
 <td>true</td>
 <td>Draw resting orders and each trade's live stop on the chart</td>
 </tr>
 <tr>
-<td>6. Panel and chart</td>
+<td>7. Panel and chart</td>
 <td><code>InpTextSize</code></td>
 <td>int</td>
 <td>10</td>
