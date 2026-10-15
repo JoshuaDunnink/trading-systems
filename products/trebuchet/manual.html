@@ -1,0 +1,100 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trebuchet manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Trebuchet user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/trebuchet/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Trebuchet manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Trebuchet user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/trebuchet/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/trebuchet_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Trebuchet</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#trebuchet-user-manual-draft-for-the-research-build-024">Trebuchet - user manual (draft for the research build 0.24)</a><ul>
+<li><a href="#1-what-it-does">1. What it does</a></li>
+<li><a href="#2-installing">2. Installing</a></li>
+<li><a href="#3-modes">3. Modes</a></li>
+<li><a href="#4-inputs-that-matter">4. Inputs that matter</a></li>
+<li><a href="#5-backtesting-it-yourself">5. Backtesting it yourself</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="trebuchet-user-manual-draft-for-the-research-build-024">Trebuchet - user manual (draft for the research build 0.24)</h1>
+<h2 id="1-what-it-does">1. What it does</h2>
+<p>Trebuchet trades gold (XAUUSD) breakouts of a price channel with seven exit legs per breakout. See the listing for the full
+description. Nothing here is financial advice. Trading leveraged products carries a high risk of loss. Past results, backtested or
+live, do not predict future results.</p>
+<h2 id="2-installing">2. Installing</h2>
+<p>Attach the EA to any XAUUSD chart on a hedging account and enable algorithmic trading. It needs no set file. Keep the terminal running
+(VPS or always-on PC): the break-even and the protection locks run inside the EA.</p>
+<h2 id="3-modes">3. Modes</h2>
+<table>
+<thead>
+<tr>
+<th>Mode</th>
+<th>What changes</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default</td>
+<td>near-miss protection on (burst lock and near-target lock), spread-aware break-even</td>
+</tr>
+<tr>
+<td>Selective</td>
+<td>as Default, and no new orders while gold's recent daily range is in the busiest 40 percent of its own past year</td>
+</tr>
+<tr>
+<td>Maximum protection</td>
+<td>as Default, and a trailing stop over the last stretch to the target</td>
+</tr>
+</tbody>
+</table>
+<h2 id="4-inputs-that-matter">4. Inputs that matter</h2>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Lot per order</td>
+<td>0.01</td>
+<td>fixed lot for every leg (balance-based sizing in preparation)</td>
+</tr>
+<tr>
+<td>Maximum spread</td>
+<td>300 points</td>
+<td>a new order waits while the spread is wider</td>
+</tr>
+<tr>
+<td>Burst lock</td>
+<td>40 % within 3 min, keep 30 %</td>
+<td>fast spikes toward the target</td>
+</tr>
+<tr>
+<td>Near-target lock</td>
+<td>at 75 %, keep 20 %</td>
+<td>trades close to their target</td>
+</tr>
+<tr>
+<td>Busy-market filter</td>
+<td>off (on in Selective)</td>
+<td>stand aside in busy markets</td>
+</tr>
+<tr>
+<td>Trailing stop</td>
+<td>off (on in Maximum protection)</td>
+<td>from 90 % of the way, 15 % of the target behind the price</td>
+</tr>
+</tbody>
+</table>
+<h2 id="5-backtesting-it-yourself">5. Backtesting it yourself</h2>
+<p>Run it in the MetaTrader 5 Strategy Tester with "Every tick based on real ticks" on a gold symbol, any chart timeframe.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

@@ -1,0 +1,78 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Trebuchet research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="How Trebuchet was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/trebuchet/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Trebuchet research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="How Trebuchet was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/trebuchet/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/trebuchet_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Trebuchet</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#trebuchet-how-it-was-built-and-tested">Trebuchet - how it was built and tested</a><ul>
+<li><a href="#1-what-the-rules-are">1. What the rules are</a></li>
+<li><a href="#2-the-give-back-problem">2. The give-back problem</a></li>
+<li><a href="#3-when-it-works-and-when-it-does-not">3. When it works and when it does not</a></li>
+<li><a href="#4-living-next-to-other-gold-breakout-systems">4. Living next to other gold breakout systems</a></li>
+<li><a href="#5-what-is-still-open">5. What is still open</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="trebuchet-how-it-was-built-and-tested">Trebuchet - how it was built and tested</h1>
+<p>Trebuchet started as the reconstruction of a commercial gold EA. The work had two goals: understand exactly what that system does,
+and then build our own version that does it with fewer give-backs and smaller dips.</p>
+<h2 id="1-what-the-rules-are">1. What the rules are</h2>
+<p>Every four hours the EA reads a price channel - the highest high and lowest low of a fixed number of past bars - and rests a buy stop
+exactly on the channel high and a sell stop exactly on the channel low. One breakout is traded by seven legs that share the entry and
+differ in their target (0.4 to 5 percent of price) and stop loss (0.1 to 0.9 percent of price plus the spread). An order is placed
+only when the channel edge is far enough from price, untriggered orders expire after three and a half to ten and a half days, and a
+trade that is a little ahead gets a break-even stop.</p>
+<p>These rules were measured, not guessed: the rebuilt EA reproduced the original's fills for most legs on two brokers and its net
+result within a few percent (backtest, MetaTrader 5 Strategy Tester, real ticks, Vantage, 2025-07-04 to 2026-10-13).</p>
+<h2 id="2-the-give-back-problem">2. The give-back problem</h2>
+<p>On a client's chart a breakout system like this shows a familiar pattern: equity climbs above the balance while trades run toward
+their targets, then falls back as many of those trades return to their break-even stop. Measured trade by trade, about half of the
+trades that reached 40 percent of the way to their target ended at break-even or worse, and trades that came within ten percent of
+their target and then missed kept only a few percent of it (backtest, MetaTrader 5 Strategy Tester, real ticks, Vantage, 2025-07-04
+to 2026-10-07).</p>
+<p>Three kinds of protective exit were compared on three separate test slices, and the setting was chosen by the WEAKEST slice, not the
+strongest one:</p>
+<ul>
+<li>a lock that follows the open profit on every trade from early on cut the far-target trades that carry the results; it was dropped;</li>
+<li>a give-back limit sized to recent volatility (the kind used on short-target systems) proved too tight for targets this far away;</li>
+<li>two fixed locks scaled to each trade's own target worked: a burst lock for trades that cover 40 percent of the way within three
+  minutes of the fill (fast spikes often snap back), keeping 30 percent of the target, and a near-target lock at 75 percent of the
+  way, keeping 20 percent. Neighbouring settings gave similar results, and a setting picked on two slices held on the third.</li>
+</ul>
+<p>Together they cost no net profit on any of the three brokers tested and cut the trades that gave everything back from 54 to 38
+percent (backtest, MetaTrader 5 Strategy Tester, real ticks, default settings, BlackBull 2022-11 to 2026-10, Vantage 2025-07 to
+2026-10, Pepperstone 2025). An optional trailing stop over the last stretch keeps most of a near miss for a small cost in net profit.</p>
+<h2 id="3-when-it-works-and-when-it-does-not">3. When it works and when it does not</h2>
+<p>The edge of a channel breakout is the follow-through of a trending market. In these tests:</p>
+<ul>
+<li>the profit came mainly from the trending gold market of 2024 to 2026; in the quiet market of 2023 the balance went sideways for most
+  of the year (backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2022-11 to 2026-10);</li>
+<li>inside a trending period, ranging days earned about as much per trade as trending days - short ranges were not the problem;</li>
+<li>busy markets were: when gold's recent daily range was in the busiest third of its own past year, the fixed stops sat inside the
+  noise and the breaks were weaker. Selective mode stands aside then;</li>
+<li>a long sideways market is the real weakness: on gold prices from 2013 to 2015, tested at today's price level, the same rules lost
+  money over two years, and Selective mode only softened it.</li>
+</ul>
+<h2 id="4-living-next-to-other-gold-breakout-systems">4. Living next to other gold breakout systems</h2>
+<p>Breakout systems trade the same kind of moment. In the tests about half of Trebuchet's entries fell within fifteen minutes of a
+same-side entry of Kingfisher, and about half of a Captain Karat-Smash entry. Because the exits differ, the daily results moved little
+with Kingfisher's (correlation 0.03) and moderately with Captain Karat-Smash's (0.35) (backtest, MetaTrader 5 Strategy Tester, real
+ticks, Vantage, 2025-08-08 to 2026-09-25, default settings). Trebuchet is a different exit design on similar moments, not a different
+market idea.</p>
+<h2 id="5-what-is-still-open">5. What is still open</h2>
+<ul>
+<li>Balance-based position sizing (the tests use a fixed 0.01 lot per order).</li>
+<li>One of the seven legs reproduces the original less closely than the others.</li>
+<li>Peak equity drawdown on two of the brokers is a little above the original's, while net profit and profit factor are above it on
+  all four brokers tested.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
