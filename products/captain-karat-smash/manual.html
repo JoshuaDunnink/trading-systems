@@ -31,6 +31,7 @@
 <li><a href="#what-these-rules-do-not-do">What these rules do not do</a></li>
 </ul>
 </li>
+<li><a href="#the-broker-clock-since-115">The broker clock (since 1.15)</a></li>
 <li><a href="#6-troubleshooting">6. Troubleshooting</a></li>
 <li><a href="#complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</a></li>
 </ul>
@@ -742,6 +743,47 @@ the middle of the day does not give it a fresh daily allowance.</p>
 <li>No minimum trade duration and no minimum number of trading days.</li>
 </ul>
 <p><strong>Proof.</strong> With every rule off, this version placed the same deals as the version before it, deal for deal (32 trades, net +261.37, Pepperstone real ticks, 28 August - 19 September 2026). Each rule was then switched on at a level the same weeks reach; at all 8 triggers the EA closed its trades, opened nothing until the pause ended, and placed exactly the same deals as with the rules off up to the first trigger.</p>
+<h2 id="the-broker-clock-since-115">The broker clock (since 1.15)</h2>
+<p>Captain Karat-Smash's times are written for the clock gold brokers use: server time = Eastern European Time with US daylight saving
+(GMT+2 in winter, GMT+3 in summer; the switch is on the second Sunday of March and the first Sunday of November). On that clock
+a server hour keeps the same distance to the London and New York sessions all year. A broker on another clock - plain GMT,
+or GMT+3 all year - would quietly move every server-hour rule by the difference.</p>
+<p>What Captain Karat-Smash does, on a live or demo account only:</p>
+<ol>
+<li>At start, and once every server day, it reads the server's offset from GMT (server time minus GMT, rounded to the hour)
+   and compares it with that EET + US daylight saving clock.</li>
+<li>Same clock: one Journal line (<code>BROKER CLOCK: GMT+3, the reference clock ... same clock, nothing to convert</code>). Nothing else changes.</li>
+<li>Different clock: one Journal line, a small note at the lower left of the chart (<code>Broker clock GMT+0 - ...</code>) and these
+   times are converted so they keep their market meaning: the session windows the Grip uses (Asia, London, New York morning and afternoon are read against New York time; on the tested clock the broker is 7 hours ahead of New York, a plain-GMT broker 5 or 4 hours), and the prop-firm rules' day start and Friday close hour.</li>
+<li>Not converted (the Journal line says so): the strategies read the broker's own daily (S1, S2) and 4-hour (S3 - S7) candles for their swing levels; those candles start at the broker's midnight, so on a broker whose midnight sits elsewhere the levels differ from the tested ones. For the tested behaviour use a broker on the EET + US daylight saving clock.</li>
+<li>If the offset cannot be read (the computer's own date, time or time zone is wrong by more than a quarter of an hour) a red
+   note and a Journal line say so, and nothing is converted.</li>
+</ol>
+<p>The setting is the input group <strong>Broker clock</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auto (default)</td>
+<td>the check above (live and demo)</td>
+</tr>
+<tr>
+<td>Off - broker is on EET + US daylight saving</td>
+<td>no check, no conversion</td>
+</tr>
+<tr>
+<td>Manual</td>
+<td>you type the broker's offset from GMT for winter and summer; it is used live and also in the Strategy Tester (this is how to see what a different clock would do)</td>
+</tr>
+</tbody>
+</table>
+<p>In the Strategy Tester Auto does nothing: the tester runs on the data's own clock, which is the clock the hours were tested on, so
+every result in this manual is unchanged by the check. The check needs your computer's date, time and time zone to be right.</p>
 <h2 id="6-troubleshooting">6. Troubleshooting</h2>
 <p>The EA prints a one-line census when it stops, for example:</p>
 <pre><code>Captain Karat-Smash: orders placed 632 | skipped - no level 2, spread 0, price inside stop level 1,
@@ -970,6 +1012,27 @@ swing before it places anything, and the daily strategies can wait days.</p>
 <td>bool</td>
 <td>false</td>
 <td>New challenge, same login: true once</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerClock</code></td>
+<td>BrokerClockMode</td>
+<td>BCLK_AUTO</td>
+<td>Broker clock: Auto = check it, convert the session hours</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerGmtWinter</code></td>
+<td>int</td>
+<td>2</td>
+<td>Manual: broker server offset from GMT, winter</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerGmtSummer</code></td>
+<td>int</td>
+<td>3</td>
+<td>Manual: broker server offset from GMT, summer</td>
 </tr>
 <tr>
 <td>4. Trading</td>

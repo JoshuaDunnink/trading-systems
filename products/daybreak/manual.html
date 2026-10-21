@@ -33,6 +33,7 @@
 <li><a href="#10-optimising-for-advanced-users">10. Optimising (for advanced users)</a></li>
 <li><a href="#11-what-is-saved-and-what-is-not">11. What is saved and what is not</a></li>
 <li><a href="#12-troubleshooting">12. Troubleshooting</a></li>
+<li><a href="#the-broker-clock-since-102">The broker clock (since 1.02)</a></li>
 <li><a href="#13-final-checklist-and-disclaimer">13. Final checklist and disclaimer</a></li>
 <li><a href="#14-reproduce-the-tests-yourself">14. Reproduce the tests yourself</a></li>
 <li><a href="#complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</a></li>
@@ -163,6 +164,18 @@ five days, which is let through on its own.</p>
 <td>Only if you trade a funded/prop account with its own daily/max-loss numbers</td>
 </tr>
 <tr>
+<td>Broker clock</td>
+<td><code>InpBrokerClock</code></td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerGmtWinter</code></td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerGmtSummer</code></td>
+</tr>
+<tr>
 <td>4. When not to trade</td>
 <td>NFP / FOMC / year-end skips (leave on)</td>
 </tr>
@@ -290,6 +303,47 @@ via terminal global variables; the Strategy Tester always starts fresh. Nothing 
   your broker's <code>STOPS_LEVEL</code> is wider than the $ stop; contact your broker about a tighter minimum
   or use a wider custom stop.</li>
 </ul>
+<h2 id="the-broker-clock-since-102">The broker clock (since 1.02)</h2>
+<p>DAYBREAK's times are written for the clock gold brokers use: server time = Eastern European Time with US daylight saving
+(GMT+2 in winter, GMT+3 in summer; the switch is on the second Sunday of March and the first Sunday of November). On that clock
+a server hour keeps the same distance to the London and New York sessions all year. A broker on another clock - plain GMT,
+or GMT+3 all year - would quietly move every server-hour rule by the difference.</p>
+<p>What DAYBREAK does, on a live or demo account only:</p>
+<ol>
+<li>At start, and once every server day, it reads the server's offset from GMT (server time minus GMT, rounded to the hour)
+   and compares it with that EET + US daylight saving clock.</li>
+<li>Same clock: one Journal line (<code>BROKER CLOCK: GMT+3, the reference clock ... same clock, nothing to convert</code>). Nothing else changes.</li>
+<li>Different clock: one Journal line, a small note at the lower left of the chart (<code>Broker clock GMT+0 - ...</code>) and these
+   times are converted so they keep their market meaning: the prop-firm rules' day start and Friday close hour (DAYBREAK has no other hour of its own).</li>
+<li>Not converted (the Journal line says so): the prior day's high and low are the broker's own daily candle; it starts at the broker's midnight, not at 17:00 New York, so on a broker whose midnight sits elsewhere the two levels - the whole idea of DAYBREAK - differ from the tested ones. The Journal line says so. For the tested behaviour use a broker on the EET + US daylight saving clock.</li>
+<li>If the offset cannot be read (the computer's own date, time or time zone is wrong by more than a quarter of an hour) a red
+   note and a Journal line say so, and nothing is converted.</li>
+</ol>
+<p>The setting is the input group <strong>Broker clock</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auto (default)</td>
+<td>the check above (live and demo)</td>
+</tr>
+<tr>
+<td>Off - broker is on EET + US daylight saving</td>
+<td>no check, no conversion</td>
+</tr>
+<tr>
+<td>Manual</td>
+<td>you type the broker's offset from GMT for winter and summer; it is used live and also in the Strategy Tester (this is how to see what a different clock would do)</td>
+</tr>
+</tbody>
+</table>
+<p>In the Strategy Tester Auto does nothing: the tester runs on the data's own clock, which is the clock the hours were tested on, so
+every result in this manual is unchanged by the check. The check needs your computer's date, time and time zone to be right.</p>
 <h2 id="13-final-checklist-and-disclaimer">13. Final checklist and disclaimer</h2>
 <p>Backtest figures throughout this manual are MetaTrader 5 Strategy Tester runs on real broker ticks,
 labelled with their feed and window. They are not a promise of future results. Past performance,

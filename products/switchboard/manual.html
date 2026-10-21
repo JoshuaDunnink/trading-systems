@@ -1,0 +1,168 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Switchboard manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Switchboard user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/switchboard/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Switchboard manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Switchboard user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/switchboard/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/switchboard_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Switchboard</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#switchboard-user-manual">Switchboard - user manual</a><ul>
+<li><a href="#what-it-does">What it does</a></li>
+<li><a href="#settings-start-at-the-top">Settings: start at the top</a></li>
+<li><a href="#the-control-panel">The control panel</a></li>
+<li><a href="#what-to-expect-backtest-metatrader-5-strategy-tester-real-ticks-10000-start-13-oct-2025-12-oct-2026">What to expect (backtest, MetaTrader 5 Strategy Tester, real ticks, 10,000 start, 13 Oct 2025 - 12 Oct 2026)</a></li>
+<li><a href="#how-much-money-it-needs">How much money it needs</a></li>
+<li><a href="#practical-notes">Practical notes</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="switchboard-user-manual">Switchboard - user manual</h1>
+<h2 id="what-it-does">What it does</h2>
+<p>Switchboard runs nine separate "lines" on gold (XAUUSD). Each line watches recent swing highs and lows on its own timeframe and
+leaves one buy stop just below a swing high and one sell stop just above a swing low. When price breaks through, the order fills.</p>
+<p>Every trade has:
+- a stop loss of at most 10.00 (price units), set the moment the order is placed;
+- a take profit;
+- a lock: once the trade has moved far enough in your favour, the stop moves into profit;
+- a trailing stop on lines 4, 5, 7 and 9;
+- an early close on lines 5-9: if the first candle after the fill closes against the trade, it is closed at once.</p>
+<p>A line keeps at most one resting order per direction. Positions from earlier fills keep running, each with its own stop, so several can be open at once (up to 35 at the busiest moment in the four-year BlackBull test). Switchboard never adds to a losing trade and never raises the lot after a loss.</p>
+<h2 id="settings-start-at-the-top">Settings: start at the top</h2>
+<table>
+<thead>
+<tr>
+<th>setting</th>
+<th>what it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Risk level</td>
+<td>Low = half the standard size, Medium = the tested size (default), High = 1.5 x. Lots grow with the balance.</td>
+</tr>
+<tr>
+<td>Custom risk multiplier</td>
+<td>only with Risk level = Custom</td>
+</tr>
+<tr>
+<td>Virtual balance</td>
+<td>size as if the account held at most this amount (0 = off)</td>
+</tr>
+<tr>
+<td>Maximum spread in USD</td>
+<td>no new orders while the spread is wider (0 = off)</td>
+</tr>
+<tr>
+<td>Lines 1-9</td>
+<td>switch single lines off; all on is the tested setup</td>
+</tr>
+<tr>
+<td>US jobs report pause</td>
+<td>no orders from 13:50 to 16:30 server time on US jobs-report days</td>
+</tr>
+<tr>
+<td>Equity stop %</td>
+<td>at this % below the equity peak: close everything and place nothing more that day (default 30)</td>
+</tr>
+<tr>
+<td>Magic number</td>
+<td>change only when two copies run on one account</td>
+</tr>
+<tr>
+<td>Panel and chart</td>
+<td>the control panel and the chart drawings</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td>Auto checks your broker's server time and converts the schedule; Manual for brokers with unusual clocks</td>
+</tr>
+</tbody>
+</table>
+<h2 id="the-control-panel">The control panel</h2>
+<p>Pause (resting orders are removed, open trades keep their exits) / Resume, Refresh orders, Lock profit (moves the stop of the
+selected trade to its line's lock level, or to break-even), Close all. The status line says why Switchboard is or is not trading.</p>
+<h2 id="what-to-expect-backtest-metatrader-5-strategy-tester-real-ticks-10000-start-13-oct-2025-12-oct-2026">What to expect (backtest, MetaTrader 5 Strategy Tester, real ticks, 10,000 start, 13 Oct 2025 - 12 Oct 2026)</h2>
+<table>
+<thead>
+<tr>
+<th>risk level</th>
+<th>net</th>
+<th>profit factor</th>
+<th>deepest equity dip</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Low</td>
+<td>+4,461</td>
+<td>3.24</td>
+<td>1.95 %</td>
+</tr>
+<tr>
+<td>Medium</td>
+<td>+10,170</td>
+<td>3.16</td>
+<td>4.33 %</td>
+</tr>
+<tr>
+<td>High</td>
+<td>+18,905</td>
+<td>3.13</td>
+<td>6.48 %</td>
+</tr>
+<tr>
+<td>(BlackBull. On VT, Medium: +13,053, profit factor 3.83, dip 3.21 %.)</td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Longer history, Medium, 10,000 start, lots growing with the balance: BlackBull 1 Nov 2022 - 12 Oct 2026 +62,341, profit factor 2.03,
+deepest equity dip 24.5 % (Sep - Nov 2024); flat for most of 2023. Vantage 4 Jul 2025 - 12 Oct 2026 +14,040, profit factor 3.23, dip 9.2 %.</p>
+<p>It earns most when gold moves a lot and slows down in quiet weeks; in the quiet 2023-24 market the backtest profit factor was 1.61.
+Backtests are not a promise of future results.</p>
+<h2 id="how-much-money-it-needs">How much money it needs</h2>
+<p>Lots grow with the balance (Risk level Medium: per line about balance x 8-33 / gold price / 1000). Below about <strong>5,000</strong> the
+formula asks for less than the broker's minimum of 0.01 lot, so every line trades 0.01 - more risk than designed.
+With every line at 0.01 lot the worst losing stretch in the tests was 745 (BlackBull, 26 Aug - 17 Oct 2024):</p>
+<table>
+<thead>
+<tr>
+<th>starting balance</th>
+<th>that stretch as a share of the balance</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2,000</td>
+<td>37 %</td>
+</tr>
+<tr>
+<td>3,000</td>
+<td>25 %</td>
+</tr>
+<tr>
+<td>5,000</td>
+<td>15 %</td>
+</tr>
+<tr>
+<td>10,000</td>
+<td>7.5 %</td>
+</tr>
+</tbody>
+</table>
+<h2 id="practical-notes">Practical notes</h2>
+<ul>
+<li>Attach to one XAUUSD chart (any timeframe). One copy per account unless the magic numbers differ.</li>
+<li>Start on Low. Run it on its own account: it tends to gain and dip in the same weeks as other gold breakout EAs.</li>
+<li>Keep the terminal running; after a restart Switchboard reads its open trades and continues.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

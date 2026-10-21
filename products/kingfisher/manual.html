@@ -45,6 +45,7 @@
 <li><a href="#10-optimising-for-advanced-users">10. Optimising (for advanced users)</a></li>
 <li><a href="#11-what-is-saved-and-what-is-not">11. What is saved and what is not</a></li>
 <li><a href="#12-troubleshooting">12. Troubleshooting</a></li>
+<li><a href="#the-broker-clock-since-119">The broker clock (since 1.19)</a></li>
 <li><a href="#13-final-checklist-and-disclaimer">13. Final checklist and disclaimer</a></li>
 <li><a href="#14-reproduce-the-tests-yourself">14. Reproduce the tests yourself</a></li>
 <li><a href="#complete-reference-every-input-its-set-file-key-and-default">Complete reference — every input, its set-file key and default</a></li>
@@ -151,9 +152,24 @@ KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker min
 <td>prop accounts, or as a daily-loss floor on any account</td>
 </tr>
 <tr>
+<td>Broker clock</td>
+<td><code>InpBrokerClock</code></td>
+<td>BrokerClockMode</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerGmtWinter</code></td>
+<td>int</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerGmtSummer</code></td>
+<td>int</td>
+</tr>
+<tr>
 <td>5. When not to trade</td>
 <td>weekend times (your broker's clock); news and spread guards (on; chapter 7.7); the quiet-market gates [Custom]</td>
-<td>weekend times only if your broker's clock differs</td>
+<td>nothing normally; a broker whose clock differs from EET + US daylight saving is converted automatically (chapter "The broker clock")</td>
 </tr>
 <tr>
 <td>6. Safety</td>
@@ -1078,6 +1094,47 @@ trades are never changed.</p>
 </tr>
 </tbody>
 </table>
+<h2 id="the-broker-clock-since-119">The broker clock (since 1.19)</h2>
+<p>KINGFISHER's times are written for the clock gold brokers use: server time = Eastern European Time with US daylight saving
+(GMT+2 in winter, GMT+3 in summer; the switch is on the second Sunday of March and the first Sunday of November). On that clock
+a server hour keeps the same distance to the London and New York sessions all year. A broker on another clock - plain GMT,
+or GMT+3 all year - would quietly move every server-hour rule by the difference.</p>
+<p>What KINGFISHER does, on a live or demo account only:</p>
+<ol>
+<li>At start, and once every server day, it reads the server's offset from GMT (server time minus GMT, rounded to the hour)
+   and compares it with that EET + US daylight saving clock.</li>
+<li>Same clock: one Journal line (<code>BROKER CLOCK: GMT+3, the reference clock ... same clock, nothing to convert</code>). Nothing else changes.</li>
+<li>Different clock: one Journal line, a small note at the lower left of the chart (<code>Broker clock GMT+0 - ...</code>) and these
+   times are converted so they keep their market meaning: the weekend shield's Friday cut-off and Monday resume (default 19:55 and 05:01 on the tested clock: on a plain-GMT broker in winter they become 17:55 and 03:01), and the prop-firm rules' day start and Friday close hour. The panel and chart notes show the converted times.</li>
+<li>Not converted (the Journal line says so): the hunters read the broker's own 4-hour candles and the Daybreak hunter's prior day is the broker's own daily candle; both start at the broker's midnight. On a broker whose midnight sits elsewhere those candles - and so the levels - differ from the tested ones. For the tested behaviour use a broker on the EET + US daylight saving clock.</li>
+<li>If the offset cannot be read (the computer's own date, time or time zone is wrong by more than a quarter of an hour) a red
+   note and a Journal line say so, and nothing is converted.</li>
+</ol>
+<p>The setting is the input group <strong>Broker clock</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auto (default)</td>
+<td>the check above (live and demo)</td>
+</tr>
+<tr>
+<td>Off - broker is on EET + US daylight saving</td>
+<td>no check, no conversion</td>
+</tr>
+<tr>
+<td>Manual</td>
+<td>you type the broker's offset from GMT for winter and summer; it is used live and also in the Strategy Tester (this is how to see what a different clock would do)</td>
+</tr>
+</tbody>
+</table>
+<p>In the Strategy Tester Auto does nothing: the tester runs on the data's own clock, which is the clock the hours were tested on, so
+every result in this manual is unchanged by the check. The check needs your computer's date, time and time zone to be right.</p>
 <h2 id="13-final-checklist-and-disclaimer">13. Final checklist and disclaimer</h2>
 <ul>
 <li>[ ] Demo run of at least four weeks on your broker</li>

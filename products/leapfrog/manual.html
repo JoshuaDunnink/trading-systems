@@ -30,6 +30,7 @@
 <li><a href="#what-these-rules-do-not-do">What these rules do not do</a></li>
 </ul>
 </li>
+<li><a href="#the-broker-clock-since-131">The broker clock (since 1.31)</a></li>
 <li><a href="#reproduce-the-tests-yourself">Reproduce the tests yourself</a></li>
 <li><a href="#deposit-and-position-sizing">Deposit and position sizing</a></li>
 <li><a href="#requirements-and-limits">Requirements and limits</a></li>
@@ -586,6 +587,47 @@ the middle of the day does not give it a fresh daily allowance.</p>
 <li>No minimum trade duration and no minimum number of trading days.</li>
 </ul>
 <p><strong>Proof.</strong> With every rule off, this version placed the same deals as the version before it, deal for deal (107 trades, net +309.21, Pepperstone real ticks, 28 August - 19 September 2026). Each rule was then switched on at a level the same weeks reach; at all 11 triggers the EA closed its trades, opened nothing until the pause ended, and placed exactly the same deals as with the rules off up to the first trigger.</p>
+<h2 id="the-broker-clock-since-131">The broker clock (since 1.31)</h2>
+<p>Leapfrog's times are written for the clock gold brokers use: server time = Eastern European Time with US daylight saving
+(GMT+2 in winter, GMT+3 in summer; the switch is on the second Sunday of March and the first Sunday of November). On that clock
+a server hour keeps the same distance to the London and New York sessions all year. A broker on another clock - plain GMT,
+or GMT+3 all year - would quietly move every server-hour rule by the difference.</p>
+<p>What Leapfrog does, on a live or demo account only:</p>
+<ol>
+<li>At start, and once every server day, it reads the server's offset from GMT (server time minus GMT, rounded to the hour)
+   and compares it with that EET + US daylight saving clock.</li>
+<li>Same clock: one Journal line (<code>BROKER CLOCK: GMT+3, the reference clock ... same clock, nothing to convert</code>). Nothing else changes.</li>
+<li>Different clock: one Journal line, a small note at the lower left of the chart (<code>Broker clock GMT+0 - ...</code>) and these
+   times are converted so they keep their market meaning: the weekend protection (Friday no-entry 19:00, delete orders 21:00, close positions 23:00, Monday resume 01:00 on the tested clock; on a plain-GMT broker in winter 17:00, 19:00 and 21:00 on Friday and the Monday resume at 23:00 on Sunday), the clock slots at which new orders are placed (every 4th hour), and the prop-firm rules' day start and Friday close hour.</li>
+<li>Not converted (the Journal line says so): the ladders' windows, the daily range and ATR gates and the same-hour range history follow the broker's own daily candle, which starts at the broker's midnight. For the tested behaviour use a broker on the EET + US daylight saving clock.</li>
+<li>If the offset cannot be read (the computer's own date, time or time zone is wrong by more than a quarter of an hour) a red
+   note and a Journal line say so, and nothing is converted.</li>
+</ol>
+<p>The setting is the input group <strong>Broker clock</strong>:</p>
+<table>
+<thead>
+<tr>
+<th>Value</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Auto (default)</td>
+<td>the check above (live and demo)</td>
+</tr>
+<tr>
+<td>Off - broker is on EET + US daylight saving</td>
+<td>no check, no conversion</td>
+</tr>
+<tr>
+<td>Manual</td>
+<td>you type the broker's offset from GMT for winter and summer; it is used live and also in the Strategy Tester (this is how to see what a different clock would do)</td>
+</tr>
+</tbody>
+</table>
+<p>In the Strategy Tester Auto does nothing: the tester runs on the data's own clock, which is the clock the hours were tested on, so
+every result in this manual is unchanged by the check. The check needs your computer's date, time and time zone to be right.</p>
 <h2 id="reproduce-the-tests-yourself">Reproduce the tests yourself</h2>
 <p>In the Strategy Tester: expert <code>LEAPFROG</code>, XAUUSD, M15, 2026.08.28 to 2026.09.19, <em>Every tick based on real ticks</em>,
 deposit 10,000, inputs right-click → Defaults. Pepperstone gives 107 trades, net +309.21, profit factor 1.53, equity
@@ -874,6 +916,27 @@ of a backtested record, and being beyond it is evidence rather than proof.</p>
 <td>bool</td>
 <td>false</td>
 <td>New challenge, same login: true once</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerClock</code></td>
+<td>BrokerClockMode</td>
+<td>BCLK_AUTO</td>
+<td>Broker clock: Auto = check it, convert the session hours</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerGmtWinter</code></td>
+<td>int</td>
+<td>2</td>
+<td>Manual: broker server offset from GMT, winter</td>
+</tr>
+<tr>
+<td>Broker clock</td>
+<td><code>InpBrokerGmtSummer</code></td>
+<td>int</td>
+<td>3</td>
+<td>Manual: broker server offset from GMT, summer</td>
 </tr>
 <tr>
 <td>4. When not to trade</td>

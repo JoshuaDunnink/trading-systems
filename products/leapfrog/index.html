@@ -58,6 +58,7 @@ group takes your firm's own daily loss limit, maximum loss limit, profit target,
 hour; when a limit is close the EA closes its own trades, deletes its orders, and pauses until the firm's next
 day (daily rules) or stops for good (maximum loss, target). It is a rule guard, not a guarantee: a price gap can
 carry a loss past a limit, which is why the EA acts ahead of the stated limit by default. Details: user manual.</p>
+<p>Broker clock. The Friday and Monday hours, the order clock slots and the prop-firm hours are written for the gold-broker server clock (EET with US daylight saving). On a live or demo account the EA reads the broker's clock once a day and, if it differs, converts those hours and tells you in the Journal and on the chart; the daily candle stays the broker's own. Nothing changes on the tested clock. User manual, chapter "The broker clock".</p>
 <h3 id="requirements">Requirements</h3>
 <ul>
 <li>Gold (XAUUSD or your broker's spelling), hedging account, VPS recommended (it maintains resting orders around
