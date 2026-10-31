@@ -1,0 +1,62 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tailwind manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Tailwind user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/tailwind/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Tailwind manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Tailwind user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/tailwind/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/tailwind_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Tailwind</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#tailwind-manual">Tailwind - manual</a><ul>
+<li><a href="#1-install-and-start-five-minutes">1. Install and start (five minutes)</a></li>
+<li><a href="#2-settings-start-at-the-top">2. Settings: start at the top</a></li>
+<li><a href="#3-what-it-does-in-order">3. What it does, in order</a></li>
+<li><a href="#4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</a></li>
+<li><a href="#5-when-it-will-not-trade">5. When it will not trade</a></li>
+<li><a href="#6-known-limits">6. Known limits</a></li>
+<li><a href="#7-frequently-asked">7. Frequently asked</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="tailwind-manual">Tailwind - manual</h1>
+<h2 id="1-install-and-start-five-minutes">1. Install and start (five minutes)</h2>
+<ol>
+<li>Copy <code>TAILWIND.ex5</code> into <code>MQL5\Experts</code>, restart the terminal or refresh the Navigator.</li>
+<li>Open a <strong>Bitcoin (BTCUSD)</strong> chart on <strong>H1</strong>. The EA refuses any other instrument.</li>
+<li>Drag the EA onto the chart, tick <em>Allow Algo Trading</em>, keep the defaults.</li>
+<li>Choose your <strong>Risk level</strong> (Low / Medium / High) and press OK. That is the only setting you need.</li>
+<li>Run it on a demo account first: the tester results are not a forecast and the live fill path has not been tested.</li>
+</ol>
+<h2 id="2-settings-start-at-the-top">2. Settings: start at the top</h2>
+<ul>
+<li><strong>Risk level:</strong> Low = half the validated size, <strong>Medium = the validated size</strong>, High = one and a half times. All other settings are fixed at the validated values.</li>
+<li><strong>Allow longs / Allow shorts:</strong> switch a side off if you want to trade one direction only.</li>
+</ul>
+<h2 id="3-what-it-does-in-order">3. What it does, in order</h2>
+<p>Trend pullback re-entry on bitcoin. The trend is a fast average above a slow one with the slow one rising; the entry is a short, deep dip in the momentum index that turns back up. The stop starts just beyond the dip and then trails at a multiple of the average range.</p>
+<h2 id="4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</h2>
+<p>Recommended minimum: <strong>$2,000</strong>. Below it the broker's minimum lot (0.01) becomes the real risk instead of the setting. Higher risk levels need a larger balance for the same safety.</p>
+<h2 id="5-when-it-will-not-trade">5. When it will not trade</h2>
+<ul>
+<li>On the wrong instrument (it refuses the chart).</li>
+<li>When the market is closed, when the spread or broker stop level blocks the order (it logs the reason in the Experts tab).</li>
+</ul>
+<h2 id="6-known-limits">6. Known limits</h2>
+<ul>
+<li>About one trade in four wins: the profit comes from a few long trend rides. Without the largest 5 % of trades the result in this window is negative.</li>
+<li>A trend system: it gives back open profit in sideways markets and needs patience through losing runs.</li>
+<li>Bitcoin trades all week, including weekends; stops can slip in fast moves.</li>
+<li>Backtest results only: no forward or live record yet.</li>
+<li>Past results do not predict future results.</li>
+</ul>
+<h2 id="7-frequently-asked">7. Frequently asked</h2>
+<p><strong>Do I need a .set file?</strong> No. The defaults are the validated settings.
+<strong>Can I change the engine?</strong> No: the engine values are fixed on purpose. Only the risk level and (where shown) the directions are yours.
+<strong>Does it use martingale, grid or averaging?</strong> No. One position at a time, with a stop on every trade.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

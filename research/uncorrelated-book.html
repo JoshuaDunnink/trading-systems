@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Three markets, one account: low correlation | Joshua Dunnink</title><meta name="description" content="A single trading system earns in the markets that suit it and waits in the rest. Several systems built on different instruments wait at different times, so">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/research/uncorrelated-book.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Three markets, one account: low correlation | Joshua Dunnink"><meta property="og:description" content="A single trading system earns in the markets that suit it and waits in the rest. Several systems built on different instruments wait at different times, so">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/research/uncorrelated-book.html">
+<link rel="stylesheet" href="../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../index.html">Home</a> <a href="../products.html">Products</a> <a href="../signal.html">Live signal</a> <a href="../market.html">Gold market</a> <a href="../research/index.html" aria-current=page>Research</a> <a href="../about.html">About</a> <a href="../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<h1>Three markets, one account: low correlation</h1><p>A single trading system earns in the markets that suit it and waits in the rest. Several systems built on different instruments wait at different times, so the account curve is smoother than any one of them. We checked this on our own results instead of assuming it.</p>
+<h2 id="what-was-measured">What was measured</h2>
+<p>Four Expert Advisors, each on its default settings, backtested in the MetaTrader 5 Strategy Tester on real ticks, BlackBull, 2022-11-01 to 2026-10-27, $10,000 start: Keystone (gold, 15-minute chart), Tailwind and Quorum (bitcoin, hourly chart), Pendulum (NASDAQ 100, 10-minute chart). Closed-trade profit was summed per week for each system.</p>
+<table>
+<thead>
+<tr>
+<th>Pair</th>
+<th>Correlation of weekly profit</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Keystone and Tailwind</td>
+<td>0.05</td>
+</tr>
+<tr>
+<td>Keystone and Pendulum</td>
+<td>0.00</td>
+</tr>
+<tr>
+<td>Tailwind and Pendulum</td>
+<td>0.11</td>
+</tr>
+<tr>
+<td>Tailwind and Quorum</td>
+<td>0.11</td>
+</tr>
+<tr>
+<td>Quorum and Pendulum</td>
+<td>0.08</td>
+</tr>
+</tbody>
+</table>
+<p>A correlation of 0 means the two earn and wait independently; 1 means they move together. Everything measured here sits within 0.11 of zero. Tailwind and Quorum trade the same instrument and the same hour chart but are still only weakly related, because they take different entries.</p>
+<h2 id="same-risk-budget-combined">Same risk budget, combined</h2>
+<p>To compare fairly, each system was scaled to the same closed-trade drawdown budget, then added together (backtest, BlackBull, 2022-11-01 to 2026-10-27, closed-trade balance, scaled to a 5 % drawdown each):</p>
+<table>
+<thead>
+<tr>
+<th>Book</th>
+<th>Net on $10,000</th>
+<th>Closed-trade drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Tailwind alone</td>
+<td>+45 %</td>
+<td>5.0 %</td>
+</tr>
+<tr>
+<td>Pendulum alone</td>
+<td>+81 %</td>
+<td>5.0 %</td>
+</tr>
+<tr>
+<td>Tailwind + Pendulum</td>
+<td>+126 %</td>
+<td>5.9 %</td>
+</tr>
+<tr>
+<td>Tailwind + Quorum + Pendulum</td>
+<td>+149 %</td>
+<td>6.8 %</td>
+</tr>
+</tbody>
+</table>
+<p>The combined books earn more than either part at almost the same drawdown, which is what low correlation should deliver. Scaling each system down to a fixed drawdown is a method, not a setting: the products themselves are sized by their own risk level.</p>
+<h2 id="what-this-does-not-show">What this does not show</h2>
+<ul>
+<li>It uses closed-trade balances. A real book also needs a combined equity check, because open losses can overlap even when closed trades do not.</li>
+<li>Four years and two market stretches are a small sample. Correlations measured on weekly sums can change when markets change.</li>
+<li>Several of the systems depend on a few large winners. Without their best five percent of trades the totals are lower, and for the trend systems they are not positive in this window.</li>
+<li>These are backtests. Nothing here is a live result.</li>
+</ul>
+<p>Related: Regime cards for strategies that work in some markets keeps track of which market each system belongs to.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
