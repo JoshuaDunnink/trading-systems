@@ -1,0 +1,75 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Wren Gold research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="How Wren Gold was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/wren-gold/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Wren Gold research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="How Wren Gold was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/wren-gold/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/wren-gold_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Wren Gold</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#wren-gold-research-note-every-number-names-its-arm-feed-and-window">Wren Gold - research note (every number names its ARM, FEED and WINDOW)</a><ul>
+<li><a href="#what-it-is">What it is</a></li>
+<li><a href="#result-by-feed">Result by feed</a></li>
+<li><a href="#what-the-curve-looks-like">What the curve looks like</a></li>
+<li><a href="#reading-it-honestly">Reading it honestly</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="wren-gold-research-note-every-number-names-its-arm-feed-and-window">Wren Gold - research note (every number names its ARM, FEED and WINDOW)</h1>
+<p>All figures: MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit (a 0.01 lot stop risks about 1 % of the balance, like the Medium setting of the other products), fixed 0.01 lot per order, 150 ms execution delay, leverage 1:500, defaults (arm "Defaults, fixed 0.01 lot", version 1.04), window 2025-11-01..2026-10-30.</p>
+<h2 id="what-it-is">What it is</h2>
+<p>Gold breakout with two parts on one account: a swing-breakout part that rests a stop order just beyond a confirmed 15-minute swing high or low, locks a small profit once the move starts and trails it, and a fixed-dollar scalper that rests stop orders just inside the hourly swing highs and lows, with a stop of a few dollars and a tight trailing stop.</p>
+<h2 id="result-by-feed">Result by feed</h2>
+<table>
+<thead>
+<tr>
+<th>Feed</th>
+<th>Net</th>
+<th>PF</th>
+<th>Equity DD</th>
+<th>Trades</th>
+<th>Tick quality</th>
+<th>Net without top 5 %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>BlackBull</strong> ← claim</td>
+<td>1,320</td>
+<td>3.93</td>
+<td>4.97 %</td>
+<td>387</td>
+<td>100 %</td>
+<td>155</td>
+</tr>
+<tr>
+<td>VT Markets ($100 start, same trades at a fixed lot)</td>
+<td>1,395</td>
+<td>4.59</td>
+<td>7.98 %</td>
+<td>384</td>
+<td>100 %</td>
+<td>202</td>
+</tr>
+</tbody>
+</table>
+<p>The claim row is the BlackBull run at a $1,000 deposit, where a 0.01 lot stop risks about 1 % of the balance, the same risk as the Medium setting of the other products. BlackBull is the weaker of the two feeds at $100. At a fixed lot the trades are the same at any deposit; only the percentages change.</p>
+<h2 id="what-the-curve-looks-like">What the curve looks like</h2>
+<ul>
+<li><strong>A few large winners make a share of the profit.</strong> Without its 19 biggest winners (the top 5 % of 387 trades) the BlackBull run makes $155 of its $1,320. The page shows both curves in dollars, not on a log scale.</li>
+<li><strong>The other trades do not bleed over the year, but they earn more slowly.</strong> On BlackBull their balance first fell by about $67 (7 % of the $1,000 deposit) over the first months and then rose slowly for the rest of the year.</li>
+<li><strong>It was tested in one kind of market.</strong> The window is the busy gold market since November 2025. Older markets replayed at today's gold price lost money in some periods and were flat in others, so do not expect it to profit in every market.</li>
+</ul>
+<h2 id="reading-it-honestly">Reading it honestly</h2>
+<ul>
+<li>Two market windows were used to check the design, and the settings were compared with alternatives on rolling forward periods; none beat them, so the settings are unchanged.</li>
+<li>The tester cannot show slippage on stop orders in fast markets.</li>
+<li>A forward test on a demo account began on 8 November 2026. Nothing here is a live record.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

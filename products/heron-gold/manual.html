@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Heron Gold manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Heron Gold user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/heron-gold/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Heron Gold manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Heron Gold user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/heron-gold/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/heron-gold_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Heron Gold</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#heron-gold-manual">Heron Gold - manual</a><ul>
+<li><a href="#1-install-and-start-five-minutes">1. Install and start (five minutes)</a></li>
+<li><a href="#2-settings-start-at-the-top">2. Settings: start at the top</a></li>
+<li><a href="#3-what-it-does-in-order">3. What it does, in order</a></li>
+<li><a href="#4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</a></li>
+<li><a href="#5-when-it-will-not-trade">5. When it will not trade</a></li>
+<li><a href="#6-known-limits">6. Known limits</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="heron-gold-manual">Heron Gold - manual</h1>
+<h2 id="1-install-and-start-five-minutes">1. Install and start (five minutes)</h2>
+<ol>
+<li>Copy <code>HERON_GOLD.ex5</code> into <code>MQL5\Experts</code>, restart the terminal or refresh the Navigator.</li>
+<li>Open a <strong>gold (XAUUSD)</strong> chart. M15 is the tested chart.</li>
+<li>Drag the EA onto the chart, tick <em>Allow Algo Trading</em>, keep the defaults and press OK.</li>
+<li>A status panel appears at the top left. It lists each part of the EA and shows whether it is watching, holding an order or in a trade.</li>
+<li>Run it on a demo account first: the tester results are not a forecast and the live fill path has not been tested.</li>
+</ol>
+<h2 id="2-settings-start-at-the-top">2. Settings: start at the top</h2>
+<ul>
+<li><strong>Lot size per order:</strong> 0.01 by default. This is the only setting you should need. Each order uses this size, and several orders can be open together.</li>
+<li><strong>Show the status panel:</strong> on by default.</li>
+<li>All other inputs are research settings. Leave them at their defaults.</li>
+</ul>
+<h2 id="3-what-it-does-in-order">3. What it does, in order</h2>
+<p>Two parts share the account, as in Wren Gold. The swing part rests a stop order just beyond a confirmed swing high or low on the 15-minute chart; when it fills, it locks a small profit and trails the stop. The scalper rests stop orders just inside the hourly swing highs and lows with a stop of a few dollars and a tight trailing stop. A calm-market rule sits on top: while gold's average daily range of the last 14 closed days is below $80, no new orders are placed and resting orders are removed. Every position has a stop loss from the moment it opens.</p>
+<h2 id="4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</h2>
+<ul>
+<li><strong>Margin:</strong> at gold near $4,500, 0.01 lot needs about $9 of margin at 1:500 and about $150 at 1:30.</li>
+<li><strong>Room for the stops:</strong> at 0.01 lot the largest single loss in the research run was about $16, and up to 2 positions were open at the same time.</li>
+<li><strong>What the research did:</strong> the claim run starts from a $1,000 deposit, where a 0.01 lot stop risks about 1 % of the balance. The same trades from a $100 start show a much larger drawdown percentage (backtest, defaults with fixed 0.01 lot, BlackBull, 2025-11-01..2026-10-30: 39.2 % at $100 against 8.8 % at $1,000), because the same dollars are a bigger share of a smaller balance. In older, calmer markets replayed at today's gold price, a $100 account was finished in some periods. A $100 account therefore has no room if gold turns calm; a larger balance gives more.</li>
+</ul>
+<h2 id="5-when-it-will-not-trade">5. When it will not trade</h2>
+<ul>
+<li>When the market is closed or the spread is above the limit.</li>
+<li>Around the US jobs report: the swing part removes its orders for a few hours on those days. The list of report dates inside the EA runs to December 2026 and needs updating after that.</li>
+<li>While gold is calm (average daily range of the last 14 closed days below $80): the status panel shows the waiting parts.</li>
+<li>On a broker whose server clock differs from the one it was tested on, session timings shift. Test on a demo account with your broker.</li>
+</ul>
+<h2 id="6-known-limits">6. Known limits</h2>
+<ul>
+<li>It earns mainly in busy gold markets. In calm markets it earns little.</li>
+<li>A few large winners make a share of the profit. The other trades add more slowly.</li>
+<li>The first weeks can sit below the starting balance.</li>
+<li>It can go for weeks without a trade when gold is calm.</li>
+<li>Which side of the calm rule a given day falls on can differ from broker to broker, so a large trade can be taken on one broker and skipped on another.</li>
+<li>Backtest results only: a demo forward test began on 8 November 2026 and there is no live record yet.</li>
+<li>Past results do not predict future results.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
