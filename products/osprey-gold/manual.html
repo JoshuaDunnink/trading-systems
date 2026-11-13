@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Osprey Gold manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Osprey Gold user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/osprey-gold/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Osprey Gold manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Osprey Gold user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/osprey-gold/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/osprey-gold_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Osprey Gold</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#osprey-gold-manual">Osprey Gold - manual</a><ul>
+<li><a href="#1-install-and-start-five-minutes">1. Install and start (five minutes)</a></li>
+<li><a href="#2-settings-start-at-the-top">2. Settings: start at the top</a></li>
+<li><a href="#3-what-it-does-in-order">3. What it does, in order</a></li>
+<li><a href="#4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</a></li>
+<li><a href="#5-when-it-will-not-trade">5. When it will not trade</a></li>
+<li><a href="#6-known-limits">6. Known limits</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="osprey-gold-manual">Osprey Gold - manual</h1>
+<h2 id="1-install-and-start-five-minutes">1. Install and start (five minutes)</h2>
+<ol>
+<li>Copy <code>OSPREY_GOLD.ex5</code> into <code>MQL5\Experts</code>, restart the terminal or refresh the Navigator.</li>
+<li>Open a <strong>gold (XAUUSD)</strong> chart on <strong>M15</strong>.</li>
+<li>Drag the EA onto the chart, tick <em>Allow Algo Trading</em>, keep the defaults and press OK.</li>
+<li>Run it on a demo account first: tester results are not a forecast and the live fill path has not been tested.</li>
+</ol>
+<h2 id="2-settings-start-at-the-top">2. Settings: start at the top</h2>
+<ul>
+<li><strong>Lot size:</strong> fixed 0.02 lot. This is the setting to review first.</li>
+<li>All other inputs are research settings. Leave them at their defaults.</li>
+</ul>
+<h2 id="3-what-it-does-in-order">3. What it does, in order</h2>
+<ol>
+<li><strong>Lines.</strong> From swing highs and swing lows on the 15-minute chart it draws falling lines through consecutive highs and rising lines through consecutive lows.</li>
+<li><strong>Break.</strong> When a bar closes through a line it counts as a break, and the line is used once.</li>
+<li><strong>Reversal.</strong> An upward break gives a sell, a downward break gives a buy.</li>
+<li><strong>Filters.</strong> No trades between 01:00 and 10:00 server time, a minimum trend-strength reading, and a higher-timeframe direction check.</li>
+<li><strong>Exit.</strong> A $50 stop from the first tick. Once the trade is $25 in profit, a trailing stop follows $10 behind price. Account guards stop it for the day after a 4 % loss and for good after an 8 % loss.</li>
+</ol>
+<h2 id="4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</h2>
+<ul>
+<li>The research run started from $10,000. The largest single loss in that run was about $110.</li>
+<li>At 1:30 leverage 0.01 lot needs about $150 of margin with gold near $4,500; a small account has little room for a losing run.</li>
+</ul>
+<h2 id="5-when-it-will-not-trade">5. When it will not trade</h2>
+<ul>
+<li>Between 01:00 and 10:00 server time.</li>
+<li>After the daily 4 % loss guard or the 8 % account guard has triggered.</li>
+<li>When the market is closed or the spread is above the limit.</li>
+<li>On a broker whose server clock differs from the tested one, session timings shift. Test on a demo account with your broker.</li>
+</ul>
+<h2 id="6-known-limits">6. Known limits</h2>
+<ul>
+<li>A single losing run can be several trades long.</li>
+<li>The 8 % account guard assumes a $10,000 account; on a smaller account lower the lot size instead.</li>
+<li>Backtest results only; there is no live record yet.</li>
+<li>Past results do not predict future results.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

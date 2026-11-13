@@ -1,0 +1,66 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Plover Gold manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Plover Gold user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/plover-gold/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Plover Gold manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Plover Gold user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/plover-gold/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/plover-gold_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Plover Gold</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#plover-gold-manual">Plover Gold - manual</a><ul>
+<li><a href="#1-install-and-start-five-minutes">1. Install and start (five minutes)</a></li>
+<li><a href="#2-settings-start-at-the-top">2. Settings: start at the top</a></li>
+<li><a href="#3-what-it-does-in-order">3. What it does, in order</a></li>
+<li><a href="#4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</a></li>
+<li><a href="#5-when-it-will-not-trade">5. When it will not trade</a></li>
+<li><a href="#6-known-limits">6. Known limits</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="plover-gold-manual">Plover Gold - manual</h1>
+<h2 id="1-install-and-start-five-minutes">1. Install and start (five minutes)</h2>
+<ol>
+<li>Copy <code>PLOVER_GOLD.ex5</code> into <code>MQL5\Experts</code>, restart the terminal or refresh the Navigator.</li>
+<li>Open a <strong>gold (XAUUSD)</strong> chart on <strong>M1</strong>.</li>
+<li>Drag the EA onto the chart, tick <em>Allow Algo Trading</em>, keep the defaults and press OK.</li>
+<li>Run it on a demo account first: tester results are not a forecast and the live fill path has not been tested.</li>
+</ol>
+<h2 id="2-settings-start-at-the-top">2. Settings: start at the top</h2>
+<ul>
+<li><strong>Lot size:</strong> lot 0.01 per $1,000 of balance (capped at 3 % risk per trade). This is the setting to review first.</li>
+<li>All other inputs are research settings. Leave them at their defaults.</li>
+</ul>
+<h2 id="3-what-it-does-in-order">3. What it does, in order</h2>
+<ol>
+<li><strong>Signal.</strong> Each new one-minute bar it checks whether the 21-period RSI has just climbed back out of below 25 (a buy setup) or dropped back from above 72 (a sell setup).</li>
+<li><strong>Trend side.</strong> A buy needs price above the hourly 50-period average. A sell needs price below it.</li>
+<li><strong>Busy gold only.</strong> The average hourly range of the last 14 hours must be above a floor, and the spread must be small.</li>
+<li><strong>Sizing.</strong> The lot is 0.01 per $1,000 of balance, capped so the stop risks at most 3 % of the balance.</li>
+<li><strong>Exit.</strong> A stop at four times and a target at two times the one-minute range, set when the order is sent. After two losing trades in one day it stops until the next day.</li>
+</ol>
+<h2 id="4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</h2>
+<ul>
+<li>The research run started from $10,000. The largest single loss in that run was about $293.</li>
+<li>At 1:30 leverage 0.01 lot needs about $150 of margin with gold near $4,500; a small account has little room for a losing run.</li>
+</ul>
+<h2 id="5-when-it-will-not-trade">5. When it will not trade</h2>
+<ul>
+<li>On Fridays, and before 09:00 or after midnight server time.</li>
+<li>When gold's hourly range is below the floor or the spread is wide.</li>
+<li>When the market is closed or the spread is above the limit.</li>
+<li>On a broker whose server clock differs from the tested one, session timings shift. Test on a demo account with your broker.</li>
+</ul>
+<h2 id="6-known-limits">6. Known limits</h2>
+<ul>
+<li>It earns mainly in busy gold markets.</li>
+<li>Several losses in a row are normal for a snap-back system; the daily two-loss stop limits a bad day.</li>
+<li>Backtest results only; there is no live record yet.</li>
+<li>Past results do not predict future results.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
