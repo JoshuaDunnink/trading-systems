@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Pipit Gold research - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="How Pipit Gold was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/pipit-gold/research.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Pipit Gold research - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="How Pipit Gold was built and tested: the market mechanism it trades, the design decisions in order, and the real-tick backtests behind each one.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/pipit-gold/research.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/pipit-gold_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Pipit Gold</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#pipit-gold-research-note-every-number-names-its-arm-feed-and-window">Pipit Gold - research note (every number names its ARM, FEED and WINDOW)</a><ul>
+<li><a href="#what-it-is">What it is</a></li>
+<li><a href="#result-by-feed">Result by feed</a></li>
+<li><a href="#what-the-curve-looks-like">What the curve looks like</a></li>
+<li><a href="#reading-it-honestly">Reading it honestly</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="pipit-gold-research-note-every-number-names-its-arm-feed-and-window">Pipit Gold - research note (every number names its ARM, FEED and WINDOW)</h1>
+<p>All figures: Backtest, MetaTrader 5 Strategy Tester, real ticks, $10,000 deposit, lot 0.01 per $1,000 of balance, capped at 0.10, 150 ms delay, leverage 1:500, defaults (no .set), version 1.01. Window 2025-11-11..2026-11-11.</p>
+<h2 id="what-it-is">What it is</h2>
+<p>Pipit Gold is a tick-driven stop-order scalper. It remembers recent daily highs and lows that were also wide swings on the hourly chart, and when gold comes within a few dollars of one it places pending stop orders a fixed fraction of a percent inside that level. Eight order settings (three for sells, five for buys) each carry their own fixed-dollar stop and target; every filled trade then locks in profit as it runs and is usually closed within seconds.</p>
+<h2 id="result-by-feed">Result by feed</h2>
+<table>
+<thead>
+<tr>
+<th>Feed</th>
+<th>Net</th>
+<th>PF</th>
+<th>Equity DD</th>
+<th>Trades</th>
+<th>Tick quality</th>
+<th>Net without top 5 %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull (claim)</td>
+<td>21,644</td>
+<td>3.10</td>
+<td>7.90 %</td>
+<td>1229</td>
+<td>100 %</td>
+<td>11,720</td>
+</tr>
+<tr>
+<td>VT Markets</td>
+<td>24,100</td>
+<td>3.79</td>
+<td>5.78 %</td>
+<td>1191</td>
+<td>100 %</td>
+<td>14,784</td>
+</tr>
+</tbody>
+</table>
+<p>Small-account row. Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2025-11-11 to 2026-11-11, version 1.01, $1,000 deposit (the lot ladder shrinks with the balance): net 4,309, PF 3.19, equity drawdown 4.83 %, 1229 trades.</p>
+<h2 id="what-the-curve-looks-like">What the curve looks like</h2>
+<ul>
+<li><strong>Concentration.</strong> Without its 61 biggest winners (the top 5 % of 1229 trades) the BlackBull run makes $11,720 of its $21,644. The page shows both curves in dollars, not on a log scale.</li>
+<li><strong>One kind of market.</strong> The window is the fast gold market since November 2025. Over 2022 to early 2025 the same rules lost money in several quarters (for example the third quarter of 2023), so do not expect it to profit in every market.</li>
+</ul>
+<h2 id="reading-it-honestly">Reading it honestly</h2>
+<ul>
+<li>This build follows its decode; the level rule was chosen on a four-year window, tested on a held-out six-month window, and the global width was preferred to per-setting widths before the final run.</li>
+<li>The tester cannot show slippage in fast markets.</li>
+<li>There is no live record yet. Nothing here is a live result.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
