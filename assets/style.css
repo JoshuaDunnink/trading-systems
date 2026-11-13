@@ -44,4 +44,9 @@ img.hero{width:100%;max-width:420px;height:auto;border-radius:12px;display:block
 .tablewrap{overflow-x:auto;margin:1em 0}.tablewrap table{display:table;width:auto;min-width:100%;margin:0}
 table.market{font-size:.82rem}table.market th,table.market td{padding:5px 6px}table.market td{white-space:nowrap}
 table.market .num{text-align:right}
+table.matrix{font-size:.78rem;border-collapse:separate;border-spacing:2px}table.matrix th,table.matrix td{padding:3px 5px;text-align:center}
+table.matrix th[scope=row]{text-align:left;white-space:nowrap;position:sticky;left:0;background:var(--bg)}table.matrix .sub{display:block;font-weight:400;color:var(--muted);font-size:.72rem}
+table.matrix th.vert{writing-mode:vertical-rl;transform:rotate(180deg);white-space:nowrap;vertical-align:bottom;height:11.5em}
+table.matrix td.self{background:var(--card,#2a2d31)}.m-diff{background:#1f6f4a;color:#fff}.m-comp{background:#3a7d5c;color:#fff}.m-part{background:#b58a2a;color:#111}.m-over{background:#9a3b3b;color:#fff}
+.legend{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.8rem;margin:2px 4px 2px 0}.sr{position:absolute;left:-9999px}
 footer{border-top:1px solid var(--line);padding-top:16px;padding-bottom:32px;color:var(--muted);font-size:.88rem}
