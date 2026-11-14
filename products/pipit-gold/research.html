@@ -19,7 +19,7 @@
 </ul>
 </div>
 </nav><h1 id="pipit-gold-research-note-every-number-names-its-arm-feed-and-window">Pipit Gold - research note (every number names its ARM, FEED and WINDOW)</h1>
-<p>All figures: Backtest, MetaTrader 5 Strategy Tester, real ticks, $10,000 deposit, lot 0.01 per $1,000 of balance, capped at 0.10, 150 ms delay, leverage 1:500, defaults (no .set), version 1.01. Window 2025-11-11..2026-11-11.</p>
+<p>All figures: Backtest, MetaTrader 5 Strategy Tester, real ticks, $10,000 deposit, lot 0.01 per $1,000 of balance, capped at 0.10, 150 ms delay, leverage 1:500, defaults (no .set), version 1.02. Window 2025-11-11..2026-11-11.</p>
 <h2 id="what-it-is">What it is</h2>
 <p>Pipit Gold is a tick-driven stop-order scalper. It remembers recent daily highs and lows that were also wide swings on the hourly chart, and when gold comes within a few dollars of one it places pending stop orders a fixed fraction of a percent inside that level. Eight order settings (three for sells, five for buys) each carry their own fixed-dollar stop and target; every filled trade then locks in profit as it runs and is usually closed within seconds.</p>
 <h2 id="result-by-feed">Result by feed</h2>
@@ -38,33 +38,33 @@
 <tbody>
 <tr>
 <td>BlackBull (claim)</td>
-<td>21,644</td>
-<td>3.10</td>
-<td>7.90 %</td>
-<td>1229</td>
+<td>16,571</td>
+<td>3.68</td>
+<td>5.45 %</td>
+<td>771</td>
 <td>100 %</td>
-<td>11,720</td>
+<td>10,591</td>
 </tr>
 <tr>
 <td>VT Markets</td>
-<td>24,100</td>
-<td>3.79</td>
-<td>5.78 %</td>
-<td>1191</td>
+<td>19,218</td>
+<td>4.68</td>
+<td>3.94 %</td>
+<td>772</td>
 <td>100 %</td>
-<td>14,784</td>
+<td>12,900</td>
 </tr>
 </tbody>
 </table>
-<p>Small-account row. Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2025-11-11 to 2026-11-11, version 1.01, $1,000 deposit (the lot ladder shrinks with the balance): net 4,309, PF 3.19, equity drawdown 4.83 %, 1229 trades.</p>
+<p>Small-account row. Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2025-11-11 to 2026-11-11, version 1.02, $1,000 deposit (the lot ladder shrinks with the balance): net 2,416, PF 3.68, equity drawdown 4.92 %, 771 trades.</p>
 <h2 id="what-the-curve-looks-like">What the curve looks like</h2>
 <ul>
-<li><strong>Concentration.</strong> Without its 61 biggest winners (the top 5 % of 1229 trades) the BlackBull run makes $11,720 of its $21,644. The page shows both curves in dollars, not on a log scale.</li>
+<li><strong>Concentration.</strong> Without its 38 biggest winners (the top 5 % of 771 trades) the BlackBull run makes $10,591 of its $16,571. The page shows both curves in dollars, not on a log scale.</li>
 <li><strong>One kind of market.</strong> The window is the fast gold market since November 2025. Over 2022 to early 2025 the same rules lost money in several quarters (for example the third quarter of 2023), so do not expect it to profit in every market.</li>
 </ul>
 <h2 id="reading-it-honestly">Reading it honestly</h2>
 <ul>
-<li>This build follows its decode; the level rule was chosen on a four-year window, tested on a held-out six-month window, and the global width was preferred to per-setting widths before the final run.</li>
+<li>This build follows its decode; the level rule was chosen on a four-year window, tested on a held-out six-month window, and the global width was preferred to per-setting widths before the final run. Two adjustments were made after the decode (a minimum level age of 14 hourly bars and at most two re-uses of a level), each chosen before its results were read and confirmed on a second broker and the four-year window; the alternatives tested were set aside.</li>
 <li>The tester cannot show slippage in fast markets.</li>
 <li>There is no live record yet. Nothing here is a live result.</li>
 </ul>
