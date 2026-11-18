@@ -20,7 +20,7 @@
 </ul>
 </div>
 </nav><h1 id="dunlin-gold-research-note-every-number-names-its-arm-feed-and-window">Dunlin Gold - research note (every number names its ARM, FEED and WINDOW)</h1>
-<p>All figures: MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit, fixed 0.01 lot per trade, 150 ms delay, leverage 1:500, version 0.23 defaults (no .set), window 2025-09-01..2026-11-14. Arm: "Defaults, fixed 0.01 lot", version 0.23.</p>
+<p>All figures: MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit, default lot (0.01 per $1,000 of balance), 150 ms delay, leverage 1:500, version 0.23 defaults (no .set), window 2025-09-01..2026-11-14. Arm: "Defaults", version 0.23. The IC Markets and VT Markets rows replay the same version's trade lists at a fixed 0.01 lot from $1,000.</p>
 <h2 id="what-it-is">What it is</h2>
 <p>Gold neural-network window trader. A small neural network reads the last two and a half days of 15-minute candles and decides whether gold is in an orderly, range-like stretch with a lean up or down; if so it opens a trading window and takes up to three positions on that side. Every position has a stop loss from the moment it opens. Profit is protected in stages: the stop moves to entry after a small favourable move, then locks profit and trails. No martingale, no grid, no averaging down.</p>
 <h2 id="how-the-network-was-made">How the network was made</h2>
@@ -40,11 +40,11 @@
 <tbody>
 <tr>
 <td><strong>BlackBull</strong> ← claim</td>
-<td>1,042</td>
-<td>2.12</td>
-<td>7.96 %</td>
-<td>716</td>
-<td>782</td>
+<td>1,027</td>
+<td>2.02</td>
+<td>8.05 %</td>
+<td>712</td>
+<td>725</td>
 </tr>
 <tr>
 <td>IC Markets</td>
@@ -64,10 +64,10 @@
 </tr>
 </tbody>
 </table>
-<p>The claim row is BlackBull, the weakest of the three on profit factor. Drawdown figures come from the closed-trade balance of the trade list.</p>
+<p>The claim row is BlackBull, the weakest of the three on profit factor. The dip column is the closed-trade balance; on BlackBull the equity drawdown including open positions was 13.55 % (backtest, defaults, BlackBull, 2025-09-01..2026-11-14).</p>
 <h2 id="what-the-curve-looks-like">What the curve looks like</h2>
 <ul>
-<li><strong>Without its biggest winners it still earns.</strong> Without the biggest winners (5 % of trades) (35 trades) the BlackBull run makes $782 of its $1,042. The page shows both curves in dollars.</li>
+<li><strong>Without its biggest winners it still earns.</strong> Without the biggest winners (5 % of trades) (35 trades) the BlackBull run makes $725 of its $1,027. The page shows both curves in dollars.</li>
 <li><strong>Most months earn.</strong> 14 of 15 calendar months are positive on BlackBull.</li>
 <li><strong>It was tested in one kind of market.</strong> The window is the orderly-to-busy gold market of 2025-26. In older gold markets replayed at today's price it lost money in some stretches; the rough-phase switch cut those losses by roughly a quarter in the research tests but did not remove them.</li>
 </ul>
