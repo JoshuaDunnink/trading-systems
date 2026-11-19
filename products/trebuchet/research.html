@@ -20,16 +20,16 @@
 </ul>
 </div>
 </nav><h1 id="trebuchet-how-it-was-built-and-tested">Trebuchet - how it was built and tested</h1>
-<p>Trebuchet started as the reconstruction of a commercial gold EA. The work had two goals: understand exactly what that system does,
-and then build our own version that does it with fewer give-backs and smaller dips.</p>
+<p>Trebuchet started as a study of a working four-hourly channel-breakout approach for gold. The work had two goals: understand exactly what makes that kind of system work,
+and then build our own version of it with fewer give-backs and smaller dips.</p>
 <h2 id="1-what-the-rules-are">1. What the rules are</h2>
 <p>Every four hours the EA reads a price channel - the highest high and lowest low of a fixed number of past bars - and rests a buy stop
 exactly on the channel high and a sell stop exactly on the channel low. One breakout is traded by seven legs that share the entry and
 differ in their target (0.4 to 5 percent of price) and stop loss (0.1 to 0.9 percent of price plus the spread). An order is placed
 only when the channel edge is far enough from price, untriggered orders expire after three and a half to ten and a half days, and a
 trade that is a little ahead gets a break-even stop.</p>
-<p>These rules were measured, not guessed: the rebuilt EA reproduced the original's fills for most legs on two brokers and its net
-result within a few percent (backtest, MetaTrader 5 Strategy Tester, real ticks, Vantage, 2025-07-04 to 2026-10-13).</p>
+<p>These rules were measured, not guessed: our first version placed its orders where the approach we studied did for most legs on two brokers, and its net
+result landed within a few percent of it (backtest, MetaTrader 5 Strategy Tester, real ticks, Vantage, 2025-07-04 to 2026-10-13).</p>
 <h2 id="2-the-give-back-problem">2. The give-back problem</h2>
 <p>On a client's chart a breakout system like this shows a familiar pattern: equity climbs above the balance while trades run toward
 their targets, then falls back as many of those trades return to their break-even stop. Measured trade by trade, about half of the
@@ -68,8 +68,8 @@ market idea.</p>
 <h2 id="5-what-is-still-open">5. What is still open</h2>
 <ul>
 <li>Balance-based position sizing (the tests use a fixed 0.01 lot per order).</li>
-<li>One of the seven legs reproduces the original less closely than the others.</li>
-<li>Peak equity drawdown on two of the brokers is a little above the original's, while net profit and profit factor are above it on
+<li>One of the seven legs tracks the approach we studied less closely than the others.</li>
+<li>Peak equity drawdown on two of the brokers is a little above the studied approach's, while net profit and profit factor are above it on
   all four brokers tested.</li>
 </ul>
 </main>

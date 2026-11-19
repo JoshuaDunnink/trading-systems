@@ -220,7 +220,7 @@ trail is what ships — cheaper to compute and no worse for it.</p>
 deal-for-deal against the version before it on a real-tick window before release:</p>
 <ul>
 <li><strong>1.07 — a wider trail on four of the seven strategies.</strong> (Strategy Tester backtest, BlackBull, OANDA,
-  Fusion and IC Markets real ticks, 2023 to 2026.) The original trail was found to close winners too early
+  Fusion and IC Markets real ticks, 2023 to 2026.) The earlier trail was found to close winners too early
   in quiet stretches; doubling its distance on strategies 3, 4, 6 and 7 earned more net on every one of the
   four broker feeds tested, and on the longest-history feed its worst drawdown episode also recovered faster.
   A trail wider still earned a little more again but took several times longer to recover from its worst
@@ -292,8 +292,8 @@ OANDA GOLD.pro, 2018-06-13 to 2026-09-05, Medium risk level):</p>
   excluded strategies, a net loss for the worst broker feed on the shipped seven.</li>
 <li><strong>Per-position profit ratchets and basket-level profit capture.</strong> A range of retrace thresholds, floors and
   basket take-profit or basket-trailing rules were tested against the plain trail. Every setting tried lost
-  money compared with letting the trail run, on both the rebuild and the reference machine it was measured
-  against. The conclusion drawn: the open-profit spikes that retreat before a position closes are the price of
+  money compared with letting the trail run, on both of the builds it was measured
+  on. The conclusion drawn: the open-profit spikes that retreat before a position closes are the price of
   the tail that eventually pays, not money left on the table.</li>
 <li><strong>Per-tick trailing.</strong> Covered in section 3 — moves exits earlier by a couple of minutes on average and
   changes almost nothing in aggregate; the cheaper one-minute-close trail ships instead.</li>
