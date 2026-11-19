@@ -3,23 +3,23 @@
 <title>The Crew - Gold session-specialist Expert Advisor for MT5 (XAUUSD M1)</title><meta name="description" content="The Crew is an MT5 Expert Advisor for gold (XAUUSD): a recovery grid with a stop loss. Session-timed specialists run a shared equal-lot grid, and every grid...">
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "SoftwareApplication", "name": "The Crew", "applicationCategory": "FinanceApplication", "operatingSystem": "MetaTrader 5 (Windows)", "description": "The Crew is an MT5 Expert Advisor for gold (XAUUSD): a recovery grid with a stop loss. Session-timed specialists run a shared equal-lot grid, and every grid...", "url": "https://joshuadunnink.github.io/trading-systems/products/the-crew/", "author": {"@type": "Person", "name": "Joshua Dunnink", "url": "https://www.mql5.com/en/users/joshuadunnink"}, "image": "https://joshuadunnink.github.io/trading-systems/img/the-crew_hero.jpg", "offers": {"@type": "Offer", "price": "199", "priceCurrency": "USD", "url": "https://www.mql5.com/en/market/product/196745"}}</script>
 <script type="application/ld+json">{"@context": "https://schema.org", "@type": "BreadcrumbList", "itemListElement": [{"@type": "ListItem", "position": 1, "name": "Home", "item": "https://joshuadunnink.github.io/trading-systems/"}, {"@type": "ListItem", "position": 2, "name": "Products", "item": "https://joshuadunnink.github.io/trading-systems/products.html"}, {"@type": "ListItem", "position": 3, "name": "The Crew", "item": "https://joshuadunnink.github.io/trading-systems/products/the-crew/"}]}</script>
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which broker and account type does The Crew need?", "acceptedAnswer": {"@type": "Answer", "text": "A hedging account, on XAUUSD (any broker spelling: XAUUSD, XAUUSD+, XAUUSD-ECN, GOLD.pro) with reasonable gold spreads."}}, {"@type": "Question", "name": "What is the minimum deposit?", "acceptedAnswer": {"@type": "Answer", "text": "The Small Account preset (Low risk - 6 strategies, static 0.01 lot, every group closed at a 150 USD floating loss per 0.01 lot) needs about 330 if you accept a 1-in-40 chance of losing 35 percent of the starting balance within a year, and about 690 if you want that chance below 1 in 100 for a 20 percent loss (backtest, raw-spread feeds 2022-2026). One stop costs about 150-165 at 0.01 lot. The EA runs whatever you choose on any balance and prints at start-up what your configuration needs."}}, {"@type": "Question", "name": "Which council should I start with?", "acceptedAnswer": {"@type": "Answer", "text": "Low risk - 6 strategies, the default: the smallest capital need and no group stop on the four test records. Medium and High add specialists that earn more and stop more often."}}, {"@type": "Question", "name": "Can I set the maximum number of layers myself?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, since 3.14: Max layers per group, 0 = each specialist's measured depth (the shipped setting); a lower number caps, a higher number raises every specialist to it. It is there so you can measure the effect yourself in both directions, because the measurement says a cap hurts: the next layer is what lets a group close, so a capped group floats until price travels much further. On BlackBull 2022-11-01 to 2024-12-31 (backtest, real ticks, shipped defaults, per 0.01 lot) a cap of 5 cut the net from 485 to 130 and raised the account equity drawdown from 7.3 to 16.1 percent. The journal warns at start-up whenever the cap binds. The bound on cost is the group stop, which is also yours."}}, {"@type": "Question", "name": "Which chart and timeframe do I attach it to?", "acceptedAnswer": {"@type": "Answer", "text": "Any timeframe on a gold chart - The Crew runs its own internal one-minute clock."}}, {"@type": "Question", "name": "Do I have to set my broker's clock?", "acceptedAnswer": {"@type": "Answer", "text": "No. With Broker clock = Auto-detect (the default) The Crew finds gold's daily pause in your broker's price history and prints the shift it uses in the journal at start-up."}}, {"@type": "Question", "name": "Is it a grid, and is it martingale?", "acceptedAnswer": {"@type": "Answer", "text": "It is an equal-lot recovery grid: a position that misses its small target is averaged by a ladder of same-sized layers and closed as one group. No martingale - every layer matches the first, each specialist has a fixed maximum depth, and every group has a 150 USD per 0.01 lot stop."}}, {"@type": "Question", "name": "Can it run on the same account as another EA?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It manages only its own trades by their magic numbers. Put it on its own gold chart; the account breaker and the free margin are shared with the other EA, and the manual explains how to size for that."}}, {"@type": "Question", "name": "Does The Crew trade through news?", "acceptedAnswer": {"@type": "Answer", "text": "By default it opens no new groups on NFP Fridays, FOMC decision days, 15 December - 15 January and late Friday, and Delphine stands aside around the 08:30 and 10:00 New York releases. Open groups keep their exit."}}, {"@type": "Question", "name": "Do I need a VPS?", "acceptedAnswer": {"@type": "Answer", "text": "A VPS or an always-on computer is recommended - the specialists work through the night and the stops and the breaker need the EA running to act."}}, {"@type": "Question", "name": "Can I backtest The Crew myself?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is one self-contained Expert Advisor with no DLLs or custom includes; it runs in the MetaTrader 5 Strategy Tester on real ticks. Use the feed, window and starting balance in the Results section to reproduce a figure. ### Requirements XAUUSD (gold), a hedging account. Any chart timeframe - the EA keeps its own internal clock. A broker with reasonable gold spreads; the EA skips entries above a configurable spread ceiling. A VPS or an always-on computer is recommended, because the specialists work through the night. ### Risk disclosure Trading leveraged instruments carries a substantial risk of loss. This is a grid strategy: it holds losing positions through adverse moves and recovers them by adding equal-sized layers. Each group is bounded by its dollar stop - on a small account one stop is a large share of the balance (the manual gives the figures) - and the account breaker flattens everything if equity falls further than you allow. Both realise the loss they were holding. The results above come from a period in which gold rose overall. A long decline without bounces is the condition this design has the least evidence about; it is the condition in which the group stop fires most often. Past backtest performance does not predict future outcomes. Test on a demo account first, long enough to see a recovery ladder open, deepen and close, before funding a live account. ---"}}]}</script>
+<script type="application/ld+json">{"@context": "https://schema.org", "@type": "FAQPage", "mainEntity": [{"@type": "Question", "name": "Which broker and account type does The Crew need?", "acceptedAnswer": {"@type": "Answer", "text": "A hedging account, on XAUUSD (any broker spelling: XAUUSD, XAUUSD+, XAUUSD-ECN, GOLD.pro) with reasonable gold spreads."}}, {"@type": "Question", "name": "What is the minimum deposit?", "acceptedAnswer": {"@type": "Answer", "text": "The Small Account preset (Low risk - 5 strategies, static 0.01 lot, every group closed at a 150 USD floating loss per 0.01 lot) needs about 470 if you accept a 1-in-40 chance of losing 35 percent of the starting balance within a year, and about 1,030 if you want that chance below 1 in 100 for a 20 percent loss (backtest, BlackBull 2022-2026 and Vantage 2025-2026, to 2026-10-09). One stop costs about 150-165 at 0.01 lot. The EA runs whatever you choose on any balance and prints at start-up what your configuration needs."}}, {"@type": "Question", "name": "Which council should I start with?", "acceptedAnswer": {"@type": "Answer", "text": "Low risk - 5 strategies, the default: the smallest capital need and one group stop on the four test records. Medium and High add specialists that earn more and stop more often."}}, {"@type": "Question", "name": "Can I set the maximum number of layers myself?", "acceptedAnswer": {"@type": "Answer", "text": "Yes, since 3.14: Max layers per group, 0 = each specialist's measured depth (the shipped setting); a lower number caps, a higher number raises every specialist to it. It is there so you can measure the effect yourself in both directions, because the measurement says a cap hurts: the next layer is what lets a group close, so a capped group floats until price travels much further. On BlackBull 2022-11-01 to 2024-12-31 (backtest, real ticks, shipped defaults, per 0.01 lot) a cap of 5 cut the net from 485 to 130 and raised the account equity drawdown from 7.3 to 16.1 percent. The journal warns at start-up whenever the cap binds. The bound on cost is the group stop, which is also yours."}}, {"@type": "Question", "name": "Which chart and timeframe do I attach it to?", "acceptedAnswer": {"@type": "Answer", "text": "Any timeframe on a gold chart - The Crew runs its own internal one-minute clock."}}, {"@type": "Question", "name": "Do I have to set my broker's clock?", "acceptedAnswer": {"@type": "Answer", "text": "No. With Broker clock = Auto-detect (the default) The Crew finds gold's daily pause in your broker's price history and prints the shift it uses in the journal at start-up."}}, {"@type": "Question", "name": "Is it a grid, and is it martingale?", "acceptedAnswer": {"@type": "Answer", "text": "It is an equal-lot recovery grid: a position that misses its small target is averaged by a ladder of same-sized layers and closed as one group. No martingale - every layer matches the first, each specialist has a fixed maximum depth, and every group has a 150 USD per 0.01 lot stop."}}, {"@type": "Question", "name": "Can it run on the same account as another EA?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It manages only its own trades by their magic numbers. Put it on its own gold chart; the account breaker and the free margin are shared with the other EA, and the manual explains how to size for that."}}, {"@type": "Question", "name": "Does The Crew trade through news?", "acceptedAnswer": {"@type": "Answer", "text": "By default it opens no new groups on NFP Fridays, FOMC decision days, 15 December - 15 January and late Friday, and Delphine stands aside around the 08:30 and 10:00 New York releases. Open groups keep their exit."}}, {"@type": "Question", "name": "Do I need a VPS?", "acceptedAnswer": {"@type": "Answer", "text": "A VPS or an always-on computer is recommended - the specialists work through the night and the stops and the breaker need the EA running to act."}}, {"@type": "Question", "name": "Can I backtest The Crew myself?", "acceptedAnswer": {"@type": "Answer", "text": "Yes. It is one self-contained Expert Advisor with no DLLs or custom includes; it runs in the MetaTrader 5 Strategy Tester on real ticks. Use the feed, window and starting balance in the Results section to reproduce a figure. ### Requirements XAUUSD (gold), a hedging account. Any chart timeframe - the EA keeps its own internal clock. A broker with reasonable gold spreads; the EA skips entries above a configurable spread ceiling. A VPS or an always-on computer is recommended, because the specialists work through the night. ### Risk disclosure Trading leveraged instruments carries a substantial risk of loss. This is a grid strategy: it holds losing positions through adverse moves and recovers them by adding equal-sized layers. Each group is bounded by its dollar stop - on a small account one stop is a large share of the balance (the manual gives the figures) - and the account breaker flattens everything if equity falls further than you allow. Both realise the loss they were holding. The results above come from a period in which gold rose overall. A long decline without bounces is the condition this design has the least evidence about; it is the condition in which the group stop fires most often. Past backtest performance does not predict future outcomes. Test on a demo account first, long enough to see a recovery ladder open, deepen and close, before funding a live account. ---"}}]}</script>
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/the-crew/"><meta property="og:type" content="website">
 <meta property="og:title" content="The Crew - Gold session-specialist Expert Advisor for MT5 (XAUUSD M1)"><meta property="og:description" content="The Crew is an MT5 Expert Advisor for gold (XAUUSD): a recovery grid with a stop loss. Session-timed specialists run a shared equal-lot grid, and every grid...">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/the-crew/"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/the-crew_hero.jpg"><meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<link rel="stylesheet" href="../../assets/style.css?v=ec9daf5ed3"></head>
 <body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
 <a href="../../img/the-crew_hero.jpg"><img class="hero" src="../../img/the-crew_hero.jpg" width="800" height="800" alt="The Crew artwork"></a><h1>The Crew</h1><p class="lead">XAUUSD · M1 · MetaTrader 5 Expert Advisor</p><p><a class="btn" href="https://www.mql5.com/en/market/product/196745">View on mql5</a><a class="btn ghost" href="manual.html">Read the manual</a><a class="btn ghost" href="research.html">How it was built</a></p><div class="card headline"><h2>Headline backtest</h2><p class="stats-line">Profit factor 5.7 · worst equity drawdown 8.76% · 625 trades · return +128.0% on 10,000</p><p class="stamp">Backtest, real ticks, BlackBull Markets, 2025-07-01 to 2026-09-07, version 3.14. The weakest of the live brokers tested, not the strongest.</p><figure><img src="../../img/the-crew_headline.png" alt="The Crew balance curve (backtest)" loading="lazy"><figcaption>Chart: closed-trade balance of this same run. Its label computes profit factor per closed trade and shows the closed-balance drawdown, so both can differ from the tester-report figures above.</figcaption></figure></div><p class="note">Figures on this page come from the MetaTrader 5 Strategy Tester on real broker ticks. They are backtests, not live results.</p><p>The Crew is an MT5 Expert Advisor for gold (XAUUSD): a recovery grid with a stop loss. Session-timed specialists run a shared equal-lot grid, and every grid group carries its own hard stop (150 USD per 0.01 lot, read on every tick), so a one-way night closes the group at a known, fixed cost instead of averaging down until the margin runs out. Above the groups sits one account-level warden.</p>
 <p>Most grid EAs are sold on their equity curve. This one is sold on its protection layers - six of them, each with a value that was measured, not guessed, and each one yours to change.</p>
 <h3 id="six-protection-layers-and-how-each-one-was-set">Six protection layers, and how each one was set</h3>
-<p>Every figure in this section: backtest, MetaTrader 5 Strategy Tester, real ticks, XAUUSD, BlackBull 2022-11-01 to 2026-09-07, IC Markets 2026-04-01 to 2026-09-07 and Vantage 2025-07-01 to 2026-09-07, at 0.01 lot unless stated.</p>
+<p>Every figure in this section: backtest, MetaTrader 5 Strategy Tester, real ticks, XAUUSD, BlackBull 2022-11-01 to 2026-10-09, IC Markets 2026-04-01 to 2026-10-09 and Vantage 2025-07-01 to 2026-10-09, at 0.01 lot unless stated.</p>
 <ol>
 <li>The lot. The engine is linear in volume: every layer of a group is the same size, so doubling the lot doubles both the profit and the floating loss and changes nothing else. That makes the lot a derived number, not a guess: the share of your balance you are willing to see floating, divided by the council's measured worst floating loss at 0.01 lot on your broker type. The EA prints that worst-case figure and the lot it derives at start-up. Static lot is one switch away.</li>
-<li>The compounding risk. The risk tiers are shares of balance floating, not multipliers: Conservative 10 percent (the default), Balanced 15, High 20, Extreme 30. The minimum balance per tier comes from a ruin-and-recovery profile: start the default council on every day of the records at 0.01 lot and count how often a loss line is touched within twelve months. A 20 percent loss stays under 1 chance in 100 from about 690; a 35 percent loss under 1 in 40 from about 330; a 50 percent loss under 1 in 20 from about 220 (backtest, raw-spread feeds 2022-2026, Low risk - 6 strategies, 0.01 lot).</li>
-<li>The group stop. Every group closes at a floating loss of 150 USD per 0.01 lot, scaled with the group's lot and read on every price tick. The number sits beyond the depth normal recoveries reach (backtest, BlackBull 2022-11-01 to 2026-09-07, 0.01 lot): groups that recovered never floated past about 120 to 195 per 0.01 lot, while one group in 2022-2024 floated to 645 before it came back. A tighter stop of 100 was tested on the same record and would have closed eight of nine groups that finished ahead. At 150 the stop fired once or twice a year on that record and cost about 15 percent of net; on the fastest tick it overshot by 1.10 times the stop (backtest, BlackBull 2022-11-01 to 2026-09-07). No group of the default council reached it on any of the four records.</li>
+<li>The compounding risk. The risk tiers are shares of balance floating, not multipliers: Conservative 10 percent (the default), Balanced 15, High 20, Extreme 30. The minimum balance per tier comes from a ruin-and-recovery profile: start the default council on every day of the records at 0.01 lot and count how often a loss line is touched within twelve months. A 20 percent loss stays under 1 chance in 100 from about 1,030; a 35 percent loss under 1 in 40 from about 470; a 50 percent loss under 1 in 20 from about 285 (backtest, BlackBull 2022-2026 and Vantage 2025-2026 to 2026-10-09, Low risk - 5 strategies, 0.01 lot).</li>
+<li>The group stop. Every group closes at a floating loss of 150 USD per 0.01 lot, scaled with the group's lot and read on every price tick. The number sits beyond the depth normal recoveries reach (backtest, BlackBull 2022-11-01 to 2026-09-07, 0.01 lot): groups that recovered never floated past about 120 to 195 per 0.01 lot, while one group in 2022-2024 floated to 645 before it came back. A tighter stop of 100 was tested on the same record and would have closed eight of nine groups that finished ahead. At 150 the stop fired once or twice a year on that record and cost about 15 percent of net; on the fastest tick it overshot by 1.10 times the stop (backtest, BlackBull 2022-11-01 to 2026-09-07). The default council reached it once on four records (BlackBull, May 2025).</li>
 <li>The depth of the ladder. Each specialist's maximum number of layers is the deepest ladder she needed over five years of real-tick history (2021 to 2026). A cap below it was tested and rejected: adding the next layer is what lets a group close, so a capped group floats until price travels much further. You do not have to take our word for it - since 3.14 the depth is an input (Max layers per group, 0 = the measured depth; lower caps, higher raises) so you can run the comparison in your own tester, in both directions. On the shipped defaults over BlackBull 2022-11-01 to 2024-12-31 (backtest, real ticks, per 0.01 lot) a cap of 5 layers cut the net from 485 to 130 and raised the account equity drawdown from 7.3 to 16.1 percent; a cap of 8 gave 305 and 16.6 percent; 12 or more changed nothing. The shipped setting stays 0 and the group stop stays the bound on cost.</li>
-<li>The account breaker. If the account falls 30 percent below its equity peak (your figure), the warden flattens every Crew group and stands down until the next day. It is the last brake, set well above the deepest equity drawdown of the records in the Results section, which stayed under 10 percent on all three feeds. An optional confirmation delay lets you require the breach to persist before it acts.</li>
+<li>The account breaker. If the account falls 30 percent below its equity peak (your figure), the warden flattens every Crew group and stands down until the next day. It is the last brake, set well above the deepest equity drawdown of the records in the Results section, which stayed under 9 percent on all three feeds. An optional confirmation delay lets you require the breach to persist before it acts.</li>
 <li>The spread guard. No entry while the spread is wider than 1.00 USD of gold price. It is set in price, not points, so it means the same on a two-digit and a three-digit gold feed; it is a guard against spread blow-outs, not a tuned edge.</li>
 </ol>
 <p>The warden's smaller rules, all on by default and all inputs: a free-margin floor of 20 percent that blocks new groups and never a layer (blocking a layer is the depth cap of point 4); a cap of 24 ounces of open longs across the book; at most 15 new groups per specialist a day; and no new groups on payrolls Friday, FOMC days, late Friday and the mid-December to mid-January pause.</p>
@@ -42,12 +42,13 @@ Juno takes London's midday push. Imogen goes through the London open with the cr
 in as the American session closes out its business.</p>
 <h3 id="three-councils-you-choose-how-much-of-the-house-works">Three councils - you choose how much of the house works</h3>
 <ul>
-<li>Low risk - 6 strategies (the default): the night crew (Nadia, Nerissa, Thea, Nova) with Delphine
-  and Cassandra. No group of this council reached its stop on any of the four test records below.</li>
-<li>Medium risk - 9 strategies: Low plus Amara, Clara and Juno - about a third more profit and about
-  half as much again in the capital it needs.</li>
-<li>High risk - 11 strategies: every specialist.</li>
-<li>Custom: choose the specialists one by one.</li>
+<li>Low risk - 5 strategies (the default): Nerissa, Nova and Thea (the night crew) with Delphine and
+  Cassandra. One group stop on the four test records below, and the only council that made money in
+  2022-23, in 2024-26 and in the quiet market since August 2026 on every feed that covers the period.</li>
+<li>Medium risk - 6 strategies: Low plus Clara - more profit, one more stop, about a tenth more capital.</li>
+<li>High risk - 9 strategies: Medium plus Nadia, Amara and Evelyn - about twice the profit of Low, the
+  most stops and about 40 percent more capital.</li>
+<li>Custom: choose the specialists one by one (Juno and Imogen are offered here only).</li>
 </ul>
 <p>Each council contains the one before it. Their measured profit, stops and capital needs are in
 the Results section. A council changes who trades; it never changes a protection value.</p>
@@ -60,7 +61,13 @@ group carries the 150 USD per 0.01 lot stop of layer 3; above the groups sit the
 layers 5 and 6.</p>
 <h3 id="new-in-this-version">New in this version</h3>
 <ul>
-<li>Max layers per group is an input (0 = each specialist's measured depth, the shipped setting). It is
+<li>The councils were re-measured (3.18). Low risk is now Nerissa, Nova, Thea, Delphine and Cassandra;
+  Medium adds Clara; High adds Nadia, Amara and Evelyn. Nadia moved to High because she lost money in
+  the quiet market of August to October 2026. Earlier councils are one Custom selection away.</li>
+<li>Four buttons on the chart panel: Pause / Resume new groups, Layers on / off, Close deep groups
+  (3 or more layers) and Close all - the last two ask for a second click. Trading is unchanged until
+  you press one.</li>
+<li>Since 3.14: max layers per group is an input (0 = each specialist's measured depth, the shipped setting). It is
   there so you can measure the depth cap yourself; layer 4 above gives what it does, and the journal
   warns at start-up whenever it binds.</li>
 <li>A guard strip on the chart panel that is always visible and lights when a layer acts - Spread,
@@ -89,7 +96,7 @@ it warns in the journal, and then it does what you configured.</p>
 <h3 id="settings">Settings</h3>
 <p>Forty-nine inputs, and every one of them is yours. The presets load the tested configurations.</p>
 <ul>
-<li>Council - Low risk - 6 strategies (default), Medium risk - 9, High risk - 11, or Custom.</li>
+<li>Council - Low risk - 5 strategies (default), Medium risk - 6, High risk - 9, or Custom.</li>
 <li>Broker clock - Auto-detect (default) or Manual.</li>
 <li>Sizing - Static lot, or Compounding with a risk tier (Conservative 10 percent is the default).</li>
 <li>Protection - account breaker, free-margin floor, max layers per group, spread ceiling, daily entry
@@ -97,9 +104,9 @@ it warns in the journal, and then it does what you configured.</p>
 <li>No new groups on - payrolls Friday, FOMC days, Friday night, the holiday pause.</li>
 <li>Group stop: 150 USD per 0.01 lot, read on every tick (0 switches it off).</li>
 <li>Prop-firm rules - thirteen inputs, all off unless you set them.</li>
-<li>Chart - the status panel and its lines.</li>
+<li>Chart - the status panel, its lines and its four control buttons.</li>
 </ul>
-<h3 id="settings-reference-every-input-of-version-314">Settings reference - every input of version 3.14</h3>
+<h3 id="settings-reference-every-input-of-version-318">Settings reference - every input of version 3.18</h3>
 <p>Generated from the compiled source; enum defaults are shown by their source names, the Inputs tab shows their plain
 labels. The presets in the package are complete sets of these inputs. The manual explains each group; the research
 note explains why the measured constants are what they are.</p>
@@ -125,7 +132,7 @@ note explains why the measured constants are what they are.</p>
 <td>1b. CUSTOM COUNCIL (Council = Custom)</td>
 <td><code>InpNightRebound</code></td>
 <td>bool</td>
-<td>true</td>
+<td>false</td>
 <td>Nadia - night rebound 22h - low risk</td>
 </tr>
 <tr>
@@ -471,8 +478,8 @@ note explains why the measured constants are what they are.</p>
 </ul>
 <h3 id="results">Results</h3>
 <p>Backtest, MetaTrader 5 Strategy Tester, real ticks, 100 percent history quality, XAUUSD, 10,000
-starting balance, the shipped defaults of build 3.10 (Low risk - 6 strategies, Compounding
-Conservative, group stop 150, news and holiday filters on); builds 3.11 to 3.14 trade the same.
+starting balance, the shipped defaults of build 3.18 (Low risk - 5 strategies, Compounding
+Conservative, group stop 150, news and holiday filters on).
 These are backtest figures; nothing below is from a live account.</p>
 <table>
 <thead>
@@ -488,75 +495,75 @@ These are backtest figures; nothing below is from a live account.</p>
 <tbody>
 <tr>
 <td>BlackBull (raw spread)</td>
-<td>2025-07-01 to 2026-09-07</td>
-<td style="text-align: right;">+12,797.30 (+128.0%)</td>
-<td style="text-align: right;">5.70</td>
-<td style="text-align: right;">625</td>
-<td style="text-align: right;">8.76%</td>
+<td>2025-07-01 to 2026-10-09</td>
+<td style="text-align: right;">+6,251.52 (+62.5%)</td>
+<td style="text-align: right;">4.40</td>
+<td style="text-align: right;">385</td>
+<td style="text-align: right;">8.85%</td>
 </tr>
 <tr>
 <td>Vantage</td>
-<td>2025-07-01 to 2026-09-07</td>
-<td style="text-align: right;">+12,858.87 (+128.6%)</td>
-<td style="text-align: right;">4.72</td>
-<td style="text-align: right;">637</td>
-<td style="text-align: right;">9.64%</td>
+<td>2025-07-04 to 2026-10-09</td>
+<td style="text-align: right;">+6,554.09 (+65.5%)</td>
+<td style="text-align: right;">4.28</td>
+<td style="text-align: right;">381</td>
+<td style="text-align: right;">8.60%</td>
 </tr>
 <tr>
 <td>Pepperstone</td>
-<td>2025-07-01 to 2026-09-07</td>
-<td style="text-align: right;">+13,269.68 (+132.7%)</td>
-<td style="text-align: right;">5.39</td>
-<td style="text-align: right;">622</td>
-<td style="text-align: right;">9.99%</td>
+<td>2025-07-01 to 2026-10-09</td>
+<td style="text-align: right;">+6,937.69 (+69.4%)</td>
+<td style="text-align: right;">5.42</td>
+<td style="text-align: right;">370</td>
+<td style="text-align: right;">8.86%</td>
 </tr>
 </tbody>
 </table>
 <p>The headline is the lowest of the three, BlackBull: the same configuration takes near-identical trades on
 every broker, so plan with the lowest figure, not the highest. No group stop fired on any of
-the three. Results differ by broker; test on the broker you intend to trade with.</p>
-<p>The three councils - backtest, The Crew councils at a static 0.01 lot with the 150 group stop, BlackBull,
+the three, and no month closed below its start. Results differ by broker; test on the broker you intend to trade with.</p>
+<p>The three councils - backtest, The Crew 3.18 councils at a static 0.01 lot with the 150 group stop, BlackBull,
 IC Markets and Vantage, the windows in the column headers, real ticks; net per record; the last column
 is the minimum balance at 0.01 lot for a Cautious / Balanced / Bold risk appetite (see the manual):</p>
 <table>
 <thead>
 <tr>
 <th>council</th>
-<th style="text-align: right;">BlackBull 2025-01 to 2026-09</th>
+<th style="text-align: right;">BlackBull 2025-01 to 2026-10</th>
 <th style="text-align: right;">BlackBull 2022-11 to 2024-12</th>
-<th style="text-align: right;">IC Markets 2026-04 to 2026-09</th>
-<th style="text-align: right;">Vantage 2025-07 to 2026-09</th>
+<th style="text-align: right;">IC Markets 2026-04 to 2026-10</th>
+<th style="text-align: right;">Vantage 2025-07 to 2026-10</th>
 <th style="text-align: right;">group stops (4 records)</th>
 <th>minimum balance at 0.01 lot</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>Low risk - 6 (default)</td>
-<td style="text-align: right;">+1,743</td>
-<td style="text-align: right;">+480</td>
-<td style="text-align: right;">+570</td>
-<td style="text-align: right;">+1,339</td>
-<td style="text-align: right;">0</td>
-<td>684 / 333 / 221</td>
+<td>Low risk - 5 (default)</td>
+<td style="text-align: right;">+964</td>
+<td style="text-align: right;">+422</td>
+<td style="text-align: right;">+305</td>
+<td style="text-align: right;">+798</td>
+<td style="text-align: right;">1</td>
+<td>1,029 / 467 / 285</td>
 </tr>
 <tr>
-<td>Medium risk - 9</td>
-<td style="text-align: right;">+2,303</td>
-<td style="text-align: right;">+776</td>
-<td style="text-align: right;">+894</td>
-<td style="text-align: right;">+1,673</td>
-<td style="text-align: right;">5</td>
-<td>1,004 / 463 / 280</td>
+<td>Medium risk - 6</td>
+<td style="text-align: right;">+1,151</td>
+<td style="text-align: right;">+451</td>
+<td style="text-align: right;">+320</td>
+<td style="text-align: right;">+852</td>
+<td style="text-align: right;">2</td>
+<td>1,129 / 539 / 324</td>
 </tr>
 <tr>
-<td>High risk - 11</td>
-<td style="text-align: right;">+2,591</td>
-<td style="text-align: right;">+950</td>
-<td style="text-align: right;">+856</td>
-<td style="text-align: right;">+1,859</td>
-<td style="text-align: right;">8</td>
-<td>1,319 / 676 / 414</td>
+<td>High risk - 9</td>
+<td style="text-align: right;">+1,889</td>
+<td style="text-align: right;">+835</td>
+<td style="text-align: right;">+576</td>
+<td style="text-align: right;">+1,626</td>
+<td style="text-align: right;">9</td>
+<td>1,413 / 650 / 378</td>
 </tr>
 </tbody>
 </table>
@@ -564,9 +571,9 @@ is the minimum balance at 0.01 lot for a Cautious / Balanced / Bold risk appetit
 <p><strong>Q: Which broker and account type does The Crew need?</strong>
 A: A hedging account, on XAUUSD (any broker spelling: XAUUSD, XAUUSD+, XAUUSD-ECN, GOLD.pro) with reasonable gold spreads.</p>
 <p><strong>Q: What is the minimum deposit?</strong>
-A: The Small Account preset (Low risk - 6 strategies, static 0.01 lot, every group closed at a 150 USD floating loss per 0.01 lot) needs about 330 if you accept a 1-in-40 chance of losing 35 percent of the starting balance within a year, and about 690 if you want that chance below 1 in 100 for a 20 percent loss (backtest, raw-spread feeds 2022-2026). One stop costs about 150-165 at 0.01 lot. The EA runs whatever you choose on any balance and prints at start-up what your configuration needs.</p>
+A: The Small Account preset (Low risk - 5 strategies, static 0.01 lot, every group closed at a 150 USD floating loss per 0.01 lot) needs about 470 if you accept a 1-in-40 chance of losing 35 percent of the starting balance within a year, and about 1,030 if you want that chance below 1 in 100 for a 20 percent loss (backtest, BlackBull 2022-2026 and Vantage 2025-2026, to 2026-10-09). One stop costs about 150-165 at 0.01 lot. The EA runs whatever you choose on any balance and prints at start-up what your configuration needs.</p>
 <p><strong>Q: Which council should I start with?</strong>
-A: Low risk - 6 strategies, the default: the smallest capital need and no group stop on the four test records. Medium and High add specialists that earn more and stop more often.</p>
+A: Low risk - 5 strategies, the default: the smallest capital need and one group stop on the four test records. Medium and High add specialists that earn more and stop more often.</p>
 <p><strong>Q: Can I set the maximum number of layers myself?</strong>
 A: Yes, since 3.14: Max layers per group, 0 = each specialist's measured depth (the shipped setting); a lower number caps, a higher number raises every specialist to it. It is there so you can measure the effect yourself in both directions, because the measurement says a cap hurts: the next layer is what lets a group close, so a capped group floats until price travels much further. On BlackBull 2022-11-01 to 2024-12-31 (backtest, real ticks, shipped defaults, per 0.01 lot) a cap of 5 cut the net from 485 to 130 and raised the account equity drawdown from 7.3 to 16.1 percent. The journal warns at start-up whenever the cap binds. The bound on cost is the group stop, which is also yours.</p>
 <p><strong>Q: Which chart and timeframe do I attach it to?</strong>
@@ -604,7 +611,7 @@ account.</p>
 <pre><code>THE CREW - eleven session specialists on XAUUSD under Constance, the warden.
 Six measured protection layers: derived lot, risk tier, group stop, fixed depth, breaker, spread guard.
 Equal-lot recovery, no martingale. Hedging account. Forty-nine inputs, every one obeyed.
-Backtest only. Default council: Low risk - 6 strategies.
+Backtest only. Default council: Low risk - 5 strategies.
 </code></pre>
 <h2 id="pre-submission-checklist">Pre-submission checklist</h2>
 <ul>
@@ -614,8 +621,8 @@ Backtest only. Default council: Low risk - 6 strategies.
 <li>[x] No profit promise, no superlatives, no money imagery</li>
 <li>[x] Backtest figures labelled as backtest, with broker, window and history quality</li>
 <li>[x] English only, no emojis, no external links</li>
-<li>[x] Forty-nine inputs (3.14), English names, labels fit the Inputs tab (tests/test_crew_inputs_fit.py)</li>
-<li>[x] Results = the 3.10 claim battery (BlackBull, Vantage, Pepperstone; 2025-07-01 to 2026-09-07); 3.11-3.14 parity proven</li>
+<li>[x] Forty-nine inputs (3.18), English names, labels fit the Inputs tab (tests/test_crew_inputs_fit.py)</li>
+<li>[x] Results = the 3.18 claim battery (BlackBull, Vantage, Pepperstone; 2025-07-01 to 2026-10-09)</li>
 <li>[ ] <code>#property description</code> in the source updated to the block above (needs a rebuild + neutrality leg; the binary's
       brand strings wait for the owner's rebrand decision)</li>
 <li>[ ] 3 logo PNGs exported (200x200, 140x140, 60x60)</li>

@@ -4,7 +4,7 @@
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html"><meta property="og:type" content="website">
 <meta property="og:title" content="Kingfisher manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Kingfisher user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/kingfisher/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/kingfisher_hero.jpg"><meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<link rel="stylesheet" href="../../assets/style.css?v=ec9daf5ed3"></head>
 <body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
 <p><a href="index.html">&larr; Kingfisher</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
@@ -38,6 +38,9 @@
 <li><a href="#75-since-114-the-grip-can-also-move-the-brokers-stop-opt-in-inpgripserverstop-off-by-default">7.5 Since 1.14: the Grip can also move the broker's stop (opt-in, InpGripServerStop, off by default)</a></li>
 <li><a href="#76-since-117-daybreak-a-sixth-hunter-on-the-prior-days-high-and-low-inpdaybreak-on-by-default">7.6 Since 1.17: Daybreak - a sixth hunter on the prior day's high and low (InpDaybreak, on by default)</a></li>
 <li><a href="#77-since-117-news-guard-spread-guard-and-stop-from-the-fill-all-on-by-default">7.7 Since 1.17: news guard, spread guard and stop from the fill (all on by default)</a></li>
+<li><a href="#78-since-120-calm-protection-inpcalmprotect-on-by-default-since-122">7.8 Since 1.20: Calm protection (InpCalmProtect, on by default since 1.22)</a></li>
+<li><a href="#79-since-121-the-daybreak-quiet-day-rule-is-an-input-inpdbquietrule-off-by-default">7.9 Since 1.21: the Daybreak quiet-day rule is an input (InpDbQuietRule, off by default)</a></li>
+<li><a href="#710-since-122-core-b-a-seventh-hunter-on-one-hour-swing-levels-inpcoreb-off-by-default">7.10 Since 1.22: Core B - a seventh hunter on one-hour swing levels (InpCoreB, off by default)</a></li>
 </ul>
 </li>
 <li><a href="#8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</a></li>
@@ -138,7 +141,7 @@ KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker min
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
-<td>the five hunters, Rebound (off; ECN only; chapter 7.3), Daybreak (on; low-latency ECN only; chapter 7.6), buy/sell</td>
+<td>the five hunters, Rebound (off; ECN only; chapter 7.3), Daybreak (on; low-latency ECN only; chapter 7.6), Calm protection (on; chapter 7.8), Core B (off; chapter 7.10), buy/sell</td>
 <td>rarely</td>
 </tr>
 <tr>
@@ -173,7 +176,7 @@ KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker min
 </tr>
 <tr>
 <td>6. Safety</td>
-<td>maximum lot, margin cap, gold-only lock, magic number (Daybreak uses it + 1), stop from the fill (on; chapter 7.7)</td>
+<td>maximum lot, margin cap, gold-only lock, magic number (Daybreak uses it + 1, Core B + 2), stop from the fill (on; chapter 7.7)</td>
 <td>a second chart needs a magic number 2 apart</td>
 </tr>
 <tr>
@@ -568,8 +571,8 @@ properties if you do not see them). Turning <code>InpDrawTrades</code> off chang
 </thead>
 <tbody>
 <tr>
-<td><code>KINGFISHER 1.14  XAUUSD  risk Medium  magic 89830</code></td>
-<td>what runs on this chart</td>
+<td><code>Kingfisher</code>, with <code>v1.22</code> at the right edge of the same line (since 1.20)</td>
+<td>the product and its version; hover for symbol, risk, magic and the Calm protection state</td>
 </tr>
 <tr>
 <td><code>Stop 2.00  target 15.00 USD per 0.01 lot  Grip from +1.00, keeps 50% of the best</code></td>
@@ -937,7 +940,7 @@ market - a buy above yesterday's high, a sell below yesterday's low.</p>
 <li><strong>One trade at a time</strong>, at most one per level per day. A level the market already passed at the open, or jumped through in one
   move, is skipped for the day.</li>
 <li><strong>It stands aside</strong> on a US jobs-report day, a Fed rate-decision day and the thin year-end days (24, 26 and 31 December), and after
-  a quiet day (yesterday's range under 2 % of price) unless the break reaches ground the market has not traded in five days. Open
+  a quiet day only when you switch on the quiet-day rule (<code>InpDbQuietRule</code>, off by default since 1.21, chapter 7.9). Open
   trades are still managed on those days.</li>
 <li><strong>Size</strong> follows your Risk level: one Daybreak trade risks <code>InpDaybreakRisk</code> (section 1, default 0.75) times what one Kingfisher
   level risks 0.75 % of the balance at Medium. Prop-firm modes and the Custom sizing section apply the same way. Set <code>InpDaybreakRisk</code> lower to make it
@@ -974,6 +977,58 @@ seconds later, each losing more than twice its planned 2.00. Three guards stand 
 <p>What they cost: on ordinary minutes the guards skip some trades that would have won. The tester's price history does not contain the
 release-second spreads (its stored ticks show spreads of 0.15-1.20 at releases where the live spread reached about 30), so a backtest can
 show the guards' cost but not what they save; chapter 14 lists both runs. Each guard can be switched off.</p>
+<h3 id="78-since-120-calm-protection-inpcalmprotect-on-by-default-since-122">7.8 Since 1.20: Calm protection (<code>InpCalmProtect</code>, on by default since 1.22)</h3>
+<p>In a calm market a breakout often fails after a small push, and the four Dive hunters, which wait for a large move, are the ones that
+give back an open profit. Calm protection gives the Dives the Grip exit when the market is calm, and leaves them on the normal exit otherwise.</p>
+<ul>
+<li><strong>What "calm" means.</strong> The prior day's D1 ATR(14) as a percentage of price is in the bottom third of its own last 250 days. It ranks
+  the market against its own history, so it needs no gold-price level and keeps its meaning when gold doubles. The EA needs about 250
+  daily bars on the chart to rank it; until then the normal exit is used.</li>
+<li><strong>When it is decided.</strong> Once, when a new Dive position is first seen, and saved with the Grip state: a restart or a version swap keeps
+  each position's choice. Open positions are not changed when the market state changes later.</li>
+<li><strong>What it does not touch.</strong> The Skim and Daybreak hunters, entries, stops, targets, lot size and every other guard. Switched off,
+  1.20 trades exactly like 1.19. <strong>Since 1.22 it is on by default</strong>; to get the earlier behaviour set <code>InpCalmProtect</code> to false
+  (Inputs, group 2).</li>
+<li><strong>How it differs from the quiet-market gate (chapter 6).</strong> The gate stops new orders when the stop is large against the hourly
+  range. Calm protection places the same orders and only changes how the Dive trades close.</li>
+<li><strong>What it cost and saved in the tests</strong> (backtest, real ticks, XAUUSD, 0.01 lot): over twelve months on BlackBull the net was
+  2,318.6 against 2,324.3 with it on and the biggest dip below the peak was equal; only 23 positions were gripped, because 2025-26 had
+  few calm days. In the calm month 2026-09-24 to 2026-10-21 the biggest dip was about 0.4 times as deep on BlackBull and on Vantage. One
+  calm month and a mostly busy year are the whole evidence, and the threshold (the bottom third) was fixed before the test: forward
+  running is the real test.</li>
+</ul>
+<h3 id="79-since-121-the-daybreak-quiet-day-rule-is-an-input-inpdbquietrule-off-by-default">7.9 Since 1.21: the Daybreak quiet-day rule is an input (<code>InpDbQuietRule</code>, off by default)</h3>
+<p>Up to 1.20 Daybreak skipped a day after a quiet one: when yesterday's range was under 2 % of price, it took a break only if the
+break reached ground the market had not traded in five days. From 1.21 that rule is an input and it is <strong>off</strong>: Daybreak trades the
+prior day's high and low every day (the jobs-report, rate-decision and year-end stand-asides stay on). Switch the input on to get the 1.20 behaviour back.</p>
+<ul>
+<li><strong>Why it is off.</strong> The rule was never shown to protect. Compared with it on, switching it off in the tests added net on both
+  feeds and both windows and lowered the dip below the peak in the latest three months. It also made the worst five days a little
+  deeper, so it is not free.</li>
+<li><strong>Tests</strong> (backtest, real ticks, XAUUSD, 0.01 lot, whole book, rule on against off): 2026-07-20 to 2026-10-24 net on BlackBull
+  323.4 against 349.5 and on Vantage 453.9 against 480.2; 2025-07-04 to 2026-07-19 net on BlackBull 2,009.5 against 2,053.3 and on
+  Vantage 2,372.9 against 2,415.6. The worst five days were 2 to 6 deeper per 0.01 lot at equal net.</li>
+<li><strong>Nothing else changes.</strong> Dives, Skim, Rebound, stops, targets, lot size and every guard are as in 1.20.</li>
+</ul>
+<h3 id="710-since-122-core-b-a-seventh-hunter-on-one-hour-swing-levels-inpcoreb-off-by-default">7.10 Since 1.22: Core B - a seventh hunter on one-hour swing levels (<code>InpCoreB</code>, off by default)</h3>
+<p>Core B is a separate, optional hunter. It is <strong>off</strong> until you switch it on (Inputs, group 2, <code>InpCoreB</code>), and with it off the
+EA places exactly the orders it placed without it. It works on gold only.</p>
+<ul>
+<li><strong>What it does.</strong> It watches the one-hour chart for the high or low of a clear swing that price has not yet traded through. When
+  price comes to just short of such a level (a little under a swing low or a little above a swing high, depending on the side) it opens one market
+  trade with a fixed stop. It is flat or in one trade at a time. The trade is closed early if the first minute or the first
+  quarter-hour bar after the entry closes against it, the stop moves to just above the entry once price is well ahead, and the
+  trade closes at a target beyond the level. The jobs-report and rate-decision days are skipped.</li>
+<li><strong>Own magic number.</strong> Core B trades carry the magic number set in <code>InpMagic</code> plus 2 (default 89832) and the comment <code>KF TB &lt;level&gt;</code>.
+  The other hunters do not count or manage them, and Core B does not count or manage theirs. The panel, the chart drawings and the
+  Close all / Lock actions include Core B trades. A second chart needs a magic number 3 or more apart.</li>
+<li><strong>Size.</strong> <code>InpCoreBRisk</code> (group 1, default 1.00) is the risk of one Core B trade as a multiple of the risk of one level, under
+  your Risk level. It only matters while Core B is on.</li>
+<li><strong>Guards.</strong> The pause switch and the news, spread and spike guards hold new Core B entries as they hold the others.</li>
+<li><strong>Works with every Strategy settings choice.</strong> Recommended, Classic and Custom all honour the switch.</li>
+<li><strong>Nothing is claimed for it here.</strong> It is an option to test on your own account type and broker before you rely on it; run it on a
+  demo first and read the journal line <code>KINGFISHER Core B ON | magic ...</code> to confirm it is active.</li>
+</ul>
 <h2 id="8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</h2>
 <p>Same entries, same hit rate on every broker tested; what differs is how far past the 2.00 stop you are filled on a fast move. Measured medians (2026, losers): 2.06, 2.11, 2.17, 2.30 on the four live feeds; the widest feed earned about 25 % less per trade than the tightest. Execution delay of 100–500 ms was tested on the five level hunters and changed their result by at most 1 %; for them it is the broker's quote path, not latency, that costs. Daybreak is different - it enters at market and trails tick by tick (chapter 7.6).</p>
 <p><strong>Spread is the bigger cost, and it is visible before you trade.</strong> KINGFISHER's stop is a fixed 2.00 per 0.01 lot, so
@@ -1241,6 +1296,13 @@ ticks produces a different, invalid result.</p>
 </tr>
 <tr>
 <td>1. Start here</td>
+<td><code>InpCoreBRisk</code></td>
+<td>double</td>
+<td>1.00</td>
+<td>Core B size, x the risk of one level (only when Core B is on)</td>
+</tr>
+<tr>
+<td>1. Start here</td>
 <td><code>InpVirtualBalance</code></td>
 <td>double</td>
 <td>0.0</td>
@@ -1304,6 +1366,13 @@ ticks produces a different, invalid result.</p>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
+<td><code>InpCoreB</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Core B - 1-hour swing level breakout, own magic (opt-in, 1.22)</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
 <td><code>InpAllowBuy</code></td>
 <td>bool</td>
 <td>true</td>
@@ -1315,6 +1384,20 @@ ticks produces a different, invalid result.</p>
 <td>bool</td>
 <td>true</td>
 <td>Allow sell trades</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpCalmProtect</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Calm protection - grip the Dive trades while the market is calm (1.20, on by default since 1.22)</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpDbQuietRule</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Daybreak quiet-day rule - after a day with a very small range, Daybreak only takes a break into fresh 5-day ground (1.21, off)</td>
 </tr>
 <tr>
 <td>3. Exit [Custom]</td>

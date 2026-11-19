@@ -4,13 +4,18 @@
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/leapfrog/manual.html"><meta property="og:type" content="website">
 <meta property="og:title" content="Leapfrog manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Leapfrog user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/leapfrog/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/leapfrog_hero.jpg"><meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<link rel="stylesheet" href="../../assets/style.css?v=ec9daf5ed3"></head>
 <body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
 <p><a href="index.html">&larr; Leapfrog</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
 <ul>
 <li><a href="#leapfrog-user-manual">Leapfrog — User Manual</a><ul>
 <li><a href="#what-it-does">What it does</a></li>
+<li><a href="#what-changed-in-version-133-profit-protection">What changed in version 1.33 - Profit protection</a></li>
+<li><a href="#what-changed-in-version-132-the-glance-panel-and-calm-protection">What changed in version 1.32 - the glance panel and Calm protection</a><ul>
+<li><a href="#calm-protection-what-the-tests-say-both-ways">Calm protection - what the tests say, both ways</a></li>
+</ul>
+</li>
 <li><a href="#what-changed-in-version-130">What changed in version 1.30</a></li>
 <li><a href="#what-changed-in-version-129-panel-chart-labels-restart-safe">What changed in version 1.29 - panel, chart labels, restart-safe</a><ul>
 <li><a href="#the-panel-and-the-chart-since-129">The panel and the chart (since 1.29)</a></li>
@@ -57,6 +62,76 @@ martingale: each ladder holds at most one position per side, and a losing positi
 <p>The ranges often end at the same high or low, so on a clean break several ladders fill at once: most
 breaks are traded by two to four ladders together. Treat the five ladders as one strategy traded at up to
 five times the lot per ladder, not as five unrelated systems (chapter "Deposit and position sizing").</p>
+<h2 id="what-changed-in-version-133-profit-protection">What changed in version 1.33 - Profit protection</h2>
+<p>A trade that has run to 0.6 R in profit but not yet to the first part-close (0.71 R) used to give its whole gain back about one time in
+four. Profit protection moves the stop to the entry plus 0.05 R once the trade reaches 0.6 R, so such a trade closes at a small gain
+instead of a loss. It is one input, <code>InpProtect</code> (group "4b. Profit protection"), <strong>on by default</strong>; switch it off to get the 1.32 exit back.</p>
+<ul>
+<li><strong>What it does.</strong> One stop move per trade, only when the trade is at least 0.6 R in profit and has not reached its first
+  part-close. After the first part-close the normal part-closes and trail run as before. Entries, stops, targets, lot size, the
+  ladders and every guard are not touched. The stop at the broker is the record, so a restart keeps it.</li>
+<li><strong>What it is for.</strong> The share of trades that win rises, and the share of trades that reach half their stop in profit and then close at
+  or below break-even falls. It trades a little of the occasional large run for fewer wins handed back.</li>
+<li><strong>What the tests showed</strong> (backtest, real ticks, XAUUSD, 0.01 lot per ladder, protection on against off, win rate and net).
+  BlackBull 2026-07-20 to 2026-10-24: win rate 40.3 % to 47.3 %, net 255.5 to 284.3. BlackBull 2026-01-02 to 2026-07-19: 47.2 % to
+  50.0 %, net 1,008.3 to 1,017.0. BlackBull 2025-07-04 to 2025-12-30: 42.5 % to 45.7 %, net 426.6 to 422.1. BlackBull 2024: 46.9 % to
+  49.5 %, net 641.7 to 638.1. Vantage 2026-07-20 to 2026-10-24: 43.5 % to 47.5 %, net 349.8 to 364.2. Vantage 2026-01-02 to 2026-07-19:
+  46.9 % to 49.7 %, net 963.5 to 981.0. Vantage 2025-07-04 to 2025-12-30: 42.7 % to 46.5 %, net 587.9 to 595.5. The win rate rose in all
+  seven tests; the net was higher in five and at most 1.1 % lower in the other two. The values 0.55 R and 0.65 R, and a lock of 0.15 R, gave the same pattern;
+  0.70 R changed almost nothing.</li>
+<li><strong>What it does not do.</strong> It does not cut the deepest drops, and it does not fix the size of a very small account: the minimum lot still
+  makes a 500 account several times the recommended size.</li>
+</ul>
+<h2 id="what-changed-in-version-132-the-glance-panel-and-calm-protection">What changed in version 1.32 - the glance panel and Calm protection</h2>
+<ul>
+<li><strong>A glance panel.</strong> The same layout as Kingfisher, Karat-Smash and The Crew: the product name and version (<code>v1.32</code>) on the header line, one status word (Trading, Weekend, Calm, Stand down, Waiting, Paused, Closed, Margin, Prop hold, Algo off), one dot row per ladder (A, B, C, E, D: off, watching, orders resting, or the open trades with their result), a guard strip that lights when a layer acts (Weekend, Volatility, Spread, Margin), the money at the stops, an account bar, today and 7 days, and compact buttons. Details are in the tooltips. Drawing only: <strong>trades identical to 1.31, proved deal for deal</strong> (BlackBull 1,479 and Vantage 1,461 deal rows, 2026-04-01 to 2026-10-24, real ticks). The older panel text in the section below is replaced by this layout; the buttons and the chart labels are unchanged.</li>
+<li><strong>Calm protection</strong> (<code>InpCalmProtect</code>, group 4, <strong>off by default</strong>). On: no new orders while yesterday's daily range (ATR 14) ranks below the bottom third (33 %) of its own last 250 days. Off: the floor stays at the old 10 % - the 1.31 behaviour, trade for trade (proved on BlackBull and Vantage). It uses the stand-down that already existed, at a higher floor, so the panel's Volatility chip and status word show it lighting ("Calm").</li>
+</ul>
+<h3 id="calm-protection-what-the-tests-say-both-ways">Calm protection - what the tests say, both ways</h3>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, XAUUSD, 0.01 lot per ladder order, Calm protection on against off.</p>
+<table>
+<thead>
+<tr>
+<th>window</th>
+<th>feed</th>
+<th>effect with it on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>2026-07-20 to 2026-10-24 (the latest three months, calm)</td>
+<td>BlackBull, Vantage</td>
+<td>net 32 % and 15 % higher; the biggest dip 39 % and 48 % smaller; the area under the dips about 60 % smaller</td>
+</tr>
+<tr>
+<td>2026-07-20 to 2026-10-24, a 500 account at the 0.01 minimum lot</td>
+<td>BlackBull</td>
+<td>balance ended 730 against 674; lowest 428 against 387; biggest drop from a peak 108 against 140</td>
+</tr>
+<tr>
+<td>2026-07-20 to 2026-10-24, a 500 account at the 0.01 minimum lot</td>
+<td>Vantage</td>
+<td>balance ended 861 against 812; lowest 422 against 386; biggest drop from a peak 90 against 130</td>
+</tr>
+<tr>
+<td>each full year 2022-2025</td>
+<td>BlackBull</td>
+<td>net 0.73x (2022), 0.53x (2023), 1.02x (2024), 0.90x (2025) of the net without it; the dips grew in 2022 and 2023</td>
+</tr>
+<tr>
+<td>2025</td>
+<td>Vantage</td>
+<td>net 0.92x of the net without it</td>
+</tr>
+<tr>
+<td>2026-01 to 2026-07-19</td>
+<td>BlackBull, Vantage</td>
+<td>no difference: the floor never bound</td>
+</tr>
+</tbody>
+</table>
+<p>How to read it. In the latest three months, a calm stretch after a very active one, the extra floor kept Leapfrog out of the small, failing breakouts and it protected the account. In the earlier years calm days were not a loss for this system: gold's calm stretches in 2022 and 2023 still paid, and the floor gave part of that up. A rule that helps in one stretch and costs in four years is not a default, which is why it is an input you switch on, and why 1.32 ships with it off. The protection works on the number of new orders; it does not change a trade that is already open.</p>
+<p>On a small account the minimum lot decides the size. Five ladders at the 0.01 minimum lot hold five times the size per 10,000 that the recommended 0.04 per ladder gives on 5,000 (the recommended minimum). On 500 the result above is the 0.01 lot floor at work; Calm protection reduces how often it is exposed, it does not change that floor. Fewer exposed days is the whole of what it does; a bigger balance is what changes the size.</p>
 <h2 id="what-changed-in-version-130">What changed in version 1.30</h2>
 <ul>
 <li><strong>Trades identical to the previous version</strong> (proved deal for deal). It no longer sends a new stop order into a closed market (the broker's daily break, a holiday): the request the broker would have refused is skipped, so the trades are unchanged and the journal no longer fills with 'Market closed' errors.</li>
@@ -937,6 +1012,20 @@ of a backtested record, and being beyond it is evidence rather than proof.</p>
 <td>int</td>
 <td>3</td>
 <td>Manual: broker server offset from GMT, summer</td>
+</tr>
+<tr>
+<td>4. When not to trade</td>
+<td><code>InpCalmProtect</code></td>
+<td>bool</td>
+<td>false</td>
+<td>Calm protection - no new orders while the market is calm (1.32)</td>
+</tr>
+<tr>
+<td>4b. Profit protection</td>
+<td><code>InpProtect</code></td>
+<td>bool</td>
+<td>true</td>
+<td>Profit protection - lock a small gain once a trade is 0.6 R in profit (1.33)</td>
 </tr>
 <tr>
 <td>4. When not to trade</td>

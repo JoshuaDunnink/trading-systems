@@ -4,7 +4,7 @@
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/the-crew/manual.html"><meta property="og:type" content="website">
 <meta property="og:title" content="The Crew manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="The Crew user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/the-crew/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/the-crew_hero.jpg"><meta name="twitter:card" content="summary_large_image">
-<link rel="stylesheet" href="../../assets/style.css?v=c3cb0b03f8"></head>
+<link rel="stylesheet" href="../../assets/style.css?v=ec9daf5ed3"></head>
 <body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
 <p><a href="index.html">&larr; The Crew</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
@@ -59,7 +59,7 @@
 </ul>
 </div>
 </nav><h1 id="the-crew">THE CREW</h1>
-<p><em>Version 3.14 · XAUUSD · MetaTrader 5</em></p>
+<p><em>Version 3.18 · XAUUSD · MetaTrader 5</em></p>
 <h3 id="eleven-session-specialists-under-one-warden-equal-lot-recovery-you-choose-how-many-run"><em>Eleven session specialists under one warden. Equal-lot recovery. You choose how many run.</em></h3>
 <p><strong>Symbol:</strong> XAUUSD (Gold) — any broker spelling (<code>XAUUSD</code>, <code>XAUUSD+</code>, <code>XAUUSD-ECN</code>, <code>GOLD.pro</code>)
 <strong>Timeframe:</strong> any — the EA runs its own internal clock · <strong>Platform:</strong> MetaTrader 5 · <strong>Account type:</strong> hedging</p>
@@ -120,7 +120,7 @@ floating exposure and the minimum balance at start-up, and the EA trades your co
 <h2 id="3-quick-start">3. Quick Start</h2>
 <ol>
 <li>Attach to a <strong>gold</strong> chart (any timeframe) on a <strong>hedging</strong> account.</li>
-<li>Leave <strong>Council</strong> on <strong>Low risk - 6 strategies</strong> (the default) or load a preset from <code>presets/</code>.</li>
+<li>Leave <strong>Council</strong> on <strong>Low risk - 5 strategies</strong> (the default) or load a preset from <code>presets/</code>.</li>
 <li>Choose your <strong>Sizing</strong> (section 5b): <strong>Compounding</strong> (the default — the lot grows with the balance; <code>Conservative</code>
    budgets 10% of the balance for
    floating drawdown. On a small account, load <strong><code>THE_CREW_SMALL_ACCOUNT</code></strong> instead: the same council at a
@@ -143,25 +143,25 @@ floating exposure and the minimum balance at start-up, and the EA trades your co
 <tbody>
 <tr>
 <td><strong><code>THE_CREW_LOW_RISK</code></strong> ⭐</td>
-<td>Low risk - 6 strategies</td>
+<td>Low risk - 5 strategies</td>
 <td>Compounding, Conservative (10%)</td>
-<td><strong>the shipped defaults</strong> — the recommended starting point: the smallest floor, no group stop on four records</td>
+<td><strong>the shipped defaults</strong> — the recommended starting point: the smallest floor and the fewest group stops (section 5)</td>
 </tr>
 <tr>
 <td><code>THE_CREW_MEDIUM_RISK</code></td>
-<td>Medium risk - 9 strategies</td>
+<td>Medium risk - 6 strategies</td>
 <td>Compounding, Conservative</td>
-<td>about a third more profit than Low, a higher floor (section 5)</td>
+<td>Low plus Clara: more profit, one more measured tail (section 5)</td>
 </tr>
 <tr>
 <td><code>THE_CREW_HIGH_RISK</code></td>
-<td>High risk - 11 strategies</td>
+<td>High risk - 9 strategies</td>
 <td>Compounding, Conservative</td>
-<td>every specialist: the most profit, a higher floor (section 5)</td>
+<td>the most profit, the highest floor and the most group stops (section 5)</td>
 </tr>
 <tr>
 <td><code>THE_CREW_SMALL_ACCOUNT</code></td>
-<td>Low risk - 6 strategies</td>
+<td>Low risk - 5 strategies</td>
 <td>Static 0.01 lot</td>
 <td><strong>small accounts</strong> — section 5, <em>Small accounts</em></td>
 </tr>
@@ -171,12 +171,49 @@ floating exposure and the minimum balance at start-up, and the EA trades your co
 <code>.mq5</code> defaults. A hand-edited or partial <code>.set</code> silently inherits whatever the build happens to default
 to, which is how you end up trading a configuration nobody validated. Do not edit them by hand.</p>
 <p><strong>Settings saved with 3.05 or earlier</strong> still load: an old council or risk-tier value is mapped at start-up and the journal
-says what it ran (for example <em>"saved council (3.05 value 8) = Medium risk - 9 strategies (the same crew)"</em>). Councils that
+says what it ran (for example <em>"saved council (3.05 value 8) = Medium risk - 6 strategies (3.18: Nadia, Juno and Amara are no longer in it)"</em>). Councils that
 no longer exist (the five 2.x councils, Decoded 8, Decoded 9) run the council that contains their crew — Medium, or High for
 Decoded 9 — and the journal says so; choose a council to make it your own choice again.</p>
-<p><strong>Low risk changed in 3.10.</strong> Up to 3.09 <em>Low risk</em> was 4 strategies (the night crew). From 3.10 it is 6: the night crew plus
-Delphine and Cassandra, and it is the default (section 5, <em>The three councils</em>). A saved <em>Low</em> setting now runs the 6, and the journal
-says so; for the old 4, choose <strong>Custom</strong> with Nadia, Nerissa, Thea and Nova on.</p>
+<p><strong>The councils changed in 3.18.</strong> <em>Low risk</em> is now 5 strategies — Nerissa, Nova and Thea (the night crew), Delphine the dip
+buyer and Cassandra the London fade. <em>Medium risk</em> is Low plus Clara (6). <em>High risk</em> adds Nadia, Amara and Evelyn (9). Nadia left
+Low because she is the one specialist who lost money in the quiet, low-volume market of August to October 2026, including a
+group stop on 2026-10-06; Clara left Low because she carries the March 2023 group stop. A saved <em>Low</em>, <em>Medium</em> or <em>High</em> setting
+runs the new council and the journal says so. Earlier councils are one <strong>Custom</strong> selection away:</p>
+<table>
+<thead>
+<tr>
+<th>Version</th>
+<th>Low</th>
+<th>Medium</th>
+<th>High</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>3.18 (now)</td>
+<td>Nerissa, Nova, Thea, Delphine, Cassandra</td>
+<td>Low + Clara</td>
+<td>Medium + Nadia, Amara, Evelyn</td>
+</tr>
+<tr>
+<td>3.16 – 3.17</td>
+<td>Nova, Thea, Delphine, Cassandra, Clara</td>
+<td>Low + Nadia, Nerissa</td>
+<td>Medium + Amara, Evelyn</td>
+</tr>
+<tr>
+<td>3.10 – 3.15</td>
+<td>Nadia, Nerissa, Thea, Nova, Delphine, Cassandra</td>
+<td>Low + Amara, Clara, Juno</td>
+<td>every specialist (11)</td>
+</tr>
+</tbody>
+</table>
+<p><strong>Changing the council on a running chart.</strong> A specialist who is not in the new council no longer manages her open group — no
+layers, no target, no stop. Change the council (or update from an older version) while the specialists you are removing have no
+open group; the status panel shows who holds one. If a group is left behind, THE CREW names it in the journal at start-up
+(<em>"THE CREW WARNING: open position #… belongs to Nadia, who is not in this council - it is NOT managed"</em>): close it by hand or
+re-attach with a council that holds her.</p>
 <hr />
 <h2 id="4-where-the-risk-really-lives">4. Where the Risk Really Lives</h2>
 <p><strong>1. It holds floating drawdown on purpose.</strong> While a group recovers you will see red on open
@@ -276,18 +313,18 @@ the journal.</p>
 <h2 id="5-performance-and-account-sizing-the-important-section">5. Performance and Account Sizing — the important section</h2>
 <blockquote>
 <p><strong>Honesty note.</strong> The figures below are backtest results, MetaTrader 5 Strategy Tester, real
-ticks, 100% history quality, XAUUSD, 10,000 starting balance, build 3.05/3.06 (identical trades),
-Risk tier Conservative, group stop 150 USD per 0.01 lot, news &amp; holiday filters on. The lot follows
-the balance, so the net compounds. <strong>Past performance does not guarantee future results.</strong> There is
+ticks, 100% history quality, XAUUSD, 10,000 starting balance, build 3.18, the shipped defaults: Low risk - 5
+strategies, Compounding Conservative, group stop 150 USD per 0.01 lot, breaker and news &amp; holiday filters on. The
+lot follows the balance, so the net compounds. <strong>Past performance does not guarantee future results.</strong> There is
 no live track record.</p>
 </blockquote>
-<p><strong>The default since 3.10 — Low risk - 6 strategies</strong>, the same settings (Compounding, Conservative, group stop 150), 10,000 start:</p>
+<p><strong>The default since 3.18 — Low risk - 5 strategies</strong> (Compounding, Conservative, group stop 150), 10,000 start:</p>
 <table>
 <thead>
 <tr>
 <th>Feed</th>
 <th>Window</th>
-<th style="text-align: right;">Low risk - 6 (default)</th>
+<th style="text-align: right;">Low risk - 5 (default)</th>
 <th style="text-align: right;">Equity drawdown</th>
 <th style="text-align: right;">Group stops</th>
 <th style="text-align: right;">Negative months</th>
@@ -296,75 +333,82 @@ no live track record.</p>
 <tbody>
 <tr>
 <td>BlackBull (raw spread)</td>
-<td>2025-07-01 to 2026-09-07</td>
-<td style="text-align: right;"><strong>+12,797.30</strong> (+128.0%), PF 5.70</td>
-<td style="text-align: right;">8.76%</td>
+<td>2025-07-01 to 2026-10-09</td>
+<td style="text-align: right;"><strong>+6,251.52</strong> (+62.5%), PF 4.40</td>
+<td style="text-align: right;">8.85%</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0 of 15</td>
+<td style="text-align: right;">0 of 16</td>
 </tr>
 <tr>
-<td>IC Markets (raw spread)</td>
-<td>2026-04-01 to 2026-09-07</td>
-<td style="text-align: right;"><strong>+3,780.31</strong> (+37.8%), PF 6.32</td>
-<td style="text-align: right;">6.12%</td>
+<td>Pepperstone</td>
+<td>2025-07-01 to 2026-10-09</td>
+<td style="text-align: right;"><strong>+6,937.69</strong> (+69.4%), PF 5.42</td>
+<td style="text-align: right;">8.86%</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0 of 6</td>
+<td style="text-align: right;">0 of 16</td>
 </tr>
 <tr>
 <td>Vantage (live-account server)</td>
-<td>2025-07-04 to 2026-09-26</td>
-<td style="text-align: right;"><strong>+13,991.10</strong> (+139.9%), PF 4.35</td>
-<td style="text-align: right;">9.65%</td>
+<td>2025-07-04 to 2026-10-09</td>
+<td style="text-align: right;"><strong>+6,554.09</strong> (+65.5%), PF 4.28</td>
+<td style="text-align: right;">8.60%</td>
 <td style="text-align: right;">0</td>
-<td style="text-align: right;">0 of 15</td>
+<td style="text-align: right;">0 of 16</td>
+</tr>
+<tr>
+<td>IC Markets (raw spread)</td>
+<td>2026-04-01 to 2026-10-09</td>
+<td style="text-align: right;"><strong>+2,040.86</strong> (+20.4%), PF 4.83</td>
+<td style="text-align: right;">5.31%</td>
+<td style="text-align: right;">0</td>
+<td style="text-align: right;">0 of 7</td>
 </tr>
 </tbody>
 </table>
-<p>Medium risk - 9, the default up to 3.09, on the same windows:</p>
+<p>Medium and High on the same windows and settings:</p>
 <table>
 <thead>
 <tr>
 <th>Feed</th>
-<th>Window</th>
-<th style="text-align: right;">Medium risk - 9 (the 3.02–3.09 default)</th>
-<th style="text-align: right;">3.01 default (8 strategies, retired)</th>
-<th style="text-align: right;">Equity drawdown (Medium / 3.01)</th>
-<th style="text-align: right;">Negative months (Medium)</th>
+<th style="text-align: right;">Medium risk - 6</th>
+<th style="text-align: right;">High risk - 9</th>
+<th style="text-align: right;">Equity drawdown (Medium / High)</th>
+<th style="text-align: right;">Group stops (Medium / High)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>BlackBull (raw spread)</td>
-<td>2025-07-01 to 2026-09-07</td>
-<td style="text-align: right;"><strong>+17,958.88</strong> (+179.6%), PF 3.22</td>
-<td style="text-align: right;">+14,740.50 (+147.4%), PF 3.04</td>
-<td style="text-align: right;">7.94% / 7.75%</td>
-<td style="text-align: right;">1 of 15 (−18.36)</td>
+<td>BlackBull</td>
+<td style="text-align: right;">+6,367.65 (+63.7%), PF 4.28</td>
+<td style="text-align: right;">+12,109.57 (+121.1%), PF 1.86</td>
+<td style="text-align: right;">8.85% / 15.12%</td>
+<td style="text-align: right;">0 / 3</td>
 </tr>
 <tr>
-<td>IC Markets (raw spread)</td>
-<td>2026-04-01 to 2026-09-07</td>
-<td style="text-align: right;"><strong>+7,316.02</strong> (+73.2%), PF 4.95</td>
-<td style="text-align: right;">+6,545.56 (+65.5%), PF 4.81</td>
-<td style="text-align: right;">7.56% / 7.74%</td>
-<td style="text-align: right;">0 of 6</td>
+<td>Vantage</td>
+<td style="text-align: right;">+7,077.44 (+70.8%), PF 4.08</td>
+<td style="text-align: right;">+17,236.63 (+172.4%), PF 2.30</td>
+<td style="text-align: right;">9.47% / 10.08%</td>
+<td style="text-align: right;">0 / 2</td>
 </tr>
 <tr>
-<td>Vantage (live-account server)</td>
-<td>2025-07-04 to 2026-09-26</td>
-<td style="text-align: right;"><strong>+21,039.85</strong> (+210.4%), PF 3.11</td>
-<td style="text-align: right;">+17,047.43 (+170.5%), PF 2.90</td>
-<td style="text-align: right;">7.72% / 7.67%</td>
-<td style="text-align: right;">0 of 15</td>
+<td>IC Markets</td>
+<td style="text-align: right;">+2,158.98 (+21.6%), PF 4.57</td>
+<td style="text-align: right;">+4,005.40 (+40.1%), PF 1.77</td>
+<td style="text-align: right;">5.31% / 18.00%</td>
+<td style="text-align: right;">0 / 2</td>
 </tr>
 </tbody>
 </table>
-<p>The IC window starts where that broker's real-tick history starts. Two group stops fired on BlackBull and
-on Vantage in fourteen months (2025-10-15 and 2026-01-29, about 10–11% of the balance each, both by
-session specialists); IC had none. The same configuration takes near-identical trades on every broker and
-earns different money on each.</p>
-<p><strong>What Delphine adds, and her quiet windows.</strong> Medium is the 3.01 crew plus
-Delphine, a dip buyer that trades at any hour. In the tests above she added 12–23% to the net at the same equity drawdown,
+<p>The IC window starts where that broker's real-tick history starts. High earns the most and pays for it: its group stops
+are each about a tenth of the balance at the Conservative tier, and its equity drawdown is up to twice Low's. The same
+configuration takes near-identical trades on every broker and earns different money on each.</p>
+<p><strong>What 3.18 changed, in money.</strong> At a static 0.01 lot on the same window (BlackBull / Vantage), the new Low earned 778 / 798,
+the 3.16–3.17 Low 717 / 756, and the 3.10–3.15 Low 6 (with Nadia) 988 / 1,061. Nadia is a large earner over long stretches;
+she is also the specialist who lost money in the quiet market of August to October 2026 and holds the 2026-10-06 group stop.
+She is in High, and one Custom switch away if you want her in a smaller council.</p>
+<p><strong>What Delphine adds, and her quiet windows.</strong> Delphine, a dip buyer that trades at any hour, is in every council.
+Measured on the 3.01 crew she added 12–23% to the net at the same equity drawdown,
 and her baskets almost never overlap another specialist's, so she does not deepen the council's worst
 moment. One thing she must not do is buy a dip in the minutes before a scheduled US data release: on
 2026-03-25 a dip she bought at 08:21 New York ran into the 08:30 release, gold fell 50 dollars in ten
@@ -372,62 +416,64 @@ minutes and her group was stopped at the low. Since 3.04 she opens <strong>no ne
 5 minutes after 08:30 and 10:00 New York, Monday to Friday</strong> (server 15:00–15:35 and 16:30–17:05). A group
 she opened earlier carries on normally.</p>
 <h3 id="the-three-councils-what-you-trade-for-what-you-need">The three councils — what you trade for what you need</h3>
-<p>Measured at a <strong>static 0.01 lot</strong> with the 150 group stop, real ticks (net per record, and the floor — the balance at 0.01 lot that
-keeps a bad year inside your appetite, see <em>Small accounts</em> below):</p>
+<p>Measured at a <strong>static 0.01 lot</strong> with the 150 group stop, real ticks, build 3.18 (net per record, and the floor — the balance
+at 0.01 lot that keeps a bad year inside your appetite, see <em>Small accounts</em> below):</p>
 <table>
 <thead>
 <tr>
 <th>Council</th>
-<th style="text-align: right;">BlackBull 2025-01 → 2026-09</th>
+<th style="text-align: right;">BlackBull 2025-01 → 2026-10</th>
 <th style="text-align: right;">BlackBull 2022-11 → 2024-12</th>
-<th style="text-align: right;">IC 2026-04 → 09</th>
-<th style="text-align: right;">Vantage 2025-07 → 2026-09</th>
+<th style="text-align: right;">IC 2026-04 → 10</th>
+<th style="text-align: right;">Vantage 2025-07 → 2026-10</th>
 <th style="text-align: right;">Group stops (4 records)</th>
 <th>Floor at 0.01 lot (Cautious / Balanced / Bold)</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><strong>Low risk - 6</strong> (default)</td>
-<td style="text-align: right;">+1,743</td>
-<td style="text-align: right;">+480</td>
-<td style="text-align: right;">+570</td>
-<td style="text-align: right;">+1,339</td>
-<td style="text-align: right;">0</td>
-<td><strong>684 / 333 / 221</strong></td>
+<td><strong>Low risk - 5</strong> (default)</td>
+<td style="text-align: right;">+964</td>
+<td style="text-align: right;">+422</td>
+<td style="text-align: right;">+305</td>
+<td style="text-align: right;">+798</td>
+<td style="text-align: right;">1</td>
+<td><strong>1,029 / 467 / 285</strong></td>
 </tr>
 <tr>
-<td><strong>Medium risk - 9</strong></td>
-<td style="text-align: right;">+2,303</td>
-<td style="text-align: right;">+776</td>
-<td style="text-align: right;">+894</td>
-<td style="text-align: right;">+1,673</td>
-<td style="text-align: right;">5</td>
-<td><strong>1,004 / 463 / 280</strong></td>
+<td><strong>Medium risk - 6</strong></td>
+<td style="text-align: right;">+1,151</td>
+<td style="text-align: right;">+451</td>
+<td style="text-align: right;">+320</td>
+<td style="text-align: right;">+852</td>
+<td style="text-align: right;">2</td>
+<td><strong>1,129 / 539 / 324</strong></td>
 </tr>
 <tr>
-<td><strong>High risk - 11</strong></td>
-<td style="text-align: right;">+2,591</td>
-<td style="text-align: right;">+950</td>
-<td style="text-align: right;">+856</td>
-<td style="text-align: right;">+1,859</td>
-<td style="text-align: right;">8</td>
-<td><strong>1,319 / 676 / 414</strong></td>
+<td><strong>High risk - 9</strong></td>
+<td style="text-align: right;">+1,889</td>
+<td style="text-align: right;">+835</td>
+<td style="text-align: right;">+576</td>
+<td style="text-align: right;">+1,626</td>
+<td style="text-align: right;">9</td>
+<td><strong>1,413 / 650 / 378</strong></td>
 </tr>
 </tbody>
 </table>
-<p>Each council contains the one above it. <strong>Low</strong> is the night crew (Nadia, Nerissa, Thea, Nova) with Delphine and Cassandra: no
-group of it reached the stop on any of the four records, it needs about a third less capital than Medium and earns about three
-quarters of Medium's profit. On 2018–2022 history it was never chosen on, it halved Medium's deep groups and its worst group
-(−123 against −223 per 0.01 lot). <strong>Medium</strong> adds the three specialists that took every stop on the four records — Amara (the
-Asian session), Clara (the Europe morning) and Juno (London midday): more profit, five stops. <strong>High</strong> adds Evelyn and Imogen — the New York evening and the London open drive — to
-Medium: more profit on three of the four records, about a third more capital, and one 2023 recovery that took 127 trading days.
+<p>Each council contains the one above it. <strong>Low</strong> is Nerissa, Nova and Thea (the night crew) with Delphine and Cassandra: the
+fewest group stops (one, on BlackBull in May 2025), the smallest floor, and the only council that made money in every period
+we measured it on — 2022–23, 2024–26 and the quiet market since August 2026 — on every feed that covers the period. <strong>Medium</strong> adds Clara (the Europe
+morning): more profit and one more stop, the March 2023 group whose recovery took most of a year on the 2022–24 record. <strong>High</strong>
+adds Nadia (the night rebound), Amara (the Asian session) and Evelyn (the New York evening): about twice Low's profit, nine
+stops on four records and the largest floor. Juno and Imogen, whose groups lose money on balance, are offered in Custom only.
 A council's risk is measured as a team: what sets the floor is two bad events landing close together, which no single
 specialist's label shows.</p>
+<p><strong>These floors are re-measured on records to 2026-10-09</strong> and are higher than the figures printed for 3.10–3.17 (684 / 333 / 221
+for the old Low 6): the longer records hold the 2026 stops. The old Low 6, measured on the same records, needs 1,224 / 549 / 309.</p>
 <h3 id="small-accounts-the-group-stop-and-the-minimum-balance">Small accounts — the group stop and the minimum balance</h3>
 <p>THE CREW holds floating drawdown on purpose, and on a large account that is the whole design. On a small
 account one deep group can take the account with it, so a small account needs a bound. The
-<strong><code>THE_CREW_SMALL_ACCOUNT</code></strong> preset runs Low risk - 6 strategies at a static 0.01 lot and closes any group whose
+<strong><code>THE_CREW_SMALL_ACCOUNT</code></strong> preset runs Low risk - 5 strategies at a static 0.01 lot and closes any group whose
 floating loss reaches <strong>150 USD</strong> at 0.01 lot (the same gold move on a USD, EUR or cent account), read on
 every tick. (The 150 stop is on in every council by default.)</p>
 <p><strong>Where that 150 comes from.</strong> Closing a group early normally turns a recovery into a loss: in our
@@ -435,10 +481,10 @@ tests, a stop at 100 closed nine groups, and eight of them would have finished i
 hours. Groups that recovered never floated deeper than about 120–195 per 0.01 lot; the one group that
 went further went much further (about 645 before it came back). A stop at 150 sits past nearly all
 normal recoveries and still catches that kind of run. Expect roughly one or two stops a year.</p>
-<p><strong>What one stop costs:</strong> about 150–165 at 0.01 lot — <strong>30–33 % of a 500 account</strong>, 15 % of 1,000. Low risk - 6 had none on four records.</p>
-<p><strong>Minimum balance by how much risk you accept</strong> (backtest, BlackBull 2022–2026 and Vantage 2025–26, 0.01
-lot, Low risk - 6 strategies (the default); the chance of losing that share of the starting balance within a year, starting on
-any day; Medium risk - 9 needs about half as much again, High risk - 11 about twice as much — table above):</p>
+<p><strong>What one stop costs:</strong> about 150–165 at 0.01 lot — <strong>30–33 % of a 500 account</strong>, 15 % of 1,000. Low risk - 5 had one on four records.</p>
+<p><strong>Minimum balance by how much risk you accept</strong> (backtest, BlackBull 2022–2026 and Vantage 2025–26, records to 2026-10-09, 0.01
+lot, Low risk - 5 strategies (the default); the chance of losing that share of the starting balance within a year, starting on
+any day; Medium risk - 6 needs about a tenth more, High risk - 9 about 40 % more — table above):</p>
 <table>
 <thead>
 <tr>
@@ -453,19 +499,19 @@ any day; Medium risk - 9 needs about half as much again, High risk - 11 about tw
 <td>Cautious</td>
 <td>20 %</td>
 <td>1 in 100</td>
-<td style="text-align: right;"><strong>about 690</strong></td>
+<td style="text-align: right;"><strong>about 1,030</strong></td>
 </tr>
 <tr>
 <td>Balanced</td>
 <td>35 %</td>
 <td>1 in 40</td>
-<td style="text-align: right;"><strong>about 330</strong></td>
+<td style="text-align: right;"><strong>about 470</strong></td>
 </tr>
 <tr>
 <td>Bold</td>
 <td>50 %</td>
 <td>1 in 20</td>
-<td style="text-align: right;"><strong>about 220</strong></td>
+<td style="text-align: right;"><strong>about 285</strong></td>
 </tr>
 </tbody>
 </table>
@@ -572,7 +618,7 @@ virtual_equity  = InpVirtualBalance + (real_equity  - real_equity_at_start)
 <p><strong>Use it like this:</strong> fund the demo with whatever the broker gives you, set <code>InpVirtualBalance</code> to
 your intended balance, and sizing, the breaker and the risk report all behave as though the account
 were that size. The journal will print a line similar in shape to:</p>
-<pre><code>THE CREW v3.10 | XAUUSD | roster=Low risk - 6 strategies (6 specialists) | breaker=30.0% | spread&lt;=1.00
+<pre><code>THE CREW v3.18 | XAUUSD | roster=Low risk - 5 strategies (5 specialists) | breaker=30.0% | spread&lt;=1.00
 THE CREW SIZING: budget 10.0% of &lt;virtual balance&gt; against a measured &lt;X&gt; float per 0.01 lot
         -&gt; &lt;lot&gt; lots. Lots follow the balance.
 THE CREW: VIRTUAL BALANCE &lt;virtual balance&gt; (real equity &lt;real equity&gt;) - sizing, the breaker and
@@ -606,15 +652,15 @@ loadable by the shipped binary, and vice versa.)</em></p>
 <tbody>
 <tr>
 <td><strong>Council</strong> (<code>InpRoster</code>)</td>
-<td><strong>Low risk - 6 strategies</strong></td>
-<td>Which specialists trade. <strong>Low risk - 6 strategies</strong> (the default): the six marked ✓ below — the night crew (Nadia, Nerissa, Thea, Nova), Delphine the dip buyer and Cassandra the London fade. <strong>Medium risk - 9 strategies</strong>: Low plus Amara, Clara and Juno. <strong>High risk - 11 strategies</strong>: every specialist. <strong>Custom</strong>: you choose specialists one by one in group 1b. Each council contains the one before it; section 5 has the measured profit and floor of each.</td>
+<td><strong>Low risk - 5 strategies</strong></td>
+<td>Which specialists trade. <strong>Low risk - 5 strategies</strong> (the default): the five marked ✓ below — Nerissa, Nova and Thea (the night crew), Delphine the dip buyer and Cassandra the London fade. <strong>Medium risk - 6 strategies</strong>: Low plus Clara. <strong>High risk - 9 strategies</strong>: Medium plus Nadia, Amara and Evelyn. <strong>Custom</strong>: you choose specialists one by one in group 1b (Juno and Imogen are offered there only). Each council contains the one before it; section 5 has the measured profit and floor of each.</td>
 </tr>
 </tbody>
 </table>
-<p><strong>The risk in a council's name is measured on the team</strong>, not added up from its members: Low has the smallest floor and never reached the group stop, High the largest floor and the most stops (section 5, <em>The three councils</em>).</p>
+<p><strong>The risk in a council's name is measured on the team</strong>, not added up from its members: Low has the smallest floor and the fewest group stops, High the largest floor and the most stops (section 5, <em>The three councils</em>).</p>
 <h3 id="1b-custom-council-read-only-when-council-custom">1b. Custom council — read only when Council = Custom</h3>
 <p>Under any other council these switches are not read, and the journal says so at start-up. Their defaults
-are the default crew, so switching to Custom starts from the recommended council.</p>
+are the default crew (Low risk - 5), so switching to Custom starts from the recommended council.</p>
 <table>
 <thead>
 <tr>
@@ -631,7 +677,7 @@ are the default crew, so switching to Custom starts from the recommended council
 <td><strong>Nadia</strong> — night rebound (<code>InpNightRebound</code>)</td>
 <td>22:00–23:59, Monday–Thursday</td>
 <td>buy</td>
-<td style="text-align: center;">✓</td>
+<td style="text-align: center;">High only</td>
 <td>low</td>
 <td style="text-align: right;">94</td>
 </tr>
@@ -639,7 +685,7 @@ are the default crew, so switching to Custom starts from the recommended council
 <td><strong>Amara</strong> — Asian session lift (<code>InpAsianLift</code>)</td>
 <td>03:00</td>
 <td>buy</td>
-<td style="text-align: center;">Medium, High</td>
+<td style="text-align: center;">High only</td>
 <td>high</td>
 <td style="text-align: right;">332</td>
 </tr>
@@ -671,7 +717,7 @@ are the default crew, so switching to Custom starts from the recommended council
 <td><strong>Imogen</strong> — London open drive (<code>InpLondonOpenDrive</code>)</td>
 <td>08:00–10:00</td>
 <td>buy</td>
-<td style="text-align: center;">High only</td>
+<td style="text-align: center;">Custom only</td>
 <td>high</td>
 <td style="text-align: right;">426</td>
 </tr>
@@ -687,7 +733,7 @@ are the default crew, so switching to Custom starts from the recommended council
 <td><strong>Juno</strong> — London midday push (<code>InpLondonMiddayPush</code>)</td>
 <td>10:00–13:00</td>
 <td>buy</td>
-<td style="text-align: center;">Medium, High</td>
+<td style="text-align: center;">Custom only</td>
 <td>medium</td>
 <td style="text-align: right;">194</td>
 </tr>
@@ -948,20 +994,49 @@ recovery grid, high volatility calls for more layers, not wider ones.</p>
 <hr />
 <h2 id="7b-the-status-panel-and-the-chart-lines">7b. The Status Panel and the Chart Lines</h2>
 <p>With <strong>Status panel</strong> on (the default), THE CREW draws a panel in the chart's top-left corner and keeps it current
-every second. It shows what the engine itself uses — nothing on it is an estimate:</p>
+every second. It shows what the engine itself uses — nothing on it is an estimate. Hover over any line for its explanation.</p>
 <ul>
-<li><strong>Header</strong> — council, sizing (<em>static 0.01 lot per group</em>, or <em>compounding 10% → next group 0.07 lot</em>), the server
-  time and the broker-clock shift (<em>auto</em> or <em>manual</em>).</li>
-<li><strong>Breaker</strong> — the account equity at which the 30% breaker would flatten THE CREW, and the equity now. If it has
-  fired: <em>no new groups until the next day</em>.</li>
-<li><strong>Other trades on XAUUSD</strong> — shown only when another EA (or you) holds gold on the same account: those lots move
-  the equity the breaker reads and use the same margin (section 7c).</li>
-<li><strong>One row per specialist</strong> — name, risk class, its trading hours <strong>on your server clock</strong>, and what it is doing:
-  <em>in window – watching</em>, <em>next window 22:00</em>, <em>not today</em>, <em>paused (news / holiday)</em>, <em>quiet window (US release)</em>
-  (Delphine), <em>stood down</em>.</li>
-<li><strong>An open group</strong> takes two lines: BUY or SELL, layers × lot, the floating result, then its <strong>target</strong>, the price
-  of the <strong>next layer</strong> (or <em>ladder full</em>) and the <strong>group stop</strong>.</li>
+<li><strong>Header</strong> — <em>THE CREW</em> and one status word: <strong>Trading</strong>, <strong>Paused</strong> (from the Pause button), <strong>Breaker</strong> (the account
+  breaker fired: everything was closed, no new groups until the next day) or <strong>Closed</strong> (the market is closed). Hovering
+  the name shows the version, council, server time and clock shift.</li>
+<li><strong>One row per specialist in your council</strong> — her name and what she is doing: the <strong>next window</strong> on your server clock
+  (for example <em>22:00</em>), <strong>watching</strong> (in her window, waiting for a setup), <strong>not today</strong>, <strong>news pause</strong>, <strong>stood down</strong>,
+  or, with a group open, <strong>BUY / SELL, layers and the floating result</strong> (hover for the lot, target, next layer and stop).</li>
+<li><strong>Guard strip</strong> — four chips that light when they act: <strong>Spread</strong> (spread above the limit, no new groups), <strong>News</strong>
+  (a payrolls / FOMC / Friday-night / holiday pause), <strong>Breaker</strong> (fired) and <strong>Group stop</strong> (green while the group stop is on).</li>
+<li><strong>Risk now</strong> — what you would lose if every open group hit its group stop now (<em>none</em> with no open group).</li>
+<li><strong>Account</strong> — a bar from the equity peak to the breaker: how far equity is below its peak against the 30% line.</li>
+<li><strong>Today / 7 days</strong> — closed result after costs.</li>
 </ul>
+<p><strong>Four buttons (since 3.17).</strong> Trading is unchanged unless you press one.</p>
+<table>
+<thead>
+<tr>
+<th>Button</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Pause / Resume</strong></td>
+<td>No <strong>new</strong> groups while paused; open groups keep their ladder, target and stop. The header says <em>Paused</em>.</td>
+</tr>
+<tr>
+<td><strong>Layers on / Layers off</strong></td>
+<td>With <em>Layers off</em>, open groups add no more layers; they still close at their target or their stop.</td>
+</tr>
+<tr>
+<td><strong>Close deep</strong></td>
+<td>Closes every group with <strong>3 or more layers</strong>. Press twice within 5 seconds (the button shows <em>Confirm?</em>).</td>
+</tr>
+<tr>
+<td><strong>Close all</strong></td>
+<td>Closes <strong>every</strong> group and pauses new groups. Press twice within 5 seconds.</td>
+</tr>
+</tbody>
+</table>
+<p>Pause and Layers off are remembered for your account across a restart of the terminal. A close by button is your
+decision, not a group stop. The buttons need <strong>Algo Trading</strong> switched on; the journal logs every press.</p>
 <p>On the chart, each open group gets three short lines, labelled with the specialist's name and the price:</p>
 <table>
 <thead>
@@ -1177,8 +1252,8 @@ trades, Vantage 156, identical tick counts). A lower number caps every specialis
 number above a specialist's depth raises her ladder to it - untested ground, where the group stop is the only bound. When the cap binds, the start-up journal
 says how many specialists it caps, the deepest measured depth, and what the measurement found.</p>
 <p>The input is offered so that you can see the effect in your own tester rather than take our word for
-it. This is what it does on the shipped defaults (Low risk - 6 strategies, Compounding Conservative,
-group stop 150, filters on), per 0.01 lot:</p>
+it. This is what it does on the 3.14 shipped defaults (Low risk - 6 strategies, the default council of 3.10–3.15,
+Compounding Conservative, group stop 150, filters on), per 0.01 lot:</p>
 <p>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2022-11-01 to 2024-12-31, version 3.14:</p>
 <table>
 <thead>
