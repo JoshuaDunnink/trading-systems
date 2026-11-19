@@ -50,3 +50,6 @@ table.matrix th.vert{writing-mode:vertical-rl;transform:rotate(180deg);white-spa
 table.matrix td.self{background:var(--card,#2a2d31)}.m-diff{background:#1f6f4a;color:#fff}.m-comp{background:#3a7d5c;color:#fff}.m-part{background:#b58a2a;color:#111}.m-over{background:#9a3b3b;color:#fff}
 .legend{display:inline-block;padding:2px 8px;border-radius:4px;font-size:.8rem;margin:2px 4px 2px 0}.sr{position:absolute;left:-9999px}
 footer{border-top:1px solid var(--line);padding-top:16px;padding-bottom:32px;color:var(--muted);font-size:.88rem}
+.sigchart svg{width:100%;height:auto;display:block}.sigchart text{fill:var(--muted);font-size:12px}
+.sigchart .grid{stroke:var(--line);stroke-width:1}.sigchart .zero{stroke:var(--muted)}
+.sigchart .bal{fill:none;stroke:var(--accent);stroke-width:2.2}.sigchart .eq{fill:none;stroke:var(--fg);stroke-width:1.2;stroke-dasharray:3 3;opacity:.7}
