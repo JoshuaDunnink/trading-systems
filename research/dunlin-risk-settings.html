@@ -1,0 +1,128 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Dunlin Gold: eight risk settings, one entry model | Joshua Dunnink</title><meta name="description" content="Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row bel">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/research/dunlin-risk-settings.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Dunlin Gold: eight risk settings, one entry model | Joshua Dunnink"><meta property="og:description" content="Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row bel">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/research/dunlin-risk-settings.html">
+<link rel="stylesheet" href="../assets/style.css?v=cd5732a902"></head>
+<body><header><a class="name" href="../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../index.html">Home</a> <a href="../products.html">Products</a> <a href="../signal.html">Live signal</a> <a href="../market.html">Gold market</a> <a href="../research/index.html" aria-current=page>Research</a> <a href="../pipeline.html">Pipeline</a> <a href="../about.html">About</a> <a href="../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<h1>Dunlin Gold: eight risk settings, one entry model</h1><p>Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row below. What changes is how much risk each setting takes around it: how strict the entry is, how many trades may be open, where the stop sits and how profit is protected. We tested each setting the same way and drew them in one chart.</p>
+<figure><img src="../img/dunlin_profiles_equity.png" width="1210" height="682" alt="Closed-trade result per 0.01 lot of eight Dunlin Gold risk settings, BlackBull, August 2025 to November 2026" loading="lazy"><figcaption>Closed-trade result per 0.01 lot of eight Dunlin Gold risk settings, BlackBull, August 2025 to November 2026</figcaption></figure>
+<p>(Backtest, MetaTrader 5 Strategy Tester, real ticks, gold, BlackBull, August 2025 to November 2026, fixed 0.01 lot. The table also shows IC Markets and VT Markets over the same months.)</p>
+<h2 id="what-each-setting-does">What each setting does</h2>
+<ul>
+<li><strong>Default</strong>: the validated configuration. Up to three trades on one side, a stop of at most $58 per 0.01 lot.</li>
+<li><strong>Safe</strong>: only the network's most confident entries, at most two trades at once, stop at most $30.</li>
+<li><strong>Safe + no adding below break-even</strong>: Safe, but no new trade while an open trade is still below its entry price.</li>
+<li><strong>Safe + target-scaled lock</strong>: Safe, but profit is locked once a trade has covered 70 % of its own target, instead of at a fixed dollar amount.</li>
+<li><strong>Calm A</strong>: Safe with both changes above.</li>
+<li><strong>Calm D</strong>: Calm A with one trade at a time.</li>
+<li><strong>Stricter entry (0.90)</strong> and <strong>Tighter stop ($20)</strong>: Calm A with a stricter entry or a smaller stop.</li>
+</ul>
+<h2 id="the-numbers">The numbers</h2>
+<p>Per 0.01 lot, BlackBull / IC Markets / VT Markets.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Result ($)</th>
+<th>Profit factor</th>
+<th>Largest dip ($)</th>
+<th>Worst week ($)</th>
+<th>Longest losing streak</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Default</td>
+<td>1,125 / 1,588 / 1,218</td>
+<td>2.2 / 2.8 / 2.3</td>
+<td>95 / 75 / 90</td>
+<td>39 / 39 / 39</td>
+<td>4 / 3 / 4</td>
+</tr>
+<tr>
+<td>Safe</td>
+<td>623 / 823 / 651</td>
+<td>3.6 / 4.0 / 3.6</td>
+<td>51 / 51 / 51</td>
+<td>26 / 26 / 26</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Safe + no adding below break-even</td>
+<td>510 / 692 / 530</td>
+<td>3.1 / 3.5 / 3.1</td>
+<td>31 / 35 / 31</td>
+<td>16 / 16 / 16</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Safe + target-scaled lock</td>
+<td>758 / 829 / 749</td>
+<td>4.1 / 4.0 / 4.0</td>
+<td>51 / 51 / 51</td>
+<td>26 / 26 / 26</td>
+<td>4</td>
+</tr>
+<tr>
+<td><strong>Calm A</strong></td>
+<td>637 / 686 / 642</td>
+<td>3.6 / 3.5 / 3.5</td>
+<td><strong>32 / 33 / 31</strong></td>
+<td><strong>16 / 18 / 16</strong></td>
+<td><strong>2</strong></td>
+</tr>
+<tr>
+<td>Calm D (one trade at a time)</td>
+<td>544 / 613 / 552</td>
+<td>3.8 / 3.7 / 3.7</td>
+<td>32 / 33 / 31</td>
+<td>20 / 18 / 16</td>
+<td>1</td>
+</tr>
+<tr>
+<td>Stricter entry (0.90)</td>
+<td>389 / 373 / 360</td>
+<td>2.7 / 2.7 / 2.6</td>
+<td>41 / 51 / 47</td>
+<td>16 / 12 / 12</td>
+<td>2</td>
+</tr>
+<tr>
+<td>Tighter stop ($20)</td>
+<td>351 / 359 / 366</td>
+<td>2.1 / 2.0 / 2.2</td>
+<td>49 / 78 / 61</td>
+<td>25 / 32 / 28</td>
+<td>2-4</td>
+</tr>
+</tbody>
+</table>
+<h2 id="what-we-learned">What we learned</h2>
+<ul>
+<li><strong>The biggest calm-down comes from not adding to a losing book.</strong> Safe's largest dip was a single afternoon with two trades open on the same side, both losing. Refusing the second trade while the first is under water cut the largest dip by about a third and the worst week from $26 to $16 on all three brokers.</li>
+<li><strong>A tighter stop made things worse, not safer.</strong> With a $20 stop many more trades are stopped out, so the largest dip grew and recoveries took about three months instead of seven weeks.</li>
+<li><strong>A stricter entry trades much less and earns about half</strong>, with long flat stretches.</li>
+<li><strong>The target-scaled lock earned more at no extra risk in this period</strong>, because gold moved more than the old fixed lock allowed for. On older gold history replayed at today's price it gave some of that back, so we treat it as a setting for the current market, not as a safety feature.</li>
+<li><strong>The early break-even is what protects every setting.</strong> Moving the stop to entry after a small favourable move is kept in all rows; moving it later multiplied full stops in our tests.</li>
+<li><strong>The size of the worst single trade (about $30 per 0.01 lot with a $30 stop) only shrinks with the lot size.</strong> A smaller lot shrinks every number in the table by the same share, profit included.</li>
+</ul>
+<h2 id="which-setting-to-pick">Which setting to pick</h2>
+<ul>
+<li><strong>Calmest across many years: Safe with one trade at a time.</strong> On older gold history (2013 to 2024) replayed at today's price it lowered the largest dip in every group of years we tested and the worst week in most of them. It earns clearly less.</li>
+<li><strong>Calmest in the current market: Safe with no adding below break-even</strong> (Calm A adds the target-scaled lock for the current market). It cuts the most pain in 2025 and 2026, but it did not hold in every older stretch.</li>
+<li><strong>Smaller everything: any setting at a smaller lot.</strong> Every dollar figure in the table shrinks by the same share, profit included.</li>
+</ul>
+<h2 id="how-much-to-trust-it">How much to trust it</h2>
+<ul>
+<li>It is one period of about fifteen months on three brokers, chosen and judged after the fact; the settings were compared, not tuned trade by trade.</li>
+<li>On older gold history (2013 to 2024) replayed at today's price, one trade at a time lowered the largest dip in every group of years we tested and the worst week in most of them, at a clearly lower result. No adding below break-even lowered the largest dip in three of four groups but not in 2017 to 2021, so for a setting that holds across years we prefer one trade at a time.</li>
+<li>It is a backtest. It is not a live record and not a forecast.</li>
+</ul>
+<p>Related: Dunlin Gold.</p>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>
