@@ -1,24 +1,26 @@
 <!doctype html>
 <html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Dunlin Gold: eight risk settings, one entry model | Joshua Dunnink</title><meta name="description" content="Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row bel">
+<title>Dunlin Gold: ten risk settings, one entry model | Joshua Dunnink</title><meta name="description" content="Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row bel">
 <link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/research/dunlin-risk-settings.html"><meta property="og:type" content="website">
-<meta property="og:title" content="Dunlin Gold: eight risk settings, one entry model | Joshua Dunnink"><meta property="og:description" content="Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row bel">
+<meta property="og:title" content="Dunlin Gold: ten risk settings, one entry model | Joshua Dunnink"><meta property="og:description" content="Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row bel">
 <meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/research/dunlin-risk-settings.html">
 <link rel="stylesheet" href="../assets/style.css?v=cd5732a902"></head>
 <body><header><a class="name" href="../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../index.html">Home</a> <a href="../products.html">Products</a> <a href="../signal.html">Live signal</a> <a href="../market.html">Gold market</a> <a href="../research/index.html" aria-current=page>Research</a> <a href="../pipeline.html">Pipeline</a> <a href="../about.html">About</a> <a href="../risk.html">Risk &amp; privacy</a></nav></header>
 <main>
-<h1>Dunlin Gold: eight risk settings, one entry model</h1><p>Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row below. What changes is how much risk each setting takes around it: how strict the entry is, how many trades may be open, where the stop sits and how profit is protected. We tested each setting the same way and drew them in one chart.</p>
+<h1>Dunlin Gold: ten risk settings, one entry model</h1><p>Dunlin Gold uses a small neural network to decide when gold is in an orderly stretch with a lean to one side. That entry model is the same in every row below. What changes is how much risk each setting takes around it: how strict the entry is, how many trades may be open, where the stop sits and how profit is protected. We tested each setting the same way and drew eight of them in one chart; the table has all ten.</p>
 <figure><img src="../img/dunlin_profiles_equity.png" width="1210" height="682" alt="Closed-trade result per 0.01 lot of eight Dunlin Gold risk settings, BlackBull, August 2025 to November 2026" loading="lazy"><figcaption>Closed-trade result per 0.01 lot of eight Dunlin Gold risk settings, BlackBull, August 2025 to November 2026</figcaption></figure>
 <p>(Backtest, MetaTrader 5 Strategy Tester, real ticks, gold, BlackBull, August 2025 to November 2026, fixed 0.01 lot. The table also shows IC Markets and VT Markets over the same months.)</p>
 <h2 id="what-each-setting-does">What each setting does</h2>
 <ul>
 <li><strong>Default</strong>: the validated configuration. Up to three trades on one side, a stop of at most $58 per 0.01 lot.</li>
+<li><strong>Default + target-scaled lock</strong>: Default, but profit is locked once a trade has covered 70 % of its own target instead of at a fixed dollar amount.</li>
+<li><strong>Default + smaller target + target-scaled lock</strong>: the same with a target of 0.8 instead of 1.1 times the recent bar range.</li>
 <li><strong>Safe</strong>: only the network's most confident entries, at most two trades at once, stop at most $30.</li>
 <li><strong>Safe + no adding below break-even</strong>: Safe, but no new trade while an open trade is still below its entry price.</li>
 <li><strong>Safe + target-scaled lock</strong>: Safe, but profit is locked once a trade has covered 70 % of its own target, instead of at a fixed dollar amount.</li>
 <li><strong>Calm A</strong>: Safe with both changes above.</li>
 <li><strong>Calm D</strong>: Calm A with one trade at a time.</li>
-<li><strong>Stricter entry (0.90)</strong> and <strong>Tighter stop ($20)</strong>: Calm A with a stricter entry or a smaller stop.</li>
+<li><strong>Stricter entry (0.90)</strong> and <strong>Tighter stop ($20)</strong>: Calm A with a stricter entry or a smaller stop (table only; both were clearly worse).</li>
 </ul>
 <h2 id="the-numbers">The numbers</h2>
 <p>Per 0.01 lot, BlackBull / IC Markets / VT Markets.</p>
@@ -40,6 +42,22 @@
 <td>2.2 / 2.8 / 2.3</td>
 <td>95 / 75 / 90</td>
 <td>39 / 39 / 39</td>
+<td>4 / 3 / 4</td>
+</tr>
+<tr>
+<td>Default + target-scaled lock</td>
+<td>1,378 / 1,633 / 1,374</td>
+<td>2.5 / 2.8 / 2.5</td>
+<td>100 / 101 / 91</td>
+<td>40 / 39 / 39</td>
+<td>4 / 3 / 4</td>
+</tr>
+<tr>
+<td>Default + smaller target + target-scaled lock</td>
+<td>1,270 / 1,504 / 1,337</td>
+<td>2.4 / 2.7 / 2.4</td>
+<td>95 / 101 / 90</td>
+<td>39 / 36 / 39</td>
 <td>4 / 3 / 4</td>
 </tr>
 <tr>
@@ -106,6 +124,8 @@
 <li><strong>A tighter stop made things worse, not safer.</strong> With a $20 stop many more trades are stopped out, so the largest dip grew and recoveries took about three months instead of seven weeks.</li>
 <li><strong>A stricter entry trades much less and earns about half</strong>, with long flat stretches.</li>
 <li><strong>The target-scaled lock earned more at no extra risk in this period</strong>, because gold moved more than the old fixed lock allowed for. On older gold history replayed at today's price it gave some of that back, so we treat it as a setting for the current market, not as a safety feature.</li>
+<li><strong>On Default the target-scaled lock adds 3 to 23 % profit</strong>, more with Default's own target than with the smaller one. On IC Markets the largest dip grew from $75 to $101, because Default holds up to three trades on one side and longer-running winners leave more of the book exposed when a move turns.</li>
+<li><strong>Exits cannot rescue a bad entry.</strong> Default's four full stops and its big losses are identical in every exit setting: they come from which trades are taken, not from how they are closed. Only the entry side (Safe's stricter selection, no adding, fewer trades at once) removes them.</li>
 <li><strong>The early break-even is what protects every setting.</strong> Moving the stop to entry after a small favourable move is kept in all rows; moving it later multiplied full stops in our tests.</li>
 <li><strong>The size of the worst single trade (about $30 per 0.01 lot with a $30 stop) only shrinks with the lot size.</strong> A smaller lot shrinks every number in the table by the same share, profit included.</li>
 </ul>
@@ -113,6 +133,7 @@
 <ul>
 <li><strong>Calmest across many years: Safe with one trade at a time.</strong> On older gold history (2013 to 2024) replayed at today's price it lowered the largest dip in every group of years we tested and the worst week in most of them. It earns clearly less.</li>
 <li><strong>Calmest in the current market: Safe with no adding below break-even</strong> (Calm A adds the target-scaled lock for the current market). It cuts the most pain in 2025 and 2026, but it did not hold in every older stretch.</li>
+<li><strong>Most profit, at Default's level of risk, in the current market: Default with the target-scaled lock.</strong> It keeps Default's full stops and adds to its largest dip on one broker, so it suits someone who already accepts Default's swings.</li>
 <li><strong>Smaller everything: any setting at a smaller lot.</strong> Every dollar figure in the table shrinks by the same share, profit included.</li>
 </ul>
 <h2 id="how-much-to-trust-it">How much to trust it</h2>
