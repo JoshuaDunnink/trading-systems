@@ -21,7 +21,7 @@
 <li><strong>Small accounts.</strong> Kingfisher has no minimum balance of its own. On a small account every order is the smallest lot (0.01), and it places one whenever your broker's margin allows it. That margin is the broker's, not the EA's: about 5-9 for 0.01 lot of gold at leverage 1:500, 25-45 at 1:100, and 120-225 on EU-regulated accounts, where retail gold leverage is capped at 1:20. Below that, the EA waits. How small is sensible is a separate question. We started accounts on every day of the test window on three live brokers and followed each for twelve months: from 100 (at 1:500 or 1:100) none got stuck. From 50, about one start in five did at 1:500 and about half at 1:100; from 25 or 10, half or more did: a few early losses leave the balance below the margin for the next order, and it never trades again. From the same start day, one test account of 10 kept trading and another stopped after its first losses. We recommend 100 or more, with leverage 1:500 so that the up to seven orders that can be open at once fit.</li>
 </ul>
 <hr />
-<p>Kingfisher is an Expert Advisor for MetaTrader 5 (MT5) that trades gold (XAUUSD) with a level-breakout strategy: it enters on the break of the nearest unbroken price level, with a stop loss on every trade. Five hunters run side by side on one
+<p>Kingfisher is an Expert Advisor for MetaTrader 5 (MT5) that trades gold (XAUUSD) with a level-breakout strategy: it enters on the break of the nearest unbroken price level, with a stop loss on every trade. Five hunters (plus three optional ones) run side by side on one
 chart: four watch the most recent unbroken swing high and swing low on the four-hour bars, one watches the
 one-hour bars. Each rests a buy stop just inside the high and a sell stop just inside the low, so it is filled at
 the moment the level gives way.</p>
@@ -39,6 +39,13 @@ are removed before the weekend.</p>
 <p>Exit. On the first tick after a fill the EA reads how fast price arrived. A fast fill rides to the take profit. A
 slow fill is managed by the Grip: once 1.00 ahead per 0.01 lot, the trade is closed if it gives back half of its
 best profit, or more than a set share of the 15-minute range, whichever comes first.</p>
+<p>Optional extras (since 1.23, all off). Three more hunters of the same kind can be switched on in the Inputs: a 30-minute swing level, a
+4-hour swing level with a narrower swing, and a 1-hour swing level, each with its own order patience (30, 15 and 60 hours), the Grip exit and
+a built-in check against the 4-hour EMA50. They are off by default, and with all three off the EA places exactly the orders version 1.22
+placed. Backtests with them on, same tester, real ticks, Medium risk, 10,000 start (version 1.23, extras 2 + 3 + 4 off / on): BlackBull
+2022-11 to 2026-11, profit factor 2.26 / 2.57, worst equity drawdown 8.7 % / 5.8 %; IC Markets 2026-04 to 2026-11, 2.25 / 2.52, 10.9 % /
+11.0 %; VT Markets 2024-02 to 2026-11, 2.86 / 3.24, 7.4 % / 3.4 %. They add about 45 % more trades and resting orders, and were not run live.
+These are backtests on three brokers' views of one gold market, not a forecast.</p>
 <p>What the EA does not do: no grid, no martingale, no averaging down, no position without a stop loss, no news
 trading logic, no files, no DLLs, no external resources.</p>
 <p>Settings. One short section, "Start here", is the whole setup: Account type (Personal, Prop firm 2-step, Prop firm

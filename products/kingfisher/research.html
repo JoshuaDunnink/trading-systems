@@ -24,7 +24,14 @@
 <li><a href="#7-what-was-tested-and-rejected">7. What was tested and rejected</a></li>
 <li><a href="#8-september-2026-the-second-research-round">8. September 2026: the second research round</a></li>
 <li><a href="#9-october-2026-version-115">9. October 2026: version 1.15</a></li>
-<li><a href="#10-limits">10. Limits</a></li>
+<li><a href="#10-november-2026-version-123-three-optional-extras">10. November 2026: version 1.23, three optional Extras</a><ul>
+<li><a href="#101-which-levels-an-extra-takes">10.1 Which levels an Extra takes</a></li>
+<li><a href="#102-risk-sharing">10.2 Risk sharing</a></li>
+<li><a href="#103-what-was-tested-and-kept-out">10.3 What was tested and kept out</a></li>
+<li><a href="#104-how-it-was-proven">10.4 How it was proven</a></li>
+</ul>
+</li>
+<li><a href="#11-limits">11. Limits</a></li>
 <li><a href="#appendix-traceability">Appendix — traceability</a></li>
 </ul>
 </li>
@@ -32,7 +39,7 @@
 </div>
 </nav><h1 id="kingfisher-research-note">Kingfisher — Research Note</h1>
 <p><em>What the machine does, what was changed on the way to the shipped version, and what each change did — with the tests that decided it.</em></p>
-<p>Versions 1.05 – 1.15 · September – October 2026</p>
+<p>Versions 1.05 – 1.23 · September – November 2026</p>
 <p>All figures in this note are Strategy Tester runs on real broker ticks at 100 % history quality. They are backtests, not a record of live trading. Every number names the build, the broker feed and the window it came from; a number that cannot be traced that way does not appear here.</p>
 <hr />
 <h2 id="0-the-result-in-one-table">0. The result in one table</h2>
@@ -310,12 +317,118 @@
 <p><strong>How it was proven.</strong> Switched off, 1.15 places exactly the same trades as 1.14. As shipped, it reproduces the research result trade for trade over 18 months on a live-broker feed (2,967 deals). With a simulated restart every hour, it trades exactly as without restarts. Visible on the panel and in the start-up line.</p>
 <p><strong>What was tested and kept out.</strong> Stricter quiet-market filters for the one-hour hunter, slower-confirmed levels, chart-pattern and channel-rhythm filters, starting the Grip earlier (down to the moment a trade opens), farther profit targets and targets at the next level, and a counter-trade confirmed by chart structure. Several made the 2025-26 stretch look smoother. Each either cost too much in today's active market, did not hold on every broker, or did harm on the older market - so none of them is in the box.</p>
 <hr />
-<h2 id="10-limits">10. Limits</h2>
+<h2 id="10-november-2026-version-123-three-optional-extras">10. November 2026: version 1.23, three optional Extras</h2>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks at 100 % history quality, Kingfisher 1.23, BlackBull / IC Markets / VT Markets, windows shown per row.</em></p>
+<p>The question this round asked: can more level hunters add profit without adding dips? Kingfisher already runs five hunters on the four-hour and one-hour charts. Version 1.23 adds three optional ones, <strong>off by default</strong>: a hunter on 30-minute swing levels (Extra 2), one on four-hour swing levels with a narrower swing (Extra 3) and one on one-hour swing levels (Extra 4). They place their orders the same way, close with the Grip exit and obey the same guards. With all three off the EA places exactly the orders 1.22 placed.</p>
+<p>Every arm was written down with its pass bar before any number was read: net profit per unit of worst closed drawdown had to be at least the base's on three tests at once (BlackBull over the whole window, BlackBull over the last seven months, IC Markets over its real-tick months), and any arm that fell short on one of them was closed with a written verdict.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, fixed 0.01 lot, Recommended settings, Extras 2 + 3 + 4 off / on.</em></p>
+<table>
+<thead>
+<tr>
+<th>feed · window</th>
+<th>trades</th>
+<th>net profit per unit of worst closed drawdown</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull · 2022-11 → 2026-11</td>
+<td>2,473 / 3,604</td>
+<td>34.5 / 50.7</td>
+</tr>
+<tr>
+<td>BlackBull · 2026-04 → 2026-11</td>
+<td></td>
+<td>19.6 / 27.0</td>
+</tr>
+<tr>
+<td>IC Markets · 2026-04 → 2026-11</td>
+<td></td>
+<td>22.9 / 29.1</td>
+</tr>
+<tr>
+<td>VT Markets · 2024-02 → 2026-11</td>
+<td>2,154 / 3,273</td>
+<td>43.8 / 59.3</td>
+</tr>
+</tbody>
+</table>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Medium risk, 10,000 start, compiled defaults against the same with the three Extras on.</em></p>
+<table>
+<thead>
+<tr>
+<th>feed · window</th>
+<th>profit factor, off / on</th>
+<th>worst equity drawdown, off / on</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>BlackBull · 2022-11 → 2026-11</td>
+<td>2.26 / 2.57</td>
+<td>8.7 % / 5.8 %</td>
+</tr>
+<tr>
+<td>IC Markets · 2026-04 → 2026-11</td>
+<td>2.25 / 2.52</td>
+<td>10.9 % / 11.0 %</td>
+</tr>
+<tr>
+<td>VT Markets · 2024-02 → 2026-11</td>
+<td>2.86 / 3.24</td>
+<td>7.4 % / 3.4 %</td>
+</tr>
+</tbody>
+</table>
+<p>IC Markets shows no drawdown benefit; BlackBull and VT Markets do. The three feeds are three brokers' views of the same gold market, not three independent samples. With the Extras on there are about 45 % more trades and resting orders.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2022-11 → 2026-11, fixed 0.01 lot: the closed-trade profit of the same EA with the Extras off and on, and how far each sits below its own peak.</em></p>
+<p><img alt="Kingfisher 1.23: Extras off and on" src="img/13_extras.png" /></p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2022-11 → 2026-11, fixed 0.01 lot, profit factor of each Extra's own trades inside the book (whole window / last seven months).</em></p>
+<table>
+<thead>
+<tr>
+<th>Extra</th>
+<th>profit factor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Extra 2, 30-minute level</td>
+<td>2.34 / 2.95</td>
+</tr>
+<tr>
+<td>Extra 3, four-hour level</td>
+<td>2.90 / 2.62</td>
+</tr>
+<tr>
+<td>Extra 4, one-hour level</td>
+<td>2.58 / 3.17</td>
+</tr>
+</tbody>
+</table>
+<h3 id="101-which-levels-an-extra-takes">10.1 Which levels an Extra takes</h3>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull 2022-11 to 2026-11 and IC Markets 2026-04 to 2026-11. Four families of level checks were tried as separate arms: where price sits against the four-hour EMA50, the slope of the four-hour EMA200, a floor on the hourly range, and a momentum reading on the hourly chart. One family passed all three tests: <strong>price not far on the wrong side of the four-hour EMA50</strong>. On Extra 2 it replaces a plainer direction check; on Extra 3 it is added to its existing four-hour direction check. The other families changed the trade count and left the result where it was. The exact distance is a setting in the manual (chapter 7.11), not a tuning surface.</p>
+<h3 id="102-risk-sharing">10.2 Risk sharing</h3>
+<p>Hunters that rest on the same chart timeframe share the risk of one level, so one break is one bet. Extra 3 watches the four-hour chart: with it on, the four Dives and Extra 3 split that level's risk and each four-hour order is a little smaller. Extra 4 shares the one-hour level with Skim. Extra 2 has its own level. The Medium-risk table above includes this effect; the fixed-lot table cannot show it.</p>
+<h3 id="103-what-was-tested-and-kept-out">10.3 What was tested and kept out</h3>
+<ul>
+<li><strong>A fourth Extra on 15-minute swing levels.</strong> It stayed weak in the current market on both feeds even with every level check, and is not in the product.</li>
+<li><strong>Sizing by confidence.</strong> Scaling every order by how wide yesterday's range was compared with its own year raised the worst drawdown by about two fifths in the tester, because bigger orders on wide days stack clustered losses. The scale-down-only version behaved like a smaller lot: smaller dips and a smaller result, not a better selection. Neither is in the product.</li>
+<li><strong>A learned confidence model.</strong> A gradient-boosted model, trained only on trades that had already closed and scored month by month, predicted the direction of the next 24 hours at an AUROC of 0.52 to 0.54. Scaling lots by its score added about a tenth to net profit per drawdown offline, on one year of trades. That is too thin to build into an EA, and it is not.</li>
+<li><strong>A learned entry filter on rescaled history.</strong> The quiet-market gate was compared with a learned filter on tick history from 2013 to 2021, rescaled to today's gold price. It was not consistently better, and Kingfisher does not use one.</li>
+<li><strong>Pulling an Extra's order when price creeps toward it in a calm market.</strong> It lowered net profit per drawdown on BlackBull and on IC Markets, so it stays out.</li>
+</ul>
+<h3 id="104-how-it-was-proven">10.4 How it was proven</h3>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, BlackBull, 2022-11 → 2026-11, fixed 0.01 lot.</em></p>
+<p>With the Extras off, the shipped 1.23 places exactly the trades 1.22 placed: 2,473 trades and a net of +2,888.67 in both. With them on, the shipped file equals the research build trade for trade on BlackBull (3,604 trades) and on IC Markets (1,409 trades over 2026-04 → 2026-11). The Market-style checks (a small deposit, gold on the daily chart and EURUSD on the hourly chart, Extras on and off) produced no new journal errors.</p>
+<hr />
+<h2 id="11-limits">11. Limits</h2>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, windows as in section 0.</em></p>
 <ul>
 <li>Kingfisher earned its result in a market of large daily gold bursts (2025-10 onward on every feed) and stands aside in quiet markets. A quiet year means few trades and little income. That is the design, and the four-year feed shows it.</li>
 <li>The figures are backtests on tick archives. Live spreads, slippage and a broker's stop fills differ from the archive's; the fill-cost section is the size of that difference on four feeds, not a guarantee of it.</li>
 <li>Growth figures at Medium include the compounding of a single 15–30-month window at 10,000 start. A different start date inside the same window moves them; the drawdown figures move less, which is why they lead every table.</li>
+<li>The Extras (version 1.23) rest on three broker feeds that show one gold market, IC Markets' real ticks begin in 2026-04, and they have not been run live. They add trades and resting orders, so the account needs the margin for them; on a small account leave them off.</li>
 <li>Past performance does not indicate future results. Test on a demo account with your broker before trading real funds.</li>
 </ul>
 <hr />
@@ -404,6 +517,11 @@
 <td>1.15</td>
 <td>the Grip hands back at most a set share of the 15-minute range; six times lighter engine</td>
 <td>switched off equals 1.14 trade for trade; as shipped equals the research result over 18 months (2,967 deals); restarts every hour identical</td>
+</tr>
+<tr>
+<td>1.23</td>
+<td>three optional Extras, off by default; research build for the Extras</td>
+<td>switched off equals 1.22 trade for trade (2,473 trades, +2,888.67, BlackBull 2022-11 → 2026-11, fixed 0.01 lot); switched on equals the research build on two feeds (3,604 and 1,409 trades)</td>
 </tr>
 </tbody>
 </table>
