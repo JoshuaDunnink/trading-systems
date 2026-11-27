@@ -41,8 +41,8 @@
 <li><a href="#78-since-120-calm-protection-inpcalmprotect-on-by-default-since-122">7.8 Since 1.20: Calm protection (InpCalmProtect, on by default since 1.22)</a></li>
 <li><a href="#79-since-121-the-daybreak-quiet-day-rule-is-an-input-inpdbquietrule-off-by-default">7.9 Since 1.21: the Daybreak quiet-day rule is an input (InpDbQuietRule, off by default)</a></li>
 <li><a href="#710-since-122-core-b-a-seventh-hunter-on-one-hour-swing-levels-inpcoreb-off-by-default">7.10 Since 1.22: Core B - a seventh hunter on one-hour swing levels (InpCoreB, off by default)</a></li>
-<li><a href="#711-since-123-extras-three-more-level-hunters-inpadd2-inpadd3-inpadd4-all-off-by-default">7.11 Since 1.23: Extras - three more level hunters (InpAdd2, InpAdd3, InpAdd4, all off by default)</a></li>
-<li><a href="#712-since-124-safety-lock-inpsafetylock-off-by-default">7.12 Since 1.24: Safety lock (InpSafetyLock, off by default)</a></li>
+<li><a href="#711-since-123-dart-plunge-and-hover-three-more-level-hunters-all-off-by-default">7.11 Since 1.23: Dart, Plunge and Hover - three more level hunters (all off by default)</a></li>
+<li><a href="#712-since-124-safety-lock-inpsafetylock-balanced-by-default-since-125">7.12 Since 1.24: Safety lock (InpSafetyLock, Balanced by default since 1.25)</a></li>
 </ul>
 </li>
 <li><a href="#8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</a></li>
@@ -143,7 +143,7 @@ KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker min
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
-<td>the five hunters, Rebound (off; ECN only; chapter 7.3), Daybreak (on; low-latency ECN only; chapter 7.6), Calm protection (on; chapter 7.8), Core B (off; chapter 7.10), Safety lock (off; chapter 7.12), Extras 2-4 (off; chapter 7.11), buy/sell</td>
+<td>the five hunters, Rebound (off; ECN only; chapter 7.3), Daybreak (on; low-latency ECN only; chapter 7.6), Calm protection (on; chapter 7.8), Core B (off; chapter 7.10), Dart / Plunge / Hover (off; chapter 7.11), Safety lock (Balanced; chapter 7.12), trade directions</td>
 <td>rarely</td>
 </tr>
 <tr>
@@ -573,7 +573,7 @@ properties if you do not see them). Turning <code>InpDrawTrades</code> off chang
 </thead>
 <tbody>
 <tr>
-<td><code>Kingfisher</code>, with <code>v1.23</code> at the right edge of the same line (since 1.20)</td>
+<td><code>Kingfisher</code>, with <code>v1.25</code> at the right edge of the same line (since 1.20)</td>
 <td>the product and its version; hover for symbol, risk, magic and the Calm protection state</td>
 </tr>
 <tr>
@@ -775,6 +775,7 @@ On a wide-fill feed (Fusion) the Grip's small wins are eaten by the fill cost - 
 <p>In the testing, Smart kept Target-only's profit at about a quarter less drawdown, on four brokers.</p>
 <p><strong>Which exit compounds fastest depends on your broker's stop fills.</strong> Where the losers fill close to the $2.00 stop (Vantage, Pepperstone in our tests), <em>Grip every trade</em> at the High level was the smoothest and fastest path (Vantage: ×27 in 15 months at a 5.7 % worst drawdown; Pepperstone ×20 at 7.0 %). Where the fills are wide (Fusion), the Grip's small wins are eaten by the fill cost and <em>Smart</em> at the High level is the fast path (×53 at 15.3 %). Run four weeks on demo, read the median fill distance past $2.00 (chapter 4): under ~$2.15 → Grip; above → Smart.</p>
 <h3 id="70-since-111-on-a-high-volatility-day-the-skim-hunter-rides">7.0 Since 1.11: on a high-volatility day the Skim hunter rides</h3>
+<p>Since 1.25 the Dart and Hover hunters (chapter 7.11) are managed the same way as Skim.</p>
 <p>The Grip on the Skim hunter pays in quiet and ordinary markets, where a break stalls and Grip keeps what a ride would give
 back. On days whose volatility is in the top third of the past year (yesterday's daily range against its own last 250
 days), breaks run far, and gripping at half the best profit cuts the runners - there the Classic exit earns more. From 1.11
@@ -1031,83 +1032,122 @@ EA places exactly the orders it placed without it. It works on gold only.</p>
 <li><strong>Nothing is claimed for it here.</strong> It is an option to test on your own account type and broker before you rely on it; run it on a
   demo first and read the journal line <code>KINGFISHER Core B ON | magic ...</code> to confirm it is active.</li>
 </ul>
-<h3 id="711-since-123-extras-three-more-level-hunters-inpadd2-inpadd3-inpadd4-all-off-by-default">7.11 Since 1.23: Extras - three more level hunters (<code>InpAdd2</code>, <code>InpAdd3</code>, <code>InpAdd4</code>, all off by default)</h3>
-<p>The Extras are three optional hunters of the same kind as the five. They are <strong>off</strong> until you switch them on (Inputs, group 2), and with
-all three off the EA places exactly the orders 1.22 placed. They work on gold only and use the Grip exit.</p>
+<h3 id="711-since-123-dart-plunge-and-hover-three-more-level-hunters-all-off-by-default">7.11 Since 1.23: Dart, Plunge and Hover - three more level hunters (all off by default)</h3>
+<p>Three optional hunters of the same kind as the five, named Extra 2, 3 and 4 until version 1.24. They are <strong>off</strong> until you switch them on
+(Inputs, group 2). They work on gold only.</p>
 <table>
 <thead>
 <tr>
 <th>Switch</th>
+<th>Hunter</th>
 <th>Level it watches</th>
 <th>Order patience</th>
+<th>Managed</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td><code>InpAdd2</code> Extra 2</td>
+<td><code>InpAdd2</code></td>
+<td><strong>Dart</strong></td>
 <td>most recent unbroken swing on the 30-minute chart</td>
 <td>30 hours</td>
+<td>like Skim</td>
 </tr>
 <tr>
-<td><code>InpAdd3</code> Extra 3</td>
+<td><code>InpAdd3</code></td>
+<td><strong>Plunge</strong></td>
 <td>most recent unbroken swing on the 4-hour chart (narrower swing than the Dives)</td>
 <td>15 hours</td>
+<td>Grip</td>
 </tr>
 <tr>
-<td><code>InpAdd4</code> Extra 4</td>
+<td><code>InpAdd4</code></td>
+<td><strong>Hover</strong></td>
 <td>most recent unbroken swing on the 1-hour chart</td>
 <td>60 hours</td>
+<td>like Skim</td>
 </tr>
 </tbody>
 </table>
 <ul>
-<li><strong>How an Extra trades.</strong> The same way as the other hunters: a stop order a small, fixed percentage of price inside the level, with the
-  fixed stop loss and take profit in the gold price (2.00 and 15.00 per 0.01 lot), the Grip exit, and the same guards (quiet-market gate,
-  news, spread, weekend). Trades carry the comment <code>KF A2</code>, <code>KF A3</code> or <code>KF A4</code> and the same magic number as the other hunters.</li>
-<li><strong>Indicator checks built in.</strong> Extra 2 and Extra 3 place an order only while price is no more than 0.7 of the 4-hour ATR on the wrong side
-  of the 4-hour EMA50 (a buy level needs price above or near it, a sell level below or near it). Extra 3 also keeps its eight-bar 4-hour
-  direction check. These checks cannot be edited in the Inputs tab; they are part of the tested configuration.</li>
-<li><strong>Size.</strong> Hunters on the same chart timeframe share the risk of one level. Extra 3 watches the 4-hour chart, so it shares that level with the
-  four Dives: with Extra 3 on, each 4-hour order is a little smaller. Extra 4 shares the 1-hour level with Skim; Extra 2 has its own level. The
-  extras add trades (about 45 % more over the test window) and resting orders, so with them on, the account needs the margin for the extra
-  orders. On a small account leave them off.</li>
-<li><strong>The panel</strong> shows one row per Extra that is on.</li>
-<li><strong>What the tests showed (backtests, MetaTrader 5 Strategy Tester, real ticks, 100 % history quality, 10,000 start, Medium risk, Recommended
-  settings, extras 2 + 3 + 4 off / on):</strong></li>
+<li><strong>How they trade.</strong> The same way as the other hunters: a stop order a small, fixed percentage of price inside the level, with the fixed
+  stop loss and take profit in the gold price (2.00 and 15.00 per 0.01 lot), and the same guards (quiet-market gate, news, spread,
+  weekend). Trades carry the comment <code>KF A2</code> (Dart), <code>KF A3</code> (Plunge) or <code>KF A4</code> (Hover) and the same magic number as the other hunters.</li>
+<li><strong>Managed like Skim</strong> means: the Grip, and on a high-volatility day (chapter 7.0) the trade rides, with the Safety lock (chapter 7.12).</li>
+<li><strong>Indicator checks built in.</strong> Dart and Plunge place an order only while price is no more than 0.7 of the 4-hour ATR on the wrong side
+  of the 4-hour EMA50. Plunge also keeps its eight-bar 4-hour direction check. These checks cannot be edited in the Inputs tab.</li>
+<li><strong>Size.</strong> Hunters on the same chart timeframe share the risk of one level. Plunge watches the 4-hour chart, so it shares that level with
+  the four Dives: with Plunge on, each 4-hour order is a little smaller. Hover shares the 1-hour level with Skim; Dart has its own level.
+  They add trades and resting orders, so with them on, the account needs the margin for the extra orders. On a small account leave them off.</li>
+<li><strong>The panel</strong> shows one row per hunter that is on.</li>
+<li><strong>Every hunter on its own</strong> (backtest, MetaTrader 5 Strategy Tester, real ticks, 100 % history quality, Kingfisher 1.25, every hunter on, fixed 0.01 lot, BlackBull and VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11; each hunter's own trades):</li>
 </ul>
 <table>
 <thead>
 <tr>
-<th>Feed and period</th>
-<th>Profit factor</th>
-<th>Worst equity drawdown</th>
+<th>Hunter</th>
+<th>Profit factor (BlackBull / VT / IC)</th>
+<th>Worst closed dip, USD per 0.01 lot</th>
 </tr>
 </thead>
 <tbody>
 <tr>
-<td>BlackBull, 2022-11 to 2026-11</td>
-<td>2.26 / 2.57</td>
-<td>8.7 % / 5.8 %</td>
+<td>Dive 1</td>
+<td>3.35 / 5.26 / 5.28</td>
+<td>15 / 16 / 13</td>
 </tr>
 <tr>
-<td>IC Markets, 2026-04 to 2026-11 (its real ticks begin 2026-04)</td>
-<td>2.25 / 2.52</td>
-<td>10.9 % / 11.0 %</td>
+<td>Dive 2</td>
+<td>3.45 / 4.86 / 4.87</td>
+<td>22 / 16 / 10</td>
 </tr>
 <tr>
-<td>VT Markets, 2024-02 to 2026-11</td>
-<td>2.86 / 3.24</td>
-<td>7.4 % / 3.4 %</td>
+<td>Dive 3</td>
+<td>2.56 / 4.58 / 3.16</td>
+<td>27 / 15 / 14</td>
+</tr>
+<tr>
+<td>Dive 4</td>
+<td>4.36 / 5.04 / 4.92</td>
+<td>15 / 14 / 10</td>
+</tr>
+<tr>
+<td>Skim</td>
+<td>1.77 / 2.14 / 1.81</td>
+<td>42 / 41 / 33</td>
+</tr>
+<tr>
+<td>Daybreak</td>
+<td>1.90 / 2.30 / 2.54</td>
+<td>25 / 13 / 18</td>
+</tr>
+<tr>
+<td>Core B</td>
+<td>2.65 / 2.55 / 4.01</td>
+<td>36 / 36 / 26</td>
+</tr>
+<tr>
+<td>Dart</td>
+<td>2.54 / 2.99 / 2.65</td>
+<td>28 / 23 / 13</td>
+</tr>
+<tr>
+<td>Plunge</td>
+<td>2.75 / 3.62 / 2.60</td>
+<td>13 / 11 / 8</td>
+</tr>
+<tr>
+<td>Hover</td>
+<td>2.79 / 3.61 / 3.57</td>
+<td>20 / 21 / 10</td>
 </tr>
 </tbody>
 </table>
-<p>At a fixed 0.01 lot the profit per unit of closed drawdown was 34.5 / 50.7 (BlackBull), 22.9 / 29.1 (IC Markets) and 43.8 / 59.3 (VT
-  Markets). The three feeds are three brokers' views of the same gold market; they are not independent samples. Nothing here is a live
-  result, and the Extras have not been run live. IC Markets showed no drawdown benefit; the other two did.
-- <strong>Recommended way to try them.</strong> Run them on a demo with your broker first, for weeks, and read the Journal: each Extra prints that it is
-  on at start. The preset <code>presets/KINGFISHER_extras.set</code> is Medium risk with the three Extras on.</p>
-<h3 id="712-since-124-safety-lock-inpsafetylock-off-by-default">7.12 Since 1.24: Safety lock (<code>InpSafetyLock</code>, off by default)</h3>
-<p>A Dive can be well ahead and still turn round into its full stop loss. The Safety lock moves the stop of such a trade into profit, so it
+<p>The three feeds are three brokers' views of the same gold market, not independent samples. Nothing here is a live result.
+- <strong>Recommended way to try them.</strong> Run them on a demo with your broker first, for weeks, and read the Journal: each prints that it is on at
+  start. The preset <code>presets/KINGFISHER_extras.set</code> is Medium risk with all three on.</p>
+<h3 id="712-since-124-safety-lock-inpsafetylock-balanced-by-default-since-125">7.12 Since 1.24: Safety lock (<code>InpSafetyLock</code>, Balanced by default since 1.25)</h3>
+<p>A trade can be well ahead and still turn round into its full stop loss. The Safety lock moves the stop of such a trade into profit, so it
 ends with a small gain instead. It changes the stop at your broker, so it holds if your terminal loses its connection.</p>
 <table>
 <thead>
@@ -1120,72 +1160,72 @@ ends with a small gain instead. It changes the stop at your broker, so it holds 
 </thead>
 <tbody>
 <tr>
-<td>Off (default)</td>
+<td>Off</td>
 <td>none</td>
 <td>-</td>
 <td>-</td>
 </tr>
 <tr>
 <td>Light</td>
-<td>Dives that needed more than 5 seconds from the fill to +1.00</td>
+<td>those that needed more than 5 seconds from the fill to +1.00</td>
 <td>at +2.00</td>
 <td>+1.00</td>
 </tr>
 <tr>
-<td>Balanced</td>
-<td>Dives that needed more than 1 second</td>
+<td><strong>Balanced (default)</strong></td>
+<td>those that needed more than 1 second</td>
 <td>at +1.50</td>
 <td>+0.50</td>
 </tr>
 <tr>
 <td>Strong</td>
-<td>every Dive</td>
+<td>every covered trade</td>
 <td>at +1.50</td>
 <td>+0.50</td>
 </tr>
 </tbody>
 </table>
 <p>All amounts are in US dollars of gold price per 0.01 lot (+1.50 is a move of 1.50 in the gold price). The stop moves once and only ever
-towards profit. It applies to the four Dives while they ride to their target; a trade the Grip manages (including Calm protection) stays
-with the Grip. Skim, Daybreak, Core B and the Extras are not affected.</p>
-<p><strong>What it costs.</strong> Some of the trades it closes early would have gone on to the full target. In backtests (MetaTrader 5 Strategy Tester,
-real ticks, 100 % history quality, 0.01 lot; BlackBull and VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11):</p>
+towards profit. It covers the four Dives, and Skim, Dart and Hover on the days they ride; a trade the Grip manages (including Calm
+protection) stays with the Grip. Daybreak, Core B and Plunge are not affected.</p>
+<p><strong>What it does and costs.</strong> Some of the trades it closes early would have gone on to the full target. (backtest, MetaTrader 5 Strategy Tester, real ticks, 100 % history quality, Kingfisher 1.25 defaults, fixed 0.01 lot, BlackBull and VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11; each row lists
+BlackBull / VT Markets / IC Markets; net profit and dip as a share of the Off setting):</p>
 <table>
 <thead>
 <tr>
-<th>Setting</th>
-<th>Dive trades closing in profit</th>
-<th>Profit kept at a fixed lot</th>
+<th>Safety lock</th>
+<th>Dive and Skim trades closing in profit</th>
+<th>Net profit</th>
+<th>Worst closed dip</th>
+<th>Profit factor</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td>Off</td>
-<td>44 %</td>
-<td>100 %</td>
+<td>45 % / 47 % / 52 %</td>
+<td>100 % / 100 % / 100 %</td>
+<td>100 % / 100 % / 100 %</td>
+<td>2.23 / 2.52 / 2.48</td>
 </tr>
 <tr>
-<td>Light</td>
-<td>52 %</td>
-<td>103 %</td>
-</tr>
-<tr>
-<td>Balanced</td>
-<td>61 %</td>
-<td>100 %</td>
+<td>Balanced (default)</td>
+<td>58 % / 62 % / 63 %</td>
+<td>95 % / 100 % / 100 %</td>
+<td>78 % / 80 % / 95 %</td>
+<td>2.46 / 3.04 / 2.86</td>
 </tr>
 <tr>
 <td>Strong</td>
-<td>74 %</td>
-<td>91 %</td>
+<td>65 % / 67 % / 71 %</td>
+<td>79 % / 89 % / 92 %</td>
+<td>79 % / 86 % / 91 %</td>
+<td>2.45 / 3.13 / 3.20</td>
 </tr>
 </tbody>
 </table>
-<p>At Medium risk, where profits compound, Strong costs more (backtest, MetaTrader 5 Strategy Tester, real ticks, Medium risk, BlackBull and
-VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11): over those periods it ended with between 62 % and 87 % of the profit of the Off
-setting, and its worst equity drawdown was smaller on all three feeds (8.3 to 9.7 % against 10.3 to 10.9 %). Balanced ended between 94 % and
-106 %. The three feeds are three brokers' views of one gold market, the period is short, and nothing here is a live result.</p>
 <ul>
+<li>At Medium risk, where profits compound, Strong gives up noticeably more profit than these fixed-lot shares suggest.</li>
 <li>"Seconds to +1.00" depends on how often your broker sends prices, so Light and Balanced behave a little differently from broker to
   broker. Strong does not depend on it.</li>
 <li>After a restart, a trade that was already open counts as slow.</li>
@@ -1511,21 +1551,21 @@ ticks produces a different, invalid result.</p>
 <td><code>InpAdd2</code></td>
 <td>bool</td>
 <td>false</td>
-<td>Extra 2 - 30-minute level, 30 h patience (opt-in)</td>
+<td>Dart - 30-minute level, 30 h patience, managed like Skim (opt-in)</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
 <td><code>InpAdd3</code></td>
 <td>bool</td>
 <td>false</td>
-<td>Extra 3 - 4-hour level, 15 h patience (opt-in)</td>
+<td>Plunge - 4-hour level, 15 h patience (opt-in)</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
 <td><code>InpAdd4</code></td>
 <td>bool</td>
 <td>false</td>
-<td>Extra 4 - 1-hour level, 60 h patience (opt-in)</td>
+<td>Hover - 1-hour level, 60 h patience, managed like Skim (opt-in)</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
@@ -1580,8 +1620,8 @@ ticks produces a different, invalid result.</p>
 <td>2. Hunters on or off</td>
 <td><code>InpSafetyLock</code></td>
 <td>SafetyLockMode</td>
-<td>SAFE_OFF</td>
-<td>Safety lock - move a winning Dive's stop into profit (per 0.01 lot, USD on gold; 1.24, off)</td>
+<td>SAFE_BALANCED</td>
+<td>Safety lock - move a winning Dive / Skim / Dart / Hover stop into profit (per 0.01 lot, USD on gold)</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
@@ -2326,273 +2366,273 @@ ticks produces a different, invalid result.</p>
 <td>Own exit mode</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2SwingTf</code></td>
 <td>ENUM_TIMEFRAMES</td>
 <td>PERIOD_M30</td>
 <td>Swing timeframe</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2Width</code></td>
 <td>int</td>
 <td>10</td>
 <td>Swing width, bars each side</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2OffBuy</code></td>
 <td>double</td>
 <td>0.0380</td>
 <td>Buy stop inside the level, % of price</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2OffSell</code></td>
 <td>double</td>
 <td>0.0388</td>
 <td>Sell stop inside the level, % of price</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2Stop</code></td>
 <td>double</td>
 <td>2.0</td>
 <td>Stop loss per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2Target</code></td>
 <td>double</td>
 <td>15.0</td>
 <td>Take profit per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2ExpiryH</code></td>
 <td>double</td>
 <td>30</td>
 <td>Order patience, hours (0 = no expiry)</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2CheckTf</code></td>
 <td>ENUM_TIMEFRAMES</td>
 <td>PERIOD_H1</td>
 <td>Re-check the level at each close of</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2Lookback</code></td>
 <td>int</td>
 <td>144</td>
 <td>Swing search depth, bars</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2RiskWeight</code></td>
 <td>double</td>
 <td>1.0</td>
 <td>Risk weight, x a full share (0 = minimum lot)</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2GateStopAtr</code></td>
 <td>double</td>
 <td>0.0</td>
 <td>Own quiet gate, x ATR (0 = global)</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2GateActivity</code></td>
 <td>double</td>
 <td>0.0</td>
 <td>Own activity gate (0 = off)</td>
 </tr>
 <tr>
-<td>12b. Extra 2 - 30-minute level, 30 h patience [Custom]</td>
+<td>12b. Dart - 30-minute level, 30 h patience [Custom]</td>
 <td><code>InpA2Exit</code></td>
 <td>HunterExit</td>
 <td>HEXIT_GRIP_ALL</td>
 <td>Own exit mode</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3SwingTf</code></td>
 <td>ENUM_TIMEFRAMES</td>
 <td>PERIOD_H4</td>
 <td>Swing timeframe</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3Width</code></td>
 <td>int</td>
 <td>2</td>
 <td>Swing width, bars each side</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3OffBuy</code></td>
 <td>double</td>
 <td>-0.0191</td>
 <td>Buy stop inside the level, % of price</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3OffSell</code></td>
 <td>double</td>
 <td>0.0581</td>
 <td>Sell stop inside the level, % of price</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3Stop</code></td>
 <td>double</td>
 <td>2.0</td>
 <td>Stop loss per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3Target</code></td>
 <td>double</td>
 <td>15.0</td>
 <td>Take profit per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3ExpiryH</code></td>
 <td>double</td>
 <td>15</td>
 <td>Order patience, hours (0 = no expiry)</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3CheckTf</code></td>
 <td>ENUM_TIMEFRAMES</td>
 <td>PERIOD_H1</td>
 <td>Re-check the level at each close of</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3Lookback</code></td>
 <td>int</td>
 <td>48</td>
 <td>Swing search depth, bars</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3RiskWeight</code></td>
 <td>double</td>
 <td>1.0</td>
 <td>Risk weight, x a full share (0 = minimum lot)</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3GateStopAtr</code></td>
 <td>double</td>
 <td>0.0</td>
 <td>Own quiet gate, x ATR (0 = global)</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3GateActivity</code></td>
 <td>double</td>
 <td>0.0</td>
 <td>Own activity gate (0 = off)</td>
 </tr>
 <tr>
-<td>12c. Extra 3 - 4-hour level, 15 h patience [Custom]</td>
+<td>12c. Plunge - 4-hour level, 15 h patience [Custom]</td>
 <td><code>InpA3Exit</code></td>
 <td>HunterExit</td>
 <td>HEXIT_GRIP_ALL</td>
 <td>Own exit mode</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4SwingTf</code></td>
 <td>ENUM_TIMEFRAMES</td>
 <td>PERIOD_H1</td>
 <td>Swing timeframe</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4Width</code></td>
 <td>int</td>
 <td>8</td>
 <td>Swing width, bars each side</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4OffBuy</code></td>
 <td>double</td>
 <td>0.0570</td>
 <td>Buy stop inside the level, % of price</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4OffSell</code></td>
 <td>double</td>
 <td>0.0578</td>
 <td>Sell stop inside the level, % of price</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4Stop</code></td>
 <td>double</td>
 <td>2.0</td>
 <td>Stop loss per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4Target</code></td>
 <td>double</td>
 <td>15.0</td>
 <td>Take profit per 0.01 lot, USD on gold (any account)</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4ExpiryH</code></td>
 <td>double</td>
 <td>60</td>
 <td>Order patience, hours (0 = no expiry)</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4CheckTf</code></td>
 <td>ENUM_TIMEFRAMES</td>
 <td>PERIOD_H1</td>
 <td>Re-check the level at each close of</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4Lookback</code></td>
 <td>int</td>
 <td>120</td>
 <td>Swing search depth, bars</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4RiskWeight</code></td>
 <td>double</td>
 <td>1.0</td>
 <td>Risk weight, x a full share (0 = minimum lot)</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4GateStopAtr</code></td>
 <td>double</td>
 <td>0.0</td>
 <td>Own quiet gate, x ATR (0 = global)</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4GateActivity</code></td>
 <td>double</td>
 <td>0.0</td>
 <td>Own activity gate (0 = off)</td>
 </tr>
 <tr>
-<td>12d. Extra 4 - 1-hour level, 60 h patience [Custom]</td>
+<td>12d. Hover - 1-hour level, 60 h patience [Custom]</td>
 <td><code>InpA4Exit</code></td>
 <td>HunterExit</td>
 <td>HEXIT_GRIP_ALL</td>

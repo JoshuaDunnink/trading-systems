@@ -39,13 +39,46 @@ are removed before the weekend.</p>
 <p>Exit. On the first tick after a fill the EA reads how fast price arrived. A fast fill rides to the take profit. A
 slow fill is managed by the Grip: once 1.00 ahead per 0.01 lot, the trade is closed if it gives back half of its
 best profit, or more than a set share of the 15-minute range, whichever comes first.</p>
-<p>Optional extras (since 1.23, all off). Three more hunters of the same kind can be switched on in the Inputs: a 30-minute swing level, a
-4-hour swing level with a narrower swing, and a 1-hour swing level, each with its own order patience (30, 15 and 60 hours), the Grip exit and
-a built-in check against the 4-hour EMA50. They are off by default, and with all three off the EA places exactly the orders version 1.22
-placed. Backtests with them on, same tester, real ticks, Medium risk, 10,000 start (version 1.23, extras 2 + 3 + 4 off / on): BlackBull
-2022-11 to 2026-11, profit factor 2.26 / 2.57, worst equity drawdown 8.7 % / 5.8 %; IC Markets 2026-04 to 2026-11, 2.25 / 2.52, 10.9 % /
-11.0 %; VT Markets 2024-02 to 2026-11, 2.86 / 3.24, 7.4 % / 3.4 %. They add about 45 % more trades and resting orders, and were not run live.
-These are backtests on three brokers' views of one gold market, not a forecast.</p>
+<p><strong>Safety lock (on by default, Balanced).</strong> A trade that is well ahead gets its stop moved into profit once, so it ends with a small gain
+instead of turning into a full stop loss. It acts on the Dive trades and on the one-hour trades while they ride; Off, Light and Strong are
+the other choices. It closes some trades that would have reached their full target.</p>
+<p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, 100 % history quality, Kingfisher 1.25 defaults, fixed 0.01 lot, BlackBull and VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11; BlackBull / VT Markets / IC Markets.</em></p>
+<table>
+<thead>
+<tr>
+<th>Safety lock</th>
+<th>Dive and Skim trades closing in profit</th>
+<th>Net profit vs Off</th>
+<th>Worst closed dip vs Off</th>
+<th>Profit factor</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Off</td>
+<td>45 % / 47 % / 52 %</td>
+<td>100 % / 100 % / 100 %</td>
+<td>100 % / 100 % / 100 %</td>
+<td>2.23 / 2.52 / 2.48</td>
+</tr>
+<tr>
+<td>Balanced (default)</td>
+<td>58 % / 62 % / 63 %</td>
+<td>95 % / 100 % / 100 %</td>
+<td>78 % / 80 % / 95 %</td>
+<td>2.46 / 3.04 / 2.86</td>
+</tr>
+<tr>
+<td>Strong</td>
+<td>65 % / 67 % / 71 %</td>
+<td>79 % / 89 % / 92 %</td>
+<td>79 % / 86 % / 91 %</td>
+<td>2.45 / 3.13 / 3.20</td>
+</tr>
+</tbody>
+</table>
+<p>Optional hunters, all off: <strong>Dart</strong> (30-minute swing level), <strong>Plunge</strong> (4-hour swing level with a narrower swing) and <strong>Hover</strong> (1-hour swing
+level). They add trades and resting orders and have not been run live.</p>
 <p>What the EA does not do: no grid, no martingale, no averaging down, no position without a stop loss, no news
 trading logic, no files, no DLLs, no external resources.</p>
 <p>Settings. One short section, "Start here", is the whole setup: Account type (Personal, Prop firm 2-step, Prop firm
