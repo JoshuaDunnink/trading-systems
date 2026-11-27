@@ -1,0 +1,114 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Egret Gold manual - Joshua Dunnink - Trading Systems for MetaTrader 5</title><meta name="description" content="Egret Gold user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<link rel="canonical" href="https://joshuadunnink.github.io/trading-systems/products/egret-gold/manual.html"><meta property="og:type" content="website">
+<meta property="og:title" content="Egret Gold manual - Joshua Dunnink - Trading Systems for MetaTrader 5"><meta property="og:description" content="Egret Gold user manual: installation, the risk setting, every input and troubleshooting for this MetaTrader 5 Expert Advisor.">
+<meta property="og:url" content="https://joshuadunnink.github.io/trading-systems/products/egret-gold/manual.html"><meta property="og:image" content="https://joshuadunnink.github.io/trading-systems/img/egret-gold_hero.jpg"><meta name="twitter:card" content="summary_large_image">
+<link rel="stylesheet" href="../../assets/style.css?v=cd5732a902"></head>
+<body><header><a class="name" href="../../index.html">Joshua Dunnink · Trading Systems</a><nav><a href="../../index.html">Home</a> <a href="../../products.html">Products</a> <a href="../../signal.html">Live signal</a> <a href="../../market.html">Gold market</a> <a href="../../research/index.html">Research</a> <a href="../../pipeline.html">Pipeline</a> <a href="../../about.html">About</a> <a href="../../risk.html">Risk &amp; privacy</a></nav></header>
+<main>
+<p><a href="index.html">&larr; Egret Gold</a></p><nav class="toc"><strong>Contents</strong><div class="toc">
+<ul>
+<li><a href="#egret-gold-user-manual">Egret Gold - user manual</a><ul>
+<li><a href="#installation">Installation</a></li>
+<li><a href="#inputs">Inputs</a><ul>
+<li><a href="#1-start-here">1. Start here</a></li>
+<li><a href="#2-strategies">2. Strategies</a></li>
+<li><a href="#3-safety">3. Safety</a></li>
+</ul>
+</li>
+<li><a href="#risk-levels">Risk levels</a></li>
+<li><a href="#how-trades-close">How trades close</a></li>
+<li><a href="#troubleshooting">Troubleshooting</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</nav><h1 id="egret-gold-user-manual">Egret Gold - user manual</h1>
+<h2 id="installation">Installation</h2>
+<ol>
+<li>Copy <code>EGRET_GOLD.ex5</code> into <code>MQL5/Experts</code> of your MetaTrader 5 data folder (or install it from the Market).</li>
+<li>Open a gold chart (XAUUSD with any broker suffix), any chart period.</li>
+<li>Drag the EA onto the chart and allow algorithmic trading. No .set file is needed.</li>
+</ol>
+<p>The account must allow hedging, because several strategies may hold positions on gold at once.</p>
+<h2 id="inputs">Inputs</h2>
+<h3 id="1-start-here">1. Start here</h3>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Risk level</td>
+<td>Low</td>
+<td>Low 0.005 lot, Medium 0.01 lot, High 0.02 lot per $1,000 of balance per strategy, or a fixed lot. Below the broker minimum the EA trades the minimum (0.01).</td>
+</tr>
+<tr>
+<td>Lot when Risk = Fixed lot</td>
+<td>0.01</td>
+<td>Used only with the fixed-lot risk level.</td>
+</tr>
+<tr>
+<td>Size as if balance were at most</td>
+<td>0 (off)</td>
+<td>Caps the balance used for sizing.</td>
+</tr>
+<tr>
+<td>Skip entries above this spread</td>
+<td>1.5 USD</td>
+<td>No new trade while the spread is wider.</td>
+</tr>
+</tbody>
+</table>
+<h3 id="2-strategies">2. Strategies</h3>
+<p>Five switches, all on by default: A and B (2-minute RSI dip with a 5- or 15-minute trend), C (34-minute drop inside a 24-hour trend), D (1-minute dip in a strong 5-minute trend), E (2-minute dip above the 200-period average).</p>
+<h3 id="3-safety">3. Safety</h3>
+<table>
+<thead>
+<tr>
+<th>Input</th>
+<th>Default</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Magic number</td>
+<td>88990</td>
+<td>Identifies the EA's own positions.</td>
+</tr>
+<tr>
+<td>Order comment prefix</td>
+<td>EGRET</td>
+<td></td>
+</tr>
+<tr>
+<td>Max total stop risk</td>
+<td>20 %</td>
+<td>Refuses a new trade when the stop losses of all open positions plus the new one would exceed this share of the balance. 0 turns it off.</td>
+</tr>
+</tbody>
+</table>
+<h2 id="risk-levels">Risk levels</h2>
+<p>The figures on the product page use Low. Medium doubles every lot and, with five strategies able to trade at once, its worst drawdown was above 20 % of the balance (backtest, Medium risk, BlackBull and VT Markets, 2025-11-24 to 2026-11-20). Use Medium or High only if you accept deeper dips.</p>
+<h2 id="how-trades-close">How trades close</h2>
+<ul>
+<li>Target: about a quarter of the pullback the entry bought, at least $2.50 per ounce.</li>
+<li>After three hours a trade closes as soon as it is back at break-even.</li>
+<li>After four hours a trade closes as soon as its loss is within $18.40 per ounce.</li>
+<li>Hard stop loss on every trade: $75 per ounce.</li>
+</ul>
+<h2 id="troubleshooting">Troubleshooting</h2>
+<ul>
+<li>No trades for days: normal in quiet gold markets; the EA needs a trend with pullbacks and enough activity.</li>
+<li>"Hedging account required": switch to a hedging account type with your broker.</li>
+</ul>
+</main>
+<footer><p>Trading leveraged products carries a high risk of loss. Every performance figure on this site is a backtest unless it is marked as the live signal. Past results, backtested or live, do not predict future results. Nothing here is financial advice.</p><p>Built and tested by Joshua Dunnink. Products are sold only through the
+<a href="https://www.mql5.com/en/users/joshuadunnink">mql5.com Market</a>.</p></footer>
+</body></html>

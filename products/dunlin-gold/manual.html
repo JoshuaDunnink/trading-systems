@@ -25,15 +25,68 @@
 <ol>
 <li>Copy <code>DUNLIN_GOLD.ex5</code> into <code>MQL5\Experts</code>, restart the terminal or refresh the Navigator. The neural network is inside the file; no other file is needed.</li>
 <li>Open a <strong>gold (XAUUSD)</strong> chart on a <strong>hedging</strong> account. Any chart period works; the EA reads 15-minute candles.</li>
-<li>Drag the EA onto the chart, tick <em>Allow Algo Trading</em>, keep the defaults and press OK.</li>
-<li>The Experts tab prints a line starting "NOVA_LIVE v0.23" if it started correctly. If the account is netting, the EA refuses to start and says why.</li>
+<li>Drag the EA onto the chart, tick <em>Allow Algo Trading</em>, pick a <strong>Risk profile</strong> (Default if unsure, Safe for a small account) and press OK.</li>
+<li>The Experts tab prints a line starting "NOVA_LIVE v0.31" if it started correctly. If the account is netting, the EA refuses to start and says why.</li>
 <li>Run it on a demo account first: the tester results are not a forecast and the live fill path has not been tested.</li>
 </ol>
 <h2 id="2-settings-start-at-the-top">2. Settings: start at the top</h2>
-<ul>
-<li><strong>Lot per $1,000 of balance:</strong> 0.01 by default. This is the only setting you should need. Below $1,000 each trade is the broker minimum lot.</li>
-<li>All other inputs are research settings. Leave them at their defaults.</li>
-</ul>
+<p>Two inputs sit under <strong>Start here</strong>; everything below them is advanced and stays at its default.
+- <strong>Risk profile:</strong> Safe, Default (preset), Risky or Custom.
+- <strong>Lot per $1,000 of balance:</strong> 0.01 by default. Below $1,000 each trade is the broker minimum lot (0.01).</p>
+<p>Backtest, MetaTrader 5 Strategy Tester, real ticks, version 0.31 profiles, BlackBull, IC Markets and VT Markets, 2025-09-01..2026-11-18, per 0.01 lot (Risky: per 0.02 lot):</p>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>What it does</th>
+<th>Trades</th>
+<th>Profit factor</th>
+<th>Worst dip per 0.01 lot</th>
+<th>Worst day per 0.01 lot</th>
+<th>Balance for a 12-month dip under 20 %</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>Safe</strong></td>
+<td>enters only when the network is very sure (0.85), at most 2 positions at once, stop at most $30 per 0.01 lot</td>
+<td>~316</td>
+<td>3.58 - 4.02</td>
+<td>$51</td>
+<td>-$26 to -$30</td>
+<td>$350</td>
+</tr>
+<tr>
+<td><strong>Default</strong></td>
+<td>the validated configuration: entry 0.55, up to 3 positions, stop at most $58 per 0.01 lot</td>
+<td>~745</td>
+<td>2.20 - 2.75</td>
+<td>$75 - $95</td>
+<td>-$51</td>
+<td>$700</td>
+</tr>
+<tr>
+<td><strong>Risky</strong></td>
+<td>the same trades as Default at twice the lot</td>
+<td>~745</td>
+<td>2.20 - 2.75</td>
+<td>$150 - $190</td>
+<td>-$102</td>
+<td>$1,400</td>
+</tr>
+<tr>
+<td><strong>Custom</strong></td>
+<td>uses the advanced inputs (for testing only)</td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<p>Safe earns about half of Default with about half the dips; Risky earns about twice Default with twice the dips. Below $1,000 Risky trades the same 0.01 lot as Default, so it only differs from $1,000 up.
+The EA prints the profile it is running in the Experts tab and on the chart panel. If the balance is below the amount in the last column it prints a warning, and still trades the profile you chose.</p>
 <h2 id="3-what-it-does-in-order">3. What it does, in order</h2>
 <ol>
 <li>Every 15 minutes the neural network reads the last two and a half days of candles.</li>
@@ -46,8 +99,42 @@
 <h2 id="4-how-much-money-do-i-need-minimum-balance">4. How much money do I need? (minimum balance)</h2>
 <ul>
 <li><strong>Trading hours:</strong> entries are made between 03:00 and 15:45 server time.</li>
-<li><strong>Size:</strong> at $1,000 and 0.01 lot per $1,000 one full stop loss is about 6 % of the balance. At 0.02 it is about 11 %.</li>
-<li><strong>Small accounts:</strong> below $1,000 every trade is the 0.01 minimum lot. In 5,000 simulated 12-month paths per broker (backtest, Strategy Tester, real ticks, BlackBull, IC Markets and VT Markets, window 2025-09-01..2026-11-14), the chance of a drawdown above 50 % was 25 % at $150, 7 % at $200, 0.4 % at $300 and 0 from $400, and a margin stop-out at 1:500 was 1.6 % at $150 and 0.08 % at $200. At 1:100 the chance of a stop-out was 23 % at $200 and 0.07 % at $300. Practical minimum: $300 at 1:500 or $400 at 1:100.</li>
+<li><strong>Size of one full stop at $1,000:</strong> Safe about 3 % of the balance, Default about 6 %, Risky about 12 %.</li>
+<li><strong>Balance per profile</strong> (5,000 simulated 12-month paths per broker, built from 5-day blocks of the backtest's daily results; backtest, Strategy Tester, real ticks, BlackBull, IC Markets and VT Markets, 2025-09-01..2026-11-18):</li>
+</ul>
+<table>
+<thead>
+<tr>
+<th>Profile</th>
+<th>12-month dip, 95 % / 99 % of paths</th>
+<th>Dip stays under 20 % (99 %)</th>
+<th>Survival only: no dip above 50 %, no margin stop-out</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Safe</td>
+<td>$53 / $68</td>
+<td>$350</td>
+<td>$200 at 1:500 or 1:100</td>
+</tr>
+<tr>
+<td>Default</td>
+<td>$108 / $139</td>
+<td>$700</td>
+<td>$300 at 1:500, $400 at 1:100</td>
+</tr>
+<tr>
+<td>Risky</td>
+<td>$216 / $278</td>
+<td>$1,400</td>
+<td>$1,000 (below $1,000 it trades as Default)</td>
+</tr>
+</tbody>
+</table>
+<ul>
+<li><strong>Small accounts:</strong> below $1,000 every trade is the 0.01 minimum lot, so a stop takes a larger share of the balance. Safe is the profile for small accounts.</li>
+<li>These figures cover one market period (15 months). Older, rougher gold markets replayed at today's price had deeper losing stretches, so treat them as a floor, not a promise.</li>
 </ul>
 <h2 id="5-requirements">5. Requirements</h2>
 <ul>

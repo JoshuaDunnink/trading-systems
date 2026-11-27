@@ -42,6 +42,7 @@
 <li><a href="#79-since-121-the-daybreak-quiet-day-rule-is-an-input-inpdbquietrule-off-by-default">7.9 Since 1.21: the Daybreak quiet-day rule is an input (InpDbQuietRule, off by default)</a></li>
 <li><a href="#710-since-122-core-b-a-seventh-hunter-on-one-hour-swing-levels-inpcoreb-off-by-default">7.10 Since 1.22: Core B - a seventh hunter on one-hour swing levels (InpCoreB, off by default)</a></li>
 <li><a href="#711-since-123-extras-three-more-level-hunters-inpadd2-inpadd3-inpadd4-all-off-by-default">7.11 Since 1.23: Extras - three more level hunters (InpAdd2, InpAdd3, InpAdd4, all off by default)</a></li>
+<li><a href="#712-since-124-safety-lock-inpsafetylock-off-by-default">7.12 Since 1.24: Safety lock (InpSafetyLock, off by default)</a></li>
 </ul>
 </li>
 <li><a href="#8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</a></li>
@@ -142,7 +143,7 @@ KINGFISHER sizing: on a balance of 10000.00 a Dive order is 0.12 lot (broker min
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
-<td>the five hunters, Rebound (off; ECN only; chapter 7.3), Daybreak (on; low-latency ECN only; chapter 7.6), Calm protection (on; chapter 7.8), Core B (off; chapter 7.10), Extras 2-4 (off; chapter 7.11), buy/sell</td>
+<td>the five hunters, Rebound (off; ECN only; chapter 7.3), Daybreak (on; low-latency ECN only; chapter 7.6), Calm protection (on; chapter 7.8), Core B (off; chapter 7.10), Safety lock (off; chapter 7.12), Extras 2-4 (off; chapter 7.11), buy/sell</td>
 <td>rarely</td>
 </tr>
 <tr>
@@ -1105,6 +1106,92 @@ all three off the EA places exactly the orders 1.22 placed. They work on gold on
   result, and the Extras have not been run live. IC Markets showed no drawdown benefit; the other two did.
 - <strong>Recommended way to try them.</strong> Run them on a demo with your broker first, for weeks, and read the Journal: each Extra prints that it is
   on at start. The preset <code>presets/KINGFISHER_extras.set</code> is Medium risk with the three Extras on.</p>
+<h3 id="712-since-124-safety-lock-inpsafetylock-off-by-default">7.12 Since 1.24: Safety lock (<code>InpSafetyLock</code>, off by default)</h3>
+<p>A Dive can be well ahead and still turn round into its full stop loss. The Safety lock moves the stop of such a trade into profit, so it
+ends with a small gain instead. It changes the stop at your broker, so it holds if your terminal loses its connection.</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Which trades</th>
+<th>When</th>
+<th>Stop moves to</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Off (default)</td>
+<td>none</td>
+<td>-</td>
+<td>-</td>
+</tr>
+<tr>
+<td>Light</td>
+<td>Dives that needed more than 5 seconds from the fill to +1.00</td>
+<td>at +2.00</td>
+<td>+1.00</td>
+</tr>
+<tr>
+<td>Balanced</td>
+<td>Dives that needed more than 1 second</td>
+<td>at +1.50</td>
+<td>+0.50</td>
+</tr>
+<tr>
+<td>Strong</td>
+<td>every Dive</td>
+<td>at +1.50</td>
+<td>+0.50</td>
+</tr>
+</tbody>
+</table>
+<p>All amounts are in US dollars of gold price per 0.01 lot (+1.50 is a move of 1.50 in the gold price). The stop moves once and only ever
+towards profit. It applies to the four Dives while they ride to their target; a trade the Grip manages (including Calm protection) stays
+with the Grip. Skim, Daybreak, Core B and the Extras are not affected.</p>
+<p><strong>What it costs.</strong> Some of the trades it closes early would have gone on to the full target. In backtests (MetaTrader 5 Strategy Tester,
+real ticks, 100 % history quality, 0.01 lot; BlackBull and VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11):</p>
+<table>
+<thead>
+<tr>
+<th>Setting</th>
+<th>Dive trades closing in profit</th>
+<th>Profit kept at a fixed lot</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Off</td>
+<td>44 %</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Light</td>
+<td>52 %</td>
+<td>103 %</td>
+</tr>
+<tr>
+<td>Balanced</td>
+<td>61 %</td>
+<td>100 %</td>
+</tr>
+<tr>
+<td>Strong</td>
+<td>74 %</td>
+<td>91 %</td>
+</tr>
+</tbody>
+</table>
+<p>At Medium risk, where profits compound, Strong costs more (backtest, MetaTrader 5 Strategy Tester, real ticks, Medium risk, BlackBull and
+VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11): over those periods it ended with between 62 % and 87 % of the profit of the Off
+setting, and its worst equity drawdown was smaller on all three feeds (8.3 to 9.7 % against 10.3 to 10.9 %). Balanced ended between 94 % and
+106 %. The three feeds are three brokers' views of one gold market, the period is short, and nothing here is a live result.</p>
+<ul>
+<li>"Seconds to +1.00" depends on how often your broker sends prices, so Light and Balanced behave a little differently from broker to
+  broker. Strong does not depend on it.</li>
+<li>After a restart, a trade that was already open counts as slow.</li>
+<li>If the new stop would sit closer to the price than your broker allows, the EA tries again on the next price.</li>
+<li>The Journal prints one line when a lock is set, and the start-up lines name the active setting.</li>
+</ul>
 <h2 id="8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</h2>
 <p>Same entries, same hit rate on every broker tested; what differs is how far past the 2.00 stop you are filled on a fast move. Measured medians (2026, losers): 2.06, 2.11, 2.17, 2.30 on the four live feeds; the widest feed earned about 25 % less per trade than the tightest. Execution delay of 100–500 ms was tested on the five level hunters and changed their result by at most 1 %; for them it is the broker's quote path, not latency, that costs. Daybreak is different - it enters at market and trails tick by tick (chapter 7.6).</p>
 <p><strong>Spread is the bigger cost, and it is visible before you trade.</strong> KINGFISHER's stop is a fixed 2.00 per 0.01 lot, so
@@ -1438,7 +1525,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpAdd4</code></td>
 <td>bool</td>
 <td>false</td>
-<td>Extra 4 - 1-hour level, 60 h patience (opt-in, the strongest extra)</td>
+<td>Extra 4 - 1-hour level, 60 h patience (opt-in)</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>
@@ -1488,6 +1575,13 @@ ticks produces a different, invalid result.</p>
 <td>bool</td>
 <td>true</td>
 <td>Calm protection - grip the Dive trades while the market is calm (1.20, on by default since 1.22)</td>
+</tr>
+<tr>
+<td>2. Hunters on or off</td>
+<td><code>InpSafetyLock</code></td>
+<td>SafetyLockMode</td>
+<td>SAFE_OFF</td>
+<td>Safety lock - move a winning Dive's stop into profit (per 0.01 lot, USD on gold; 1.24, off)</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>

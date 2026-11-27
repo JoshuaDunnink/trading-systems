@@ -19,9 +19,9 @@
 </ul>
 </div>
 </nav><h1 id="heron-gold-research-note-every-number-names-its-arm-feed-and-window">Heron Gold - research note (every number names its ARM, FEED and WINDOW)</h1>
-<p>All figures: MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit (a 0.01 lot stop risks about 1 % of the balance, like the Medium setting of the other products), fixed 0.01 lot per order, 150 ms execution delay, leverage 1:500, defaults (arm "Defaults, fixed 0.01 lot", version 1.04), window 2025-11-01..2026-10-30.</p>
+<p>All figures: MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit (a 0.01 lot stop risks about 1 % of the balance, like the Medium setting of the other products), fixed 0.01 lot per order, 150 ms execution delay, leverage 1:500, defaults (arm "Defaults, fixed 0.01 lot", version 1.05), window 2025-11-01..2026-10-30.</p>
 <h2 id="what-it-is">What it is</h2>
-<p>The same two parts as Wren Gold (a swing-breakout part that rests a stop order just beyond a confirmed 15-minute swing high or low, locks a small profit once the move starts and trails it; a fixed-dollar scalper that rests stop orders just inside the hourly swing highs and lows, with a stop of a few dollars and a tight trailing stop) plus a calm-market rule: no new orders while gold's average daily range of the last 14 closed days is below $80.</p>
+<p>The same two parts as Wren Gold (a swing-breakout part that rests a stop order just beyond a confirmed 15-minute swing high or low, locks a small profit once the move starts and trails it; a fixed-dollar scalper that rests stop orders just inside the hourly swing highs and lows, with a stop of a few dollars and a tight trailing stop) plus a calm-market rule (no new orders while gold's average daily range of the last 14 closed days is below $80) and a news guard (the scalper rests no order around high-importance US releases).</p>
 <h2 id="result-by-feed">Result by feed</h2>
 <table>
 <thead>
@@ -38,29 +38,29 @@
 <tbody>
 <tr>
 <td><strong>BlackBull</strong> ← claim</td>
-<td>1,256</td>
-<td>4.17</td>
-<td>8.76 %</td>
-<td>343</td>
+<td>1,241</td>
+<td>4.25</td>
+<td>8.45 %</td>
+<td>324</td>
 <td>100 %</td>
-<td>158</td>
+<td>152</td>
 </tr>
 <tr>
 <td>VT Markets ($100 start, same trades at a fixed lot)</td>
-<td>1,235</td>
-<td>4.84</td>
+<td>1,214</td>
+<td>4.97</td>
 <td>8.42 %</td>
-<td>334</td>
+<td>313</td>
 <td>100 %</td>
-<td>220</td>
+<td>209</td>
 </tr>
 </tbody>
 </table>
 <p>The claim row is the BlackBull run at a $1,000 deposit, where a 0.01 lot stop risks about 1 % of the balance, the same risk as the Medium setting of the other products. BlackBull is the weaker of the two feeds at $100. At a fixed lot the trades are the same at any deposit; only the percentages change.</p>
 <h2 id="what-the-curve-looks-like">What the curve looks like</h2>
 <ul>
-<li><strong>A few large winners make a share of the profit.</strong> Without its 17 biggest winners (the top 5 % of 343 trades) the BlackBull run makes $158 of its $1,256. The page shows both curves in dollars, not on a log scale.</li>
-<li><strong>The other trades do not bleed over the year, but they earn more slowly.</strong> On BlackBull their balance first fell by about $74 (7 % of the $1,000 deposit) over the first months and then rose slowly for the rest of the year.</li>
+<li><strong>A few large winners make a share of the profit.</strong> Without its 16 biggest winners (the top 5 % of 324 trades) the BlackBull run makes $152 of its $1,241. The page shows both curves in dollars, not on a log scale.</li>
+<li><strong>The other trades do not bleed over the year, but they earn more slowly.</strong> On BlackBull their balance first fell by about $73 (7 % of the $1,000 deposit) over the first months and then rose slowly for the rest of the year.</li>
 <li><strong>It was tested in one kind of market.</strong> The window is the busy gold market since November 2025. Older markets replayed at today's gold price lost money in some periods and were flat in others, so do not expect it to profit in every market.</li>
 </ul>
 <h2 id="reading-it-honestly">Reading it honestly</h2>
