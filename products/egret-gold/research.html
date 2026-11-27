@@ -24,10 +24,10 @@
 <li><strong>A trend check over the last eight hours.</strong> Dips are taken only when price sits well above (or below) its average of the last four to eight hours. This removed most trades taken against a turning market.</li>
 <li><strong>One filter per strategy.</strong> Each filter was chosen by comparing the trades that worked with the ones that did not, and kept only when it helped in each yearly window tested.</li>
 <li><strong>Time-based exits.</strong> Most trades reach their target within the hour. A trade that has not worked after three to four hours is closed near break-even or at a small loss instead of being held to its stop.</li>
-<li><strong>A stop-risk cap.</strong> With five strategies able to trade together, the Low risk level and a 20 % cap on combined stop risk kept the worst drawdown below 20 % of the balance (backtest, default settings, BlackBull and VT Markets, 2023-11-24 to 2026-11-20).</li>
+<li><strong>At most three positions, and a stop-risk cap.</strong> With five strategies able to trade together, the Low risk level and a 20 % cap on combined stop risk kept the worst drawdown below 20 % of the balance (backtest, default settings, BlackBull and VT Markets, 2023-11-24 to 2026-11-20).</li>
 </ol>
 <h2 id="backtests-at-default-settings">Backtests at default settings</h2>
-<p>MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit, version 1.12 defaults (no .set), 150 ms delay.</p>
+<p>MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit, version 1.13 defaults (no .set), 150 ms delay.</p>
 <table>
 <thead>
 <tr>
@@ -43,34 +43,34 @@
 <tr>
 <td>VT Markets</td>
 <td>2025-11-24 to 2026-11-20</td>
-<td>2,010</td>
-<td>2.75</td>
-<td>490</td>
-<td>16.76 %</td>
+<td>1,984</td>
+<td>3.05</td>
+<td>438</td>
+<td>12.74 %</td>
 </tr>
 <tr>
 <td>BlackBull</td>
 <td>2025-11-24 to 2026-11-20</td>
-<td>2,155</td>
-<td>3.24</td>
-<td>481</td>
-<td>12.56 %</td>
+<td>2,156</td>
+<td>3.76</td>
+<td>433</td>
+<td>8.73 %</td>
 </tr>
 <tr>
 <td>BlackBull</td>
 <td>2024-11-24 to 2025-11-23</td>
-<td>606</td>
-<td>2.64</td>
-<td>242</td>
-<td>10.60 %</td>
+<td>604</td>
+<td>2.86</td>
+<td>221</td>
+<td>12.42 %</td>
 </tr>
 <tr>
 <td>BlackBull</td>
 <td>2023-11-24 to 2024-11-22</td>
-<td>83</td>
-<td>2.81</td>
-<td>48</td>
-<td>3.15 %</td>
+<td>79</td>
+<td>3.15</td>
+<td>43</td>
+<td>1.95 %</td>
 </tr>
 </tbody>
 </table>
