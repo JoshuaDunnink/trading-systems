@@ -17,17 +17,17 @@
 </ul>
 </div>
 </nav><h1 id="how-egret-gold-was-built">How Egret Gold was built</h1>
-<p>Egret Gold is our own version of a working idea: in a trending gold market, short dips against the trend tend to be bought back quickly. Five strategies look for that dip on different chart periods. They differ only in the period they read and in one filter each.</p>
+<p>Egret Gold is our own version of a working idea: in a trending gold market, short dips against the trend tend to be bought back quickly. Several strategies look for that dip on different chart periods. They differ only in the period they read and in one filter each.</p>
 <h2 id="the-design-decisions">The design decisions</h2>
 <ol>
-<li><strong>One template for five strategies.</strong> A fast RSI dip on a short period, an EMA trend on a longer one, a minimum activity in dollars. Measured on real ticks across three years of gold.</li>
+<li><strong>One template for every strategy.</strong> A fast RSI dip on a short period, an EMA trend on a longer one, a minimum activity in dollars. Measured on real ticks across three years of gold.</li>
 <li><strong>A trend check over the last eight hours.</strong> Dips are taken only when price sits well above (or below) its average of the last four to eight hours. This removed most trades taken against a turning market.</li>
 <li><strong>One filter per strategy.</strong> Each filter was chosen by comparing the trades that worked with the ones that did not, and kept only when it helped in each yearly window tested.</li>
 <li><strong>Time-based exits.</strong> Most trades reach their target within the hour. A trade that has not worked after three to four hours is closed near break-even or at a small loss instead of being held to its stop.</li>
-<li><strong>At most three positions, and a stop-risk cap.</strong> With five strategies able to trade together, the Low risk level and a 20 % cap on combined stop risk kept the worst drawdown below 20 % of the balance (backtest, default settings, BlackBull and VT Markets, 2023-11-24 to 2026-11-20).</li>
+<li><strong>Fewer, cleaner trades.</strong> Two of the five strategies took many more trades for a lower profit factor and carried the only full stop-outs; they are off by default. With one position per direction the worst single trade stayed near $20 per 0.01 lot (backtest, default settings, BlackBull and VT Markets, 2023-11-24 to 2026-11-20).</li>
 </ol>
 <h2 id="backtests-at-default-settings">Backtests at default settings</h2>
-<p>MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit, version 1.14 defaults (no .set), 150 ms delay.</p>
+<p>MetaTrader 5 Strategy Tester, real ticks, $1,000 deposit, version 1.15 defaults (no .set), 150 ms delay.</p>
 <table>
 <thead>
 <tr>
@@ -43,34 +43,34 @@
 <tr>
 <td>VT Markets</td>
 <td>2025-11-24 to 2026-11-20</td>
-<td>2,086</td>
-<td>4.23</td>
-<td>393</td>
-<td>8.20 %</td>
+<td>662</td>
+<td>5.04</td>
+<td>96</td>
+<td>6.79 %</td>
 </tr>
 <tr>
 <td>BlackBull</td>
 <td>2025-11-24 to 2026-11-20</td>
-<td>2,095</td>
-<td>4.57</td>
-<td>386</td>
-<td>8.62 %</td>
+<td>689</td>
+<td>5.69</td>
+<td>99</td>
+<td>4.10 %</td>
 </tr>
 <tr>
 <td>BlackBull</td>
 <td>2024-11-24 to 2025-11-23</td>
-<td>631</td>
-<td>3.44</td>
-<td>206</td>
-<td>10.32 %</td>
+<td>186</td>
+<td>3.50</td>
+<td>53</td>
+<td>5.03 %</td>
 </tr>
 <tr>
 <td>BlackBull</td>
 <td>2023-11-24 to 2024-11-22</td>
-<td>79</td>
-<td>3.15</td>
-<td>43</td>
-<td>1.95 %</td>
+<td>27</td>
+<td>8.52</td>
+<td>8</td>
+<td>0.57 %</td>
 </tr>
 </tbody>
 </table>

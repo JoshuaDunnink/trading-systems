@@ -66,7 +66,7 @@
 </tbody>
 </table>
 <h3 id="2-strategies">2. Strategies</h3>
-<p>Five switches, all on by default: A and B (2-minute RSI dip with a 5- or 15-minute trend), C (34-minute drop inside a 24-hour trend), D (1-minute dip in a strong 5-minute trend), E (2-minute dip above the 200-period average).</p>
+<p>Five switches: A and B (2-minute RSI dip with a 5- or 15-minute trend) and E (2-minute dip above the 200-period average) are on by default; C (34-minute drop inside a 24-hour trend) and D (1-minute dip in a strong 5-minute trend) are off by default.</p>
 <h3 id="3-safety">3. Safety</h3>
 <table>
 <thead>
@@ -88,21 +88,26 @@
 <td></td>
 </tr>
 <tr>
+<td>Max open positions per direction</td>
+<td>1</td>
+<td>At most this many buys (and this many sells) open at once across all strategies. 0 turns it off.</td>
+</tr>
+<tr>
 <td>Max total stop risk</td>
-<td>20 %</td>
-<td>Refuses a new trade when the stop losses of all open positions plus the new one would exceed this share of the balance. 0 turns it off.</td>
+<td>0 (off)</td>
+<td>Refuses a new trade when the stop losses of all open positions plus the new one would exceed this share of the balance.</td>
 </tr>
 </tbody>
 </table>
 <h2 id="risk-levels">Risk levels</h2>
-<p>The figures on the product page use Low. Medium doubles every lot and, with five strategies able to trade at once, its worst drawdown was above 20 % of the balance (backtest, Medium risk, BlackBull and VT Markets, 2025-11-24 to 2026-11-20). Use Medium or High only if you accept deeper dips.</p>
+<p>The figures on the product page use Low. Medium doubles every lot once the balance is above $1,000 and High doubles it again; dips grow in proportion. Use Medium or High only if you accept deeper dips.</p>
 <h2 id="how-trades-close">How trades close</h2>
 <ul>
 <li>Target: about a quarter of the pullback the entry bought, at least $2.50 per ounce.</li>
 <li>After three hours a trade closes as soon as it is back at break-even.</li>
 <li>After four hours a trade closes as soon as its loss is within $18.40 per ounce.</li>
 <li>Hard stop loss on every trade: $75 per ounce.</li>
-<li>At most three positions open at once across all five strategies.</li>
+<li>By default at most one buy and one sell open at once.</li>
 </ul>
 <h2 id="troubleshooting">Troubleshooting</h2>
 <ul>
