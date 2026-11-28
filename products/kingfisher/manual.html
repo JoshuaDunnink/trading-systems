@@ -42,7 +42,7 @@
 <li><a href="#79-since-121-the-daybreak-quiet-day-rule-is-an-input-inpdbquietrule-off-by-default">7.9 Since 1.21: the Daybreak quiet-day rule is an input (InpDbQuietRule, off by default)</a></li>
 <li><a href="#710-since-122-core-b-a-seventh-hunter-on-one-hour-swing-levels-inpcoreb-off-by-default">7.10 Since 1.22: Core B - a seventh hunter on one-hour swing levels (InpCoreB, off by default)</a></li>
 <li><a href="#711-since-123-dart-plunge-and-hover-three-more-level-hunters-all-off-by-default">7.11 Since 1.23: Dart, Plunge and Hover - three more level hunters (all off by default)</a></li>
-<li><a href="#712-since-124-safety-lock-inpsafetylock-balanced-by-default-since-125">7.12 Since 1.24: Safety lock (InpSafetyLock, Balanced by default since 1.25)</a></li>
+<li><a href="#712-since-124-safety-lock-inpsafetylock-balanced-by-default-since-125-daybreak-and-core-b-since-126">7.12 Since 1.24: Safety lock (InpSafetyLock, Balanced by default since 1.25, Daybreak and Core B since 1.26)</a></li>
 </ul>
 </li>
 <li><a href="#8-execution-quality-what-your-broker-adds">8. Execution quality — what your broker adds</a></li>
@@ -573,7 +573,7 @@ properties if you do not see them). Turning <code>InpDrawTrades</code> off chang
 </thead>
 <tbody>
 <tr>
-<td><code>Kingfisher</code>, with <code>v1.25</code> at the right edge of the same line (since 1.20)</td>
+<td><code>Kingfisher</code>, with <code>v1.27</code> at the right edge of the same line (since 1.20)</td>
 <td>the product and its version; hover for symbol, risk, magic and the Calm protection state</td>
 </tr>
 <tr>
@@ -1029,6 +1029,13 @@ EA places exactly the orders it placed without it. It works on gold only.</p>
   your Risk level. It only matters while Core B is on.</li>
 <li><strong>Guards.</strong> The pause switch and the news, spread and spike guards hold new Core B entries as they hold the others.</li>
 <li><strong>Works with every Strategy settings choice.</strong> Recommended, Classic and Custom all honour the switch.</li>
+<li><strong>Weekend (since 1.27).</strong> With the weekend shield on, Core B opens no trade from the Friday cut-off to the end of the weekend. Unlike the
+  other hunters it may trade again early on Monday.</li>
+<li><strong>Refused orders (since 1.27).</strong> If the broker refuses a stop move or an early close, for example in the first seconds after the market
+  opens, Core B tries again until it succeeds. If price is by then back through the level it wanted to lock, it closes the trade.</li>
+<li><strong>No time limit.</strong> A Core B trade usually ends within minutes but can stay open for hours, and one opened on Friday before the cut-off can
+  stay open over the weekend, where a gap can take it past its stop. If you want nothing held over a weekend, set
+  <code>InpPropFridayCloseHour</code>: it closes every Kingfisher trade at that hour and pauses until Monday.</li>
 <li><strong>Nothing is claimed for it here.</strong> It is an option to test on your own account type and broker before you rely on it; run it on a
   demo first and read the journal line <code>KINGFISHER Core B ON | magic ...</code> to confirm it is active.</li>
 </ul>
@@ -1146,7 +1153,7 @@ EA places exactly the orders it placed without it. It works on gold only.</p>
 <p>The three feeds are three brokers' views of the same gold market, not independent samples. Nothing here is a live result.
 - <strong>Recommended way to try them.</strong> Run them on a demo with your broker first, for weeks, and read the Journal: each prints that it is on at
   start. The preset <code>presets/KINGFISHER_extras.set</code> is Medium risk with all three on.</p>
-<h3 id="712-since-124-safety-lock-inpsafetylock-balanced-by-default-since-125">7.12 Since 1.24: Safety lock (<code>InpSafetyLock</code>, Balanced by default since 1.25)</h3>
+<h3 id="712-since-124-safety-lock-inpsafetylock-balanced-by-default-since-125-daybreak-and-core-b-since-126">7.12 Since 1.24: Safety lock (<code>InpSafetyLock</code>, Balanced by default since 1.25, Daybreak and Core B since 1.26)</h3>
 <p>A trade can be well ahead and still turn round into its full stop loss. The Safety lock moves the stop of such a trade into profit, so it
 ends with a small gain instead. It changes the stop at your broker, so it holds if your terminal loses its connection.</p>
 <table>
@@ -1187,7 +1194,10 @@ ends with a small gain instead. It changes the stop at your broker, so it holds 
 </table>
 <p>All amounts are in US dollars of gold price per 0.01 lot (+1.50 is a move of 1.50 in the gold price). The stop moves once and only ever
 towards profit. It covers the four Dives, and Skim, Dart and Hover on the days they ride; a trade the Grip manages (including Calm
-protection) stays with the Grip. Daybreak, Core B and Plunge are not affected.</p>
+protection) stays with the Grip. Since 1.26 it also covers Daybreak and Core B. Plunge is not affected.</p>
+<p>On <strong>Daybreak</strong> the lock changed at most one trade per test window, because Daybreak's own trail already does this work. On <strong>Core B</strong>
+(off by default) it matters (backtest, MetaTrader 5 Strategy Tester, real ticks, 100 % history quality, Kingfisher 1.26 with Core B on, fixed 0.01 lot, BlackBull and VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11; Core B's own trades; BlackBull / VT Markets / IC Markets): trades closing in profit go from 76 % / 75 % / 85 %
+to 85 % / 84 % / 92 %, net profit is 71 % / 78 % / 87 % of what it was with the lock off, and the worst closed dip is 82 % / 67 % / 59 % of it.</p>
 <p><strong>What it does and costs.</strong> Some of the trades it closes early would have gone on to the full target. (backtest, MetaTrader 5 Strategy Tester, real ticks, 100 % history quality, Kingfisher 1.25 defaults, fixed 0.01 lot, BlackBull and VT Markets 2025-01 to 2026-11, IC Markets 2026-04 to 2026-11; each row lists
 BlackBull / VT Markets / IC Markets; net profit and dip as a share of the Off setting):</p>
 <table>
@@ -1621,7 +1631,7 @@ ticks produces a different, invalid result.</p>
 <td><code>InpSafetyLock</code></td>
 <td>SafetyLockMode</td>
 <td>SAFE_BALANCED</td>
-<td>Safety lock - move a winning Dive / Skim / Dart / Hover stop into profit (per 0.01 lot, USD on gold)</td>
+<td>Safety lock - move a winning trade's stop into profit: Dive, Skim, Dart, Hover, Daybreak, Core B (per 0.01 lot, USD on gold)</td>
 </tr>
 <tr>
 <td>2. Hunters on or off</td>

@@ -34,6 +34,7 @@
 <li><a href="#11-november-2026-version-125-the-safety-lock">11. November 2026: version 1.25, the Safety lock</a><ul>
 <li><a href="#111-every-hunter-on-its-own">11.1 Every hunter on its own</a></li>
 <li><a href="#112-limits-of-this-round">11.2 Limits of this round</a></li>
+<li><a href="#113-versions-126-and-127-the-lock-on-daybreak-and-core-b-and-two-core-b-faults">11.3 Versions 1.26 and 1.27: the lock on Daybreak and Core B, and two Core B faults</a></li>
 </ul>
 </li>
 <li><a href="#12-limits">12. Limits</a></li>
@@ -44,7 +45,7 @@
 </div>
 </nav><h1 id="kingfisher-research-note">Kingfisher — Research Note</h1>
 <p><em>What the machine does, what was changed on the way to the shipped version, and what each change did — with the tests that decided it.</em></p>
-<p>Versions 1.05 – 1.25 · September – November 2026</p>
+<p>Versions 1.05 – 1.27 · September – November 2026</p>
 <p>All figures in this note are Strategy Tester runs on real broker ticks at 100 % history quality. They are backtests, not a record of live trading. Every number names the build, the broker feed and the window it came from; a number that cannot be traced that way does not appear here.</p>
 <hr />
 <h2 id="0-the-result-in-one-table">0. The result in one table</h2>
@@ -541,6 +542,14 @@ barely traded at all: the quiet-market gate keeps them out.</p>
 <h3 id="112-limits-of-this-round">11.2 Limits of this round</h3>
 <p>The three feeds are three brokers' views of one gold price, the windows are short, IC Markets' real ticks begin in 2026-04, and none of this
 has been run live. The one-second rule was found after looking at the data and depends on how often a broker sends prices.</p>
+<h3 id="113-versions-126-and-127-the-lock-on-daybreak-and-core-b-and-two-core-b-faults">11.3 Versions 1.26 and 1.27: the lock on Daybreak and Core B, and two Core B faults</h3>
+<p><strong>The lock on the two other hunters (1.26).</strong> On Daybreak it makes almost no difference, because Daybreak's own trail already protects a
+winning trade. On Core B, which is off by default, it gives up some profit for a shallower dip and fewer large losses.</p>
+<p><strong>Two faults found by looking at one trade (1.27).</strong> A Core B trade had stayed open over a weekend and ended at its full stop although the
+market had opened on Monday well in its favour. It had been opened late on Friday, after the cut-off the other hunters obey; and at the
+Monday open the broker refused the stop move for some seconds, after which the EA did not try again. Both are fixed: Core B opens nothing
+from Friday's cut-off through the weekend, and it keeps trying until a refused order goes through. With Core B off, as shipped, nothing
+changes. Core B still has no time limit, so a trade opened earlier on Friday can cross a weekend.</p>
 <hr />
 <h2 id="12-limits">12. Limits</h2>
 <p><em>Backtest, MetaTrader 5 Strategy Tester, real ticks, Pepperstone / Vantage / Fusion / BlackBull, windows as in section 0.</em></p>
@@ -647,6 +656,16 @@ has been run live. The one-second rule was found after looking at the data and d
 <td>1.25</td>
 <td>Safety lock, Balanced by default; Dart / Plunge / Hover names; Dart and Hover managed like Skim</td>
 <td>lock off equals 1.23 trade for trade; each setting equals its research build (BlackBull, VT Markets, IC Markets)</td>
+</tr>
+<tr>
+<td>1.26</td>
+<td>Safety lock also on Daybreak and Core B (not released on its own)</td>
+<td>each hunter alone equals its research build (BlackBull, VT Markets, IC Markets)</td>
+</tr>
+<tr>
+<td>1.27</td>
+<td>Core B retries a refused order; no Core B entry from Friday's cut-off through the weekend</td>
+<td>Core B on equals the tested research build (BlackBull, VT Markets, IC Markets); shipped defaults equal 1.26 trade for trade (IC Markets)</td>
 </tr>
 </tbody>
 </table>
